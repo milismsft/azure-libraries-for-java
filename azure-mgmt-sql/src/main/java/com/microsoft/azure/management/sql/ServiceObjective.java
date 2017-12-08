@@ -25,35 +25,30 @@ public interface ServiceObjective extends
         HasResourceGroup,
         HasName,
         HasId {
-    /**
-     * @return name of the SQL Server to which this replication belongs
-     */
-    String sqlServerName();
 
     /**
      * @return the name for the service objective.
      */
-    String serviceObjectiveName();
+    String name();
 
     /**
-     * @return whether the service level objective is the default service
-     * objective.
+     * @return whether the service level objective is the default service objective
      */
     boolean isDefault();
 
     /**
-     * @return whether the service level objective is a system service objective.
+     * @return whether the service level objective is a system service objective
      */
     boolean isSystem();
 
     /**
-     * @return the description for the service level objective.
+     * @return whether the service level objective is enabled
      */
-    String description();
+    boolean isEnabled();
 
     /**
-     * @return whether the service level objective is enabled.
+     * @return the description for the service level objective
      */
-    boolean enabled();
+    String description();
 }
 

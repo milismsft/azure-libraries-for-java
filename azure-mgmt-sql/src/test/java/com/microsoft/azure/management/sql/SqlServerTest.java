@@ -7,6 +7,7 @@
 package com.microsoft.azure.management.sql;
 
 import com.microsoft.azure.management.resources.core.TestBase;
+import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.resources.implementation.ResourceManager;
 import com.microsoft.azure.management.sql.implementation.SqlServerManager;
 import com.microsoft.rest.RestClient;
@@ -31,7 +32,7 @@ public abstract class SqlServerTest extends TestBase {
 
     @Override
     protected void initializeClients(RestClient restClient, String defaultSubscription, String domain) {
-        RG_NAME = generateRandomResourceName("javasqlrg", 20);
+        RG_NAME = generateRandomResourceName("rgsql", 20);
         SQL_SERVER_NAME = generateRandomResourceName("javasqlserver", 20);
 
         resourceManager = ResourceManager
@@ -44,6 +45,7 @@ public abstract class SqlServerTest extends TestBase {
 
     @Override
     protected void cleanUpResources() {
+        SdkContext.sleep(1000);
         resourceManager.resourceGroups().beginDeleteByName(RG_NAME);
     }
 }

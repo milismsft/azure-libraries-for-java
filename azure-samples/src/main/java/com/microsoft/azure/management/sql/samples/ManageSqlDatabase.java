@@ -12,9 +12,8 @@ import com.microsoft.azure.credentials.ApplicationTokenCredentials;
 import com.microsoft.azure.management.Azure;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.samples.Utils;
-import com.microsoft.azure.management.sql.DatabaseEditions;
+import com.microsoft.azure.management.sql.DatabaseEdition;
 import com.microsoft.azure.management.sql.ServiceObjectiveName;
-import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.serializer.AzureJacksonAdapter;
@@ -53,67 +52,68 @@ public final class ManageSqlDatabase {
         final String databaseName = "mydatabase";
         try {
 
-            // ============================================================
-            // Create a SQL Server, with 2 firewall rules.
-            SqlServer sqlServer = azure.sqlServers().define(sqlServerName)
-                    .withRegion(Region.US_EAST)
-                    .withNewResourceGroup(rgName)
-                    .withAdministratorLogin(administratorLogin)
-                    .withAdministratorPassword(administratorPassword)
-                    .withNewFirewallRule(firewallRuleIPAddress)
-                    .withNewFirewallRule(firewallRuleStartIPAddress, firewallRuleEndIPAddress)
-                    .create();
+//            // ============================================================
+//            // Create a SQL Server, with 2 firewall rules.
+//            SqlServer sqlServer = azure.sqlServers().define(sqlServerName)
+//                    .withRegion(Region.US_EAST)
+//                    .withNewResourceGroup(rgName)
+//                    .withAdministratorLogin(administratorLogin)
+//                    .withAdministratorPassword(administratorPassword)
+//                    .withNewFirewallRule(firewallRuleIPAddress)
+//                    .withNewFirewallRule(firewallRuleStartIPAddress, firewallRuleEndIPAddress)
+//                    .create();
 
-            Utils.print(sqlServer);
-
-            // ============================================================
-            // Create a Database in SQL server created above.
-            System.out.println("Creating a database");
-
-            SqlDatabase database = sqlServer.databases()
-                    .define(databaseName)
-                    .create();
-            Utils.print(database);
-
-            // ============================================================
-            // Update the edition of database.
-            System.out.println("Updating a database");
-            database = database.update()
-                    .withEdition(DatabaseEditions.STANDARD)
-                    .withServiceObjective(ServiceObjectiveName.S3)
-                    .apply();
-            Utils.print(database);
-
-            // ============================================================
-            // List and delete all firewall rules.
-            System.out.println("Listing all firewall rules");
-
-            List<SqlFirewallRule> firewallRules = sqlServer.firewallRules().list();
-            for (SqlFirewallRule firewallRule: firewallRules) {
-                // Print information of the firewall rule.
-                Utils.print(firewallRule);
-
-                // Delete the firewall rule.
-                System.out.println("Deleting a firewall rule");
-                firewallRule.delete();
-            }
-
-            // ============================================================
-            // Add new firewall rules.
-            System.out.println("Creating a firewall rule for SQL Server");
-            SqlFirewallRule firewallRule = sqlServer.firewallRules().define("myFirewallRule")
-                    .withIPAddress("10.10.10.10")
-                    .create();
-
-            Utils.print(firewallRule);
-
-            // Delete the database.
-            System.out.println("Deleting a database");
-            database.delete();
-
-            // Delete the SQL Server.
-            System.out.println("Deleting a Sql Server");
-            azure.sqlServers().deleteById(sqlServer.id());
+            // TODO: add implementation for THIS
+//            Utils.print(sqlServer);
+//
+//            // ============================================================
+//            // Create a Database in SQL server created above.
+//            System.out.println("Creating a database");
+//
+//            SqlDatabase database = sqlServer.databases()
+//                    .define(databaseName)
+//                    .create();
+//            Utils.print(database);
+//
+//            // ============================================================
+//            // Update the edition of database.
+//            System.out.println("Updating a database");
+//            database = database.update()
+//                    .withEdition(DatabaseEditions.STANDARD)
+//                    .withServiceObjective(ServiceObjectiveName.S3)
+//                    .apply();
+//            Utils.print(database);
+//
+//            // ============================================================
+//            // List and delete all firewall rules.
+//            System.out.println("Listing all firewall rules");
+//
+//            List<SqlFirewallRule> firewallRules = sqlServer.firewallRules().list();
+//            for (SqlFirewallRule firewallRule: firewallRules) {
+//                // Print information of the firewall rule.
+//                Utils.print(firewallRule);
+//
+//                // Delete the firewall rule.
+//                System.out.println("Deleting a firewall rule");
+//                firewallRule.delete();
+//            }
+//
+//            // ============================================================
+//            // Add new firewall rules.
+//            System.out.println("Creating a firewall rule for SQL Server");
+//            SqlFirewallRule firewallRule = sqlServer.firewallRules().define("myFirewallRule")
+//                    .withIPAddress("10.10.10.10")
+//                    .create();
+//
+//            Utils.print(firewallRule);
+//
+//            // Delete the database.
+//            System.out.println("Deleting a database");
+//            database.delete();
+//
+//            // Delete the SQL Server.
+//            System.out.println("Deleting a Sql Server");
+//            azure.sqlServers().deleteById(sqlServer.id());
             return true;
         } catch (Exception f) {
             System.out.println(f.getMessage());

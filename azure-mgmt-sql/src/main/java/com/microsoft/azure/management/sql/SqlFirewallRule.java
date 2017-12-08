@@ -5,6 +5,7 @@
  */
  package com.microsoft.azure.management.sql;
 
+import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.IndependentChild;
@@ -13,18 +14,19 @@ import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
-import com.microsoft.azure.management.sql.implementation.ServerFirewallRuleInner;
+import com.microsoft.azure.management.sql.implementation.FirewallRuleInner;
 import com.microsoft.azure.management.sql.implementation.SqlServerManager;
 
 /**
  * An immutable client-side representation of an Azure SQL Server FirewallRule.
  */
 @Fluent
+@Beta(Beta.SinceVersion.V2_0_0)
 public interface SqlFirewallRule extends
         IndependentChild<SqlServerManager>,
         Refreshable<SqlFirewallRule>,
         Updatable<SqlFirewallRule.Update>,
-        HasInner<ServerFirewallRuleInner> {
+        HasInner<FirewallRuleInner> {
 
     /**
      * @return name of the SQL Server to which this firewall rule belongs

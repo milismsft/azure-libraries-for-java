@@ -6,6 +6,7 @@
 
 package com.microsoft.azure.management.sql;
 
+import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.HasId;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.HasManager;
@@ -33,16 +34,12 @@ public interface RecommendedElasticPool extends
         HasManager<SqlServerManager> {
 
     /**
-     * @return name of the SQL Server to which this database belongs
-     */
-    String sqlServerName();
-
-    /**
      * @return the edition of the Azure SQL Recommended Elastic Pool. The
      * ElasticPoolEditions enumeration contains all the valid editions.
      * Possible values include: 'Basic', 'Standard', 'Premium'.
      */
-    ElasticPoolEditions databaseEdition();
+    @Beta(Beta.SinceVersion.V2_0_0)
+    ElasticPoolEdition databaseEdition();
 
     /**
      * @return the DTU for the SQL Azure Recommended Elastic Pool.
@@ -85,28 +82,28 @@ public interface RecommendedElasticPool extends
     double maxObservedStorageMB();
 
     /**
-     * @return the list of Azure SQL Databases in this pool. Expanded property.
-     */
-    List<SqlDatabase> databases();
-
-    /**
-     * Fetches list of databases by making call to Azure.
-     * @return list of the databases in recommended elastic pool
-     */
-    List<SqlDatabase> listDatabases();
-
-    /**
-     * Get a specific database in the recommended database.
-     *
-     * @param databaseName name of the database to be fetched
-     * @return information on the database recommended in recommended elastic pool
-     */
-    SqlDatabase getDatabase(String databaseName);
-
-    /**
      * Fetches list of metrics information by making call to Azure.
      * @return list of the databases in recommended elastic pool
      */
     List<RecommendedElasticPoolMetric> listMetrics();
+
+//    /**
+//     * @return the list of Azure SQL Databases in this pool. Expanded property.
+//     */
+//    List<SqlDatabase> databases();
+//
+//    /**
+//     * Fetches list of databases by making call to Azure.
+//     * @return list of the databases in recommended elastic pool
+//     */
+//    List<SqlDatabase> listDatabases();
+//
+//    /**
+//     * Get a specific database in the recommended database.
+//     *
+//     * @param databaseName name of the database to be fetched
+//     * @return information on the database recommended in recommended elastic pool
+//     */
+//    SqlDatabase getDatabase(String databaseName);
 
 }

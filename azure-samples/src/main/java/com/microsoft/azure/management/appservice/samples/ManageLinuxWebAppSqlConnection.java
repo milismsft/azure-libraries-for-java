@@ -13,7 +13,6 @@ import com.microsoft.azure.management.appservice.WebApp;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.samples.Utils;
-import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.rest.LogLevel;
 import okhttp3.OkHttpClient;
@@ -69,48 +68,49 @@ public final class ManageLinuxWebAppSqlConnection {
             //============================================================
             // Create a sql database for the web app to use
 
-            System.out.println("Creating SQL database " + sqlDbName + "...");
-
-            SqlDatabase db = server.databases().define(sqlDbName).create();
-
-            System.out.println("Created SQL database " + db.name());
-
-            //============================================================
-            // Create a web app with a new app service plan
-
-            System.out.println("Creating web app " + appName + "...");
-
-            WebApp app = azure.webApps().define(appName)
-                    .withRegion(Region.US_WEST)
-                    .withExistingResourceGroup(rgName)
-                    .withNewLinuxPlan(PricingTier.STANDARD_S1)
-                    .withBuiltInImage(RuntimeStack.PHP_5_6)
-                    .defineSourceControl()
-                        .withPublicGitRepository("https://github.com/ProjectNami/projectnami")
-                        .withBranch("master")
-                        .attach()
-                    .withAppSetting("ProjectNami.DBHost", server.fullyQualifiedDomainName())
-                    .withAppSetting("ProjectNami.DBName", db.name())
-                    .withAppSetting("ProjectNami.DBUser", admin)
-                    .withAppSetting("ProjectNami.DBPass", password)
-                    .create();
-
-            System.out.println("Created web app " + app.name());
-            Utils.print(app);
-
-            //============================================================
-            // Allow web app to access the SQL server
-
-            System.out.println("Allowing web app " + appName + " to access SQL server...");
-
-            SqlServer.Update update = server.update();
-            for (String ip : app.outboundIPAddresses()) {
-                update = update.withNewFirewallRule(ip);
-            }
-            server = update.apply();
-
-            System.out.println("Firewall rules added for web app " + appName);
-            Utils.print(server);
+            // TODO: add implementation for THIS
+//            System.out.println("Creating SQL database " + sqlDbName + "...");
+//
+//            SqlDatabase db = server.databases().define(sqlDbName).create();
+//
+//            System.out.println("Created SQL database " + db.name());
+//
+//            //============================================================
+//            // Create a web app with a new app service plan
+//
+//            System.out.println("Creating web app " + appName + "...");
+//
+//            WebApp app = azure.webApps().define(appName)
+//                    .withRegion(Region.US_WEST)
+//                    .withExistingResourceGroup(rgName)
+//                    .withNewLinuxPlan(PricingTier.STANDARD_S1)
+//                    .withBuiltInImage(RuntimeStack.PHP_5_6)
+//                    .defineSourceControl()
+//                        .withPublicGitRepository("https://github.com/ProjectNami/projectnami")
+//                        .withBranch("master")
+//                        .attach()
+//                    .withAppSetting("ProjectNami.DBHost", server.fullyQualifiedDomainName())
+//                    .withAppSetting("ProjectNami.DBName", db.name())
+//                    .withAppSetting("ProjectNami.DBUser", admin)
+//                    .withAppSetting("ProjectNami.DBPass", password)
+//                    .create();
+//
+//            System.out.println("Created web app " + app.name());
+//            Utils.print(app);
+//
+//            //============================================================
+//            // Allow web app to access the SQL server
+//
+//            System.out.println("Allowing web app " + appName + " to access SQL server...");
+//
+//            SqlServer.Update update = server.update();
+//            for (String ip : app.outboundIPAddresses()) {
+//                update = update.withNewFirewallRule(ip);
+//            }
+//            server = update.apply();
+//
+//            System.out.println("Firewall rules added for web app " + appName);
+//            Utils.print(server);
 
             System.out.println("Your WordPress app is ready.");
             System.out.println("Please navigate to http://" + appUrl + " to finish the GUI setup. Press enter to exit.");

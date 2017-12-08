@@ -8,23 +8,22 @@
 
 package com.microsoft.azure.management.sql.implementation;
 
-import com.microsoft.azure.management.sql.RestorePointTypes;
+import com.microsoft.azure.management.sql.RestorePointType;
 import org.joda.time.DateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
-import com.microsoft.azure.Resource;
 
 /**
- * Represents an Azure SQL Database restore point.
+ * A database restore point.
  */
 @JsonFlatten
-public class RestorePointInner extends Resource {
+public class RestorePointInner extends ProxyResourceInner {
     /**
-     * The restore point type of the Azure SQL database restore point. Possible
-     * values include: 'DISCRETE', 'CONTINUOUS'.
+     * The restore point type of the database restore point. Possible values
+     * include: 'DISCRETE', 'CONTINUOUS'.
      */
     @JsonProperty(value = "properties.restorePointType", access = JsonProperty.Access.WRITE_ONLY)
-    private RestorePointTypes restorePointType;
+    private RestorePointType restorePointType;
 
     /**
      * Restore point creation time (ISO8601 format). Populated when
@@ -45,7 +44,7 @@ public class RestorePointInner extends Resource {
      *
      * @return the restorePointType value
      */
-    public RestorePointTypes restorePointType() {
+    public RestorePointType restorePointType() {
         return this.restorePointType;
     }
 

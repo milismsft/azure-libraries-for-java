@@ -8,7 +8,6 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.TopLevelModifiableResourcesImpl;
-import com.microsoft.azure.management.sql.ServerVersion;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.management.sql.SqlServers;
 
@@ -32,7 +31,6 @@ class SqlServersImpl
     @Override
     protected SqlServerImpl wrapModel(String name) {
         ServerInner inner = new ServerInner();
-        inner.withVersion(ServerVersion.ONE_TWO_FULL_STOP_ZERO);
         return new SqlServerImpl(name, inner, this.manager());
     }
 

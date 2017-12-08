@@ -8,36 +8,50 @@
 
 package com.microsoft.azure.management.sql.implementation;
 
-import com.microsoft.azure.management.sql.TransparentDataEncryptionActivityStates;
+import com.microsoft.azure.management.sql.TransparentDataEncryptionActivityStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
-import com.microsoft.azure.management.sql.SqlSubResource;
 
 /**
- * Represents an Azure SQL Database Transparent Data Encryption Scan.
+ * Represents a database transparent data encryption Scan.
  */
 @JsonFlatten
-public class TransparentDataEncryptionActivityInner extends SqlSubResource {
+public class TransparentDataEncryptionActivityInner extends ProxyResourceInner {
     /**
-     * The status of the Azure SQL database. Possible values include:
-     * 'Encrypting', 'Decrypting'.
+     * Resource location.
      */
-    @JsonProperty(value = "properties.status", access = JsonProperty.Access.WRITE_ONLY)
-    private TransparentDataEncryptionActivityStates status;
+    @JsonProperty(value = "location", access = JsonProperty.Access.WRITE_ONLY)
+    private String location;
 
     /**
-     * The percent complete of the transparent data encryption scan for a Azure
-     * SQL Database.
+     * The status of the database. Possible values include: 'Encrypting',
+     * 'Decrypting'.
+     */
+    @JsonProperty(value = "properties.status", access = JsonProperty.Access.WRITE_ONLY)
+    private TransparentDataEncryptionActivityStatus status;
+
+    /**
+     * The percent complete of the transparent data encryption scan for a
+     * database.
      */
     @JsonProperty(value = "properties.percentComplete", access = JsonProperty.Access.WRITE_ONLY)
     private Double percentComplete;
+
+    /**
+     * Get the location value.
+     *
+     * @return the location value
+     */
+    public String location() {
+        return this.location;
+    }
 
     /**
      * Get the status value.
      *
      * @return the status value
      */
-    public TransparentDataEncryptionActivityStates status() {
+    public TransparentDataEncryptionActivityStatus status() {
         return this.status;
     }
 
