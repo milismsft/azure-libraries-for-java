@@ -54,6 +54,7 @@ import com.microsoft.azure.management.compute.WindowsConfiguration;
 import com.microsoft.azure.management.graphrbac.BuiltInRole;
 import com.microsoft.azure.management.graphrbac.implementation.GraphRbacManager;
 import com.microsoft.azure.management.graphrbac.implementation.RoleAssignmentHelper;
+import com.microsoft.azure.management.msi.Identity;
 import com.microsoft.azure.management.network.Network;
 import com.microsoft.azure.management.network.NetworkInterface;
 import com.microsoft.azure.management.network.PublicIPAddress;
@@ -104,8 +105,8 @@ class VirtualMachineImpl
         VirtualMachine.DefinitionManaged,
         VirtualMachine.DefinitionUnmanaged,
         VirtualMachine.Update,
-        VirtualMachine.DefinitionStages.WithLocalIdentityBasedAccessOrCreate,
-        VirtualMachine.UpdateStages.WithLocalIdentityBasedAccessOrUpdate {
+        VirtualMachine.DefinitionStages.WithSystemAssignedIdentityBasedAccessOrCreate,
+        VirtualMachine.UpdateStages.WithSystemAssignedIdentityBasedAccessOrUpdate {
     // Clients
     private final StorageManager storageManager;
     private final NetworkManager networkManager;
@@ -153,7 +154,7 @@ class VirtualMachineImpl
     // To manage boot diagnostics specific operations
     private final BootDiagnosticsHandler bootDiagnosticsHandler;
     // Utility to setup MSI for the virtual machine
-    private VirtualMachineMsiHelper virtualMachineMsiHelper;
+    private VirtualMachineMsiHandler virtualMachineMsiHandler;
     // Reference to the PublicIp creatable that is implicitly created
     private  PublicIPAddress.DefinitionStages.WithCreate implicitPipCreatable;
 
@@ -182,7 +183,7 @@ class VirtualMachineImpl
         this.managedDataDisks = new ManagedDataDiskCollection(this);
         initializeDataDisks();
         this.bootDiagnosticsHandler = new BootDiagnosticsHandler(this);
-        this.virtualMachineMsiHelper = new VirtualMachineMsiHelper(rbacManager, this);
+        this.virtualMachineMsiHandler = new VirtualMachineMsiHandler(rbacManager, this);
     }
 
     // Verbs
@@ -1273,39 +1274,57 @@ class VirtualMachineImpl
     }
 
     @Override
-    public VirtualMachineImpl withLocalManagedServiceIdentity() {
-        this.virtualMachineMsiHelper.withLocalManagedServiceIdentity();
+    public VirtualMachineImpl withSystemAssignedManagedServiceIdentity() {
+            this.virtualMachineMsiHandler.withLocalManagedServiceIdentity();
         return this;
     }
 
     @Override
-    public VirtualMachineImpl withLocalManagedServiceIdentity(int tokenPort) {
-        this.virtualMachineMsiHelper.withLocalManagedServiceIdentity(tokenPort);
+    public VirtualMachineImpl withSystemAssignedManagedServiceIdentity(int tokenPort) {
+        this.virtualMachineMsiHandler.withLocalManagedServiceIdentity(tokenPort);
         return this;
     }
 
 
     @Override
-    public VirtualMachineImpl withLocalIdentityBasedAccessTo(String resourceId, BuiltInRole role) {
-        this.virtualMachineMsiHelper.withAccessTo(resourceId, role);
+    public VirtualMachineImpl withSystemAssignedIdentityBasedAccessTo(String resourceId, BuiltInRole role) {
+        this.virtualMachineMsiHandler.withAccessTo(resourceId, role);
         return this;
     }
 
     @Override
-    public VirtualMachineImpl withLocalIdentityBasedAccessToCurrentResourceGroup(BuiltInRole role) {
-        this.virtualMachineMsiHelper.withAccessToCurrentResourceGroup(role);
+    public VirtualMachineImpl withSystemAssignedIdentityBasedAccessToCurrentResourceGroup(BuiltInRole role) {
+        this.virtualMachineMsiHandler.withAccessToCurrentResourceGroup(role);
         return this;
     }
 
     @Override
-    public VirtualMachineImpl withLocalIdentityBasedAccessTo(String resourceId, String roleDefinitionId) {
-        this.virtualMachineMsiHelper.withAccessTo(resourceId, roleDefinitionId);
+    public VirtualMachineImpl withSystemAssignedIdentityBasedAccessTo(String resourceId, String roleDefinitionId) {
+        this.virtualMachineMsiHandler.withAccessTo(resourceId, roleDefinitionId);
         return this;
     }
 
     @Override
-    public VirtualMachineImpl withLocalIdentityBasedAccessToCurrentResourceGroup(String roleDefinitionId) {
-        this.virtualMachineMsiHelper.withAccessToCurrentResourceGroup(roleDefinitionId);
+    public VirtualMachineImpl withSystemAssignedIdentityBasedAccessToCurrentResourceGroup(String roleDefinitionId) {
+        this.virtualMachineMsiHandler.withAccessToCurrentResourceGroup(roleDefinitionId);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withNewUserAssignedManagedServiceIdentity(Creatable<Identity> creatableIdentity) {
+        this.virtualMachineMsiHandler.withNewExternalManagedServiceIdentity(creatableIdentity);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withExistingUserAssignedManagedServiceIdentity(Identity identity) {
+        this.virtualMachineMsiHandler.withExistingExternalManagedServiceIdentity(identity);
+        return this;
+    }
+
+    @Override
+    public VirtualMachineImpl withoutUserAssignedManagedServiceIdentity(String identityId) {
+        this.virtualMachineMsiHandler.withoutExternalManagedServiceIdentity(identityId);
         return this;
     }
 
@@ -1568,12 +1587,13 @@ class VirtualMachineImpl
 
     @Override
     public boolean isManagedServiceIdentityEnabled() {
-        return this.localManagedServiceIdentityPrincipalId() != null
-                && this.localManagedServiceIdentityTenantId() != null;
+        ResourceIdentityType type = this.managedServiceIdentityType();
+        return type != null
+                && !type.equals(ResourceIdentityType.NONE);
     }
 
     @Override
-    public String localManagedServiceIdentityTenantId() {
+    public String systemAssignedManagedServiceIdentityTenantId() {
         if (this.inner().identity() != null) {
             return this.inner().identity().tenantId();
         }
@@ -1581,7 +1601,7 @@ class VirtualMachineImpl
     }
 
     @Override
-    public String localManagedServiceIdentityPrincipalId() {
+    public String systemAssignedManagedServiceIdentityPrincipalId() {
         if (this.inner().identity() != null) {
             return this.inner().identity().principalId();
         }
@@ -1594,6 +1614,15 @@ class VirtualMachineImpl
             return this.inner().identity().type();
         }
         return null;
+    }
+
+    @Override
+    public Set<String> userAssignedManagedServiceIdentityIds() {
+        if (this.inner().identity() != null && this.inner().identity().identityIds() != null) {
+            return Collections.unmodifiableSet(new HashSet<String>(this.inner().identity().identityIds()));
+
+        }
+        return Collections.unmodifiableSet(new HashSet<String>());
     }
 
     // CreateUpdateTaskGroup.ResourceCreator.beforeGroupCreateOrUpdate implementation
@@ -1643,6 +1672,7 @@ class VirtualMachineImpl
         this.bootDiagnosticsHandler.handleDiagnosticsSettings();
         this.handleNetworkSettings();
         this.handleAvailabilitySettings();
+        this.virtualMachineMsiHandler.handleExternalIdentitySettings();
 
         final VirtualMachineImpl self = this;
         return this.manager().inner().virtualMachines()
@@ -1662,7 +1692,7 @@ class VirtualMachineImpl
     @Override
     public Completable afterPostRunAsync(boolean isGroupFaulted) {
         this.virtualMachineExtensions.clear();
-        this.virtualMachineMsiHelper.clear();
+        this.virtualMachineMsiHandler.clear();
         if (isGroupFaulted) {
             return Completable.complete();
         } else {

@@ -13,6 +13,7 @@ import com.microsoft.azure.management.apigeneration.Method;
 import com.microsoft.azure.management.compute.implementation.ComputeManager;
 import com.microsoft.azure.management.compute.implementation.VirtualMachineInner;
 import com.microsoft.azure.management.graphrbac.BuiltInRole;
+import com.microsoft.azure.management.msi.Identity;
 import com.microsoft.azure.management.network.Network;
 import com.microsoft.azure.management.network.NetworkInterface;
 import com.microsoft.azure.management.network.PublicIPAddress;
@@ -406,24 +407,30 @@ public interface VirtualMachine extends
     boolean isManagedServiceIdentityEnabled();
 
     /**
-     * @return the Local Managed Service Identity specific Active Directory tenant ID assigned to the
-     * virtual machine.
-     */
-    @Beta // TODO Add since version 1.5
-    String localManagedServiceIdentityTenantId();
-
-    /**
-     * @return the Local Managed Service Identity specific Active Directory service principal ID assigned
+     * @return the System Assigned (Local) Managed Service Identity specific Active Directory tenant ID assigned
      * to the virtual machine.
      */
-    @Beta // TODO Add since version 1.5
-    String localManagedServiceIdentityPrincipalId();
+    @Beta(Beta.SinceVersion.V1_5_0)
+    String systemAssignedManagedServiceIdentityTenantId();
+
+    /**
+     * @return the System Assigned (Local) Managed Service Identity specific Active Directory service principal ID
+     * assigned to the virtual machine.
+     */
+    @Beta(Beta.SinceVersion.V1_5_0)
+    String systemAssignedManagedServiceIdentityPrincipalId();
 
     /**
      * @return the type of Managed Service Identity used for the virtual machine.
      */
     @Beta(Beta.SinceVersion.V1_4_0)
     ResourceIdentityType managedServiceIdentityType();
+
+    /**
+     * @return the resource ids of User Assigned Managed Service Identities associated with the virtual machine.
+     */
+    @Beta(Beta.SinceVersion.V1_5_1)
+    Set<String> userAssignedManagedServiceIdentityIds();
 
     // Setters
     //
@@ -1508,79 +1515,104 @@ public interface VirtualMachine extends
         }
 
         /**
-         * The stage of the virtual machine definition allowing to enable Local Managed Service Identity.
+         * The stage of the virtual machine definition allowing to enable System Assigned (Local) Managed Service Identity.
          */
-        @Beta // TODO Add since version 1.5
-        interface WithLocalManagedServiceIdentity {
+        @Beta(Beta.SinceVersion.V1_5_0)
+        interface WithSystemAssignedManagedServiceIdentity {
             /**
-             * Specifies that Local Managed Service Identity needs to be enabled in the virtual machine.
+             * Specifies that System Assigned (Local) Managed Service Identity needs to be enabled in the virtual machine.
              *
              * @return the next stage of the definition
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrCreate withLocalManagedServiceIdentity();
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrCreate withSystemAssignedManagedServiceIdentity();
 
             /**
-             * Specifies that Local Managed Service Identity needs to be enabled in the virtual machine.
+             * Specifies that System Assigned (Local) Managed Service Identity needs to be enabled in the virtual machine.
              *
              * @param tokenPort the port on the virtual machine where access token is available
              * @return the next stage of the definition
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrCreate withLocalManagedServiceIdentity(int tokenPort);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrCreate withSystemAssignedManagedServiceIdentity(int tokenPort);
         }
 
         /**
-         * The stage of the Local Managed Service Identity enabled virtual machine allowing to set access
-         * role for the identity.
+         * The stage of the System Assigned (Local) Managed Service Identity enabled virtual machine allowing to
+         * set access role for the identity.
          */
-        @Beta // TODO Add since version 1.5
-        interface WithLocalIdentityBasedAccessOrCreate extends WithCreate {
+        @Beta(Beta.SinceVersion.V1_5_0)
+        interface WithSystemAssignedIdentityBasedAccessOrCreate extends WithCreate {
             /**
-             * Specifies that virtual machine's local identity should have the given access (described
-             * by the role) on an ARM resource identified by the resource ID. Applications running on
-             * the virtual machine will have the same permission (role) on the ARM resource.
+             * Specifies that virtual machine's system assigned (local) identity should have the given access
+             * (described by the role) on an ARM resource identified by the resource ID. Applications running
+             * on the virtual machine will have the same permission (role) on the ARM resource.
              *
              * @param resourceId the ARM identifier of the resource
              * @param role access role to assigned to the virtual machine's local identity
              * @return the next stage of the definition
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrCreate withLocalIdentityBasedAccessTo(String resourceId, BuiltInRole role);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrCreate withSystemAssignedIdentityBasedAccessTo(String resourceId, BuiltInRole role);
 
             /**
-             * Specifies that virtual machine's local identity should have the given access (described by
-             * the role) on the resource group that virtual machine resides. Applications running on the
-             * virtual machine will have the same permission (role) on the resource group.
+             * Specifies that virtual machine's system assigned (local) identity should have the given access
+             * (described by the role) on the resource group that virtual machine resides. Applications running
+             * on the virtual machine will have the same permission (role) on the resource group.
              *
              * @param role access role to assigned to the virtual machine's local identity
              * @return the next stage of the definition
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrCreate withLocalIdentityBasedAccessToCurrentResourceGroup(BuiltInRole role);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrCreate withSystemAssignedIdentityBasedAccessToCurrentResourceGroup(BuiltInRole role);
 
             /**
-             * Specifies that virtual machine's local identity should have the access (described by the
-             * role definition) on an ARM resource identified by the resource ID.  Applications running
-             * on the virtual machine will have the same permission (role) on the ARM resource.
+             * Specifies that virtual machine's system assigned (local) identity should have the access
+             * (described by the role definition) on an ARM resource identified by the resource ID.
+             * Applications running on the virtual machine will have the same permission (role) on the ARM resource.
              *
              * @param resourceId scope of the access represented in ARM resource ID format
              * @param roleDefinitionId access role definition to assigned to the virtual machine's local identity
              * @return the next stage of the definition
              */
-            @Beta // TODO Add since 1.5
-            WithLocalIdentityBasedAccessOrCreate withLocalIdentityBasedAccessTo(String resourceId, String roleDefinitionId);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrCreate withSystemAssignedIdentityBasedAccessTo(String resourceId, String roleDefinitionId);
 
             /**
-             * Specifies that virtual machine's local identity should have the access (described by the
-             * role definition) on the resource group that virtual machine resides. Applications running
-             * on the virtual machine will have the same permission (role) on the resource group.
+             * Specifies that virtual machine's system assigned (local) identity should have the access
+             * (described by the role definition) on the resource group that virtual machine resides.
+             * Applications running on the virtual machine will have the same permission (role) on the
+             * resource group.
              *
              * @param roleDefinitionId access role definition to assigned to the virtual machine's local identity
              * @return the next stage of the definition
              */
-            @Beta // TODO Add since 1.5
-            WithLocalIdentityBasedAccessOrCreate withLocalIdentityBasedAccessToCurrentResourceGroup(String roleDefinitionId);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrCreate withSystemAssignedIdentityBasedAccessToCurrentResourceGroup(String roleDefinitionId);
+        }
+
+        /**
+         * The stage of the virtual machine definition allowing to specify User Assigned (External) Managed Service Identities.
+         */
+        @Beta(Beta.SinceVersion.V1_5_1)
+        interface WithUserAssignedManagedServiceIdentity {
+            /**
+             * Specifies the definition of a not-yet-created user assigned identity to be associated with the virtual machine.
+             *
+             * @param creatableIdentity a creatable identity definition
+             * @return the next stage of the virtual machine definition
+             */
+            @Beta(Beta.SinceVersion.V1_5_1)
+            WithCreate withNewUserAssignedManagedServiceIdentity(Creatable<Identity> creatableIdentity);
+
+            /**
+             * Specifies an existing user assigned identity to be associated with the virtual machine.
+             *
+             * @param identity the identity
+             * @return the next stage of the virtual machine definition
+             */
+            @Beta(Beta.SinceVersion.V1_5_1)
+            WithCreate withExistingUserAssignedManagedServiceIdentity(Identity identity);
         }
 
         /**
@@ -1665,7 +1697,8 @@ public interface VirtualMachine extends
                 DefinitionStages.WithExtension,
                 DefinitionStages.WithPlan,
                 DefinitionStages.WithBootDiagnostics,
-                DefinitionStages.WithLocalManagedServiceIdentity {
+                DefinitionStages.WithSystemAssignedManagedServiceIdentity,
+                DefinitionStages.WithUserAssignedManagedServiceIdentity {
         }
     }
 
@@ -1972,79 +2005,115 @@ public interface VirtualMachine extends
         }
 
         /**
-         * The stage of the virtual machine update allowing to enable Local Managed Service Identity.
+         * The stage of the virtual machine update allowing to enable System Assigned (Local) Managed Service Identity.
          */
-        @Beta // TODO Add since version 1.5
-        interface WithLocalManagedServiceIdentity {
+        @Beta(Beta.SinceVersion.V1_5_0)
+        interface WithSystemAssignedManagedServiceIdentity {
             /**
-             * Specifies that Local Managed Service Identity needs to be enabled in the virtual machine.
+             * Specifies that System Assigned (Local) Managed Service Identity needs to be enabled in the
+             * virtual machine.
              *
              * @return the next stage of the update
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrUpdate withLocalManagedServiceIdentity();
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrUpdate withSystemAssignedManagedServiceIdentity();
 
             /**
-             * Specifies that Local Managed Service Identity needs to be enabled in the virtual machine.
+             * Specifies that System Assigned (Local) Managed Service Identity needs to be enabled in
+             * the virtual machine.
              *
              * @param tokenPort the port on the virtual machine where access token is available
              * @return the next stage of the update
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrUpdate withLocalManagedServiceIdentity(int tokenPort);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrUpdate withSystemAssignedManagedServiceIdentity(int tokenPort);
         }
 
         /**
-         * The stage of the Local Managed Service Identity enabled virtual machine allowing to set access
-         * role for the identity.
+         * The stage of the System Assigned (Local) Managed Service Identity enabled virtual machine allowing
+         * to set access role for the identity.
          */
-        @Beta // TODO Add since version 1.5
-        interface WithLocalIdentityBasedAccessOrUpdate extends Update {
+        @Beta(Beta.SinceVersion.V1_5_0)
+        interface WithSystemAssignedIdentityBasedAccessOrUpdate extends Update {
             /**
-             * Specifies that virtual machine's local identity should have the given access (described
-             * by the role) on an ARM resource identified by the resource ID. Applications running on
-             * the virtual machine will have the same permission (role) on the ARM resource.
+             * Specifies that virtual machine's system assigned (local) identity should have the given
+             * access (described by the role) on an ARM resource identified by the resource ID.
+             * Applications running on the virtual machine will have the same permission (role) on
+             * the ARM resource.
              *
              * @param resourceId the ARM identifier of the resource
              * @param role access role to assigned to the virtual machine's local identity
              * @return the next stage of the update
              */
-            @Beta // TODO Add since 1.5
-            WithLocalIdentityBasedAccessOrUpdate withLocalIdentityBasedAccessTo(String resourceId, BuiltInRole role);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrUpdate withSystemAssignedIdentityBasedAccessTo(String resourceId, BuiltInRole role);
 
             /**
-             * Specifies that virtual machine's local identity should have the given access (described
-             * by the role) on the resource group that virtual machine resides. Applications running
+             * Specifies that virtual machine's system assigned (local) identity should have the given access
+             * (described by the role) on the resource group that virtual machine resides. Applications running
              * on the virtual machine will have the same permission (role) on the resource group.
              *
              * @param role access role to assigned to the virtual machine's local identity
              * @return the next stage of the update
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrUpdate withLocalIdentityBasedAccessToCurrentResourceGroup(BuiltInRole role);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrUpdate withSystemAssignedIdentityBasedAccessToCurrentResourceGroup(BuiltInRole role);
 
             /**
-             * Specifies that virtual machine's local identity should have the access (described by the
-             * role definition) on an ARM resource identified by the resource ID.  Applications running
-             * on the virtual machine will have the same permission (role) on the ARM resource.
+             * Specifies that virtual machine's system assigned (local) identity should have the access
+             * (described by the role definition) on an ARM resource identified by the resource ID.
+             * Applications running on the virtual machine will have the same permission (role) on
+             * the ARM resource.
              *
              * @param resourceId scope of the access represented in ARM resource ID format
              * @param roleDefinitionId access role definition to assigned to the virtual machine's local identity
              * @return the next stage of the update
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrUpdate withLocalIdentityBasedAccessTo(String resourceId, String roleDefinitionId);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrUpdate withSystemAssignedIdentityBasedAccessTo(String resourceId, String roleDefinitionId);
 
             /**
-             * Specifies that virtual machine's local identity should have the access (described by the
+             * Specifies that virtual machine's system assigned (local) identity should have the access (described by the
              * role definition) on the resource group that virtual machine resides. Applications running
              * on the virtual machine will have the same permission (role) on the resource group.
              *
              * @param roleDefinitionId access role definition to assigned to the virtual machine's local identity
              * @return the next stage of the update
              */
-            @Beta // TODO Add since version 1.5
-            WithLocalIdentityBasedAccessOrUpdate withLocalIdentityBasedAccessToCurrentResourceGroup(String roleDefinitionId);
+            @Beta(Beta.SinceVersion.V1_5_0)
+            WithSystemAssignedIdentityBasedAccessOrUpdate withSystemAssignedIdentityBasedAccessToCurrentResourceGroup(String roleDefinitionId);
+        }
+
+        /**
+         * The stage of the virtual machine update allowing to add or remove User Assigned (External) Managed Service Identities.
+         */
+        @Beta(Beta.SinceVersion.V1_5_1)
+        interface WithUserAssignedManagedServiceIdentity {
+            /**
+             * Specifies the definition of a not-yet-created user assigned identity to be associated with the virtual machine.
+             *
+             * @param creatableIdentity a creatable identity definition
+             * @return the next stage of the virtual machine update
+             */
+            @Beta(Beta.SinceVersion.V1_5_1)
+            Update withNewUserAssignedManagedServiceIdentity(Creatable<Identity> creatableIdentity);
+
+            /**
+             * Specifies an existing user assigned identity to be associated with the virtual machine.
+             * @param identity the identity
+             * @return the next stage of the virtual machine update
+             */
+            @Beta(Beta.SinceVersion.V1_5_1)
+            Update withExistingUserAssignedManagedServiceIdentity(Identity identity);
+
+            /**
+             * Specifies that an user assigned identity associated with the virtual machine should be removed.
+             *
+             * @param identityId ARM resource id of the identity
+             * @return the next stage of the virtual machine update
+             */
+            @Beta(Beta.SinceVersion.V1_5_1)
+            Update withoutUserAssignedManagedServiceIdentity(String identityId);
         }
     }
 
@@ -2059,8 +2128,8 @@ public interface VirtualMachine extends
             UpdateStages.WithSecondaryNetworkInterface,
             UpdateStages.WithExtension,
             UpdateStages.WithBootDiagnostics,
-            UpdateStages.WithLocalManagedServiceIdentity {
-
+            UpdateStages.WithSystemAssignedManagedServiceIdentity,
+            UpdateStages.WithUserAssignedManagedServiceIdentity {
         /**
          * Specifies the encryption settings for the OS Disk.
          *
