@@ -8,6 +8,7 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.TopLevelModifiableResourcesImpl;
+import com.microsoft.azure.management.sql.SqlFirewallRuleOperations;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.management.sql.SqlServers;
 
@@ -23,6 +24,8 @@ class SqlServersImpl
             ServersInner,
             SqlServerManager>
         implements SqlServers {
+
+    private SqlFirewallRuleOperations firewallRules;
 
     protected SqlServersImpl(SqlServerManager manager) {
         super(manager.inner().servers(), manager);
@@ -46,5 +49,14 @@ class SqlServersImpl
     @Override
     public SqlServer.DefinitionStages.Blank define(String name) {
         return wrapModel(name);
+    }
+
+    @Override
+    public SqlFirewallRuleOperations firewallRules() {
+        if (firewallRules == null) {
+            firewallRules = new SqlFirewallRuleOperationsImpl(this.manager());
+        }
+
+        return firewallRules;
     }
 }

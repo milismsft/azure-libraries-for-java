@@ -46,7 +46,10 @@ public class SqlServerOperationsTests extends SqlServerTest {
                     .withNewResourceGroup(RG_NAME)
                     .withAdministratorLogin(sqlServerAdminName)
                     .withAdministratorPassword("N0t@P@ssw0rd!")
-                    .withAccessFromAzureServices()
+                    .withoutAccessFromAzureServices()
+                    .defineFirewallRule("somefirewallrule1")
+                        .withIPAddress("0.0.0.1")
+                        .attach()
                     .create();
         Assert.assertEquals(sqlServerAdminName, sqlServer.administratorLogin());
         Assert.assertEquals("v12.0", sqlServer.kind());
@@ -56,6 +59,35 @@ public class SqlServerOperationsTests extends SqlServerTest {
         Assert.assertEquals(sqlServerAdminName, sqlServer.administratorLogin());
         Assert.assertEquals("v12.0", sqlServer.kind());
         Assert.assertEquals("12.0", sqlServer.version());
+
+        SqlFirewallRule firewallRule = sqlServerManager.sqlServers().firewallRules().get(RG_NAME, SQL_SERVER_NAME, "somefirewallrule1");
+        Assert.assertEquals("0.0.0.1", firewallRule.startIPAddress());
+        Assert.assertEquals("0.0.0.1", firewallRule.endIPAddress());
+
+        firewallRule = sqlServerManager.sqlServers().firewallRules().get(RG_NAME, SQL_SERVER_NAME, "AllowAllWindowsAzureIps");
+        Assert.assertNull(firewallRule);
+
+        sqlServer.addAccessFromAzureServices();
+        firewallRule = sqlServerManager.sqlServers().firewallRules().get(RG_NAME, SQL_SERVER_NAME, "AllowAllWindowsAzureIps");
+        Assert.assertEquals("0.0.0.0", firewallRule.startIPAddress());
+        Assert.assertEquals("0.0.0.0", firewallRule.endIPAddress());
+
+        sqlServer.update()
+            .withNewFirewallRule("0.0.0.2")
+            .apply();
+
+        firewallRule = sqlServerManager.sqlServers().firewallRules()
+            .define("newFirewallRule")
+            .withExistingSqlServer(RG_NAME, SQL_SERVER_NAME)
+            .withIPAddress("0.0.0.3")
+            .create();
+        Assert.assertEquals("0.0.0.3", firewallRule.startIPAddress());
+        Assert.assertEquals("0.0.0.3", firewallRule.endIPAddress());
+
+        sqlServer.firewallRules().delete("somefirewallrule1");
+        firewallRule = sqlServerManager.sqlServers().firewallRules().get(RG_NAME, SQL_SERVER_NAME, "somefirewallrule1");
+        Assert.assertNull(firewallRule);
+
 
 
 

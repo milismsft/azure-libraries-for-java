@@ -37,4 +37,10 @@ public interface SqlServers extends
         SupportsBatchDeletion,
         HasManager<SqlServerManager>,
         HasInner<ServersInner> {
+
+    /**
+     * @return the SQL Server Firewall rules API entry point
+     */
+    SqlFirewallRuleOperations firewallRules();
+
 }

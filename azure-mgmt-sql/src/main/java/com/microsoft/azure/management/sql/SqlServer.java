@@ -20,6 +20,7 @@ import rx.Completable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -54,25 +55,42 @@ public interface SqlServer extends
 
     // Actions
 
+    /**
+     * Sets the Azure services default access to this server to true.
+     * <p>
+     * A firewall rule named "AllowAllWindowsAzureIps" with the start IP "0.0.0.0" will be added
+     *   to the SQL server if one does not exist.
+     *
+     * @return the SQL Firewall rule
+     */
+    SqlFirewallRule addAccessFromAzureServices();
+
+    /**
+     * Sets the Azure services default access to this server to false.
+     * <p>
+     * The firewall rule named "AllowAllWindowsAzureIps" will be removed from the SQL server.
+     */
+    void removeAccessFromAzureServices();
+
     // Collections
 
+    /**
+     * @return returns entry point to manage Firewall rules for this SQL server.
+     */
+    SqlFirewallRuleOperations.SqlFirewallRuleActionsDefinition firewallRules();
+
 //    /**
-//     * @return returns entry point to manage FirewallRules in SqlServer.
-//     */
-//    FirewallRules firewallRules();
-//
-//    /**
-//     * @return returns entry point to manage ElasticPools in SqlServer.
+//     * @return returns entry point to manage ElasticPools for this SQL server.
 //     */
 //    ElasticPools elasticPools();
 //
 //    /**
-//     * @return entry point to manage Databases in SqlServer.
+//     * @return entry point to manage Databases for this SQL server.
 //     */
 //    Databases databases();
 //
 //    /**
-//     * @return entry point to manage Databases in SqlServer.
+//     * @return entry point to manage Databases for this SQL server.
 //     */
 //    @Beta(Beta.SinceVersion.V2_0_0)
 //    FailoverGroups failoverGroups();
@@ -252,8 +270,7 @@ public interface SqlServer extends
         DefinitionStages.WithAdministratorPassword,
 //        DefinitionStages.WithElasticPool,
 //        DefinitionStages.WithDatabase,
-//        DefinitionStages.WithFirewallRule,
-        DefinitionStages.WithAccessFromAzureServices,
+        DefinitionStages.WithFirewallRule,
         DefinitionStages.WithCreate {
     }
 
@@ -299,18 +316,6 @@ public interface SqlServer extends
             WithCreate withAdministratorPassword(String administratorLoginPassword);
         }
 
-        /**
-         * The stage of the SQL Server definition allowing to specify the Azure services default access to this resource.
-         */
-        interface WithAccessFromAzureServices {
-            /**
-             * Sets the Azure services default access to this server to true using a special firewall rule named "AllowAllWindowsAzureIPs".
-             *
-             * @return Next stage of the SQL Server definition
-             */
-            WithCreate withAccessFromAzureServices();
-        }
-
 //        /**
 //         * A SQL Server definition for specifying elastic pool.
 //         */
@@ -347,6 +352,60 @@ public interface SqlServer extends
 //            WithCreate withNewDatabase(String databaseName);
 //        }
 //
+
+        /**
+         * The stage of the SQL Server definition allowing to specify the SQL Firewall rules.
+         */
+        interface WithFirewallRule {
+            /**
+             * Sets the Azure services default access to this server to false.
+             * <p>
+             * The default is to allow Azure services default access to this server via a special
+             *   firewall rule named "AllowAllWindowsAzureIps" with the start IP "0.0.0.0".
+             *
+             * @return Next stage of the SQL Server definition
+             */
+            WithCreate withoutAccessFromAzureServices();
+
+            /**
+             * Begins the definition of a new SQL Firewall rule to be added to this server.
+             *
+             * @param name the name of the new SQL Firewall rule
+             * @return the first stage of the new SQL Firewall rule definition
+             */
+            SqlFirewallRule.DefinitionStages.Blank<WithCreate> defineFirewallRule(String name);
+
+            /**
+             * Creates new firewall rule in the SQL Server.
+             *
+             * @param ipAddress ipAddress for the firewall rule
+             * @return Next stage of the SQL Server definition
+             */
+            @Deprecated
+            WithCreate withNewFirewallRule(String ipAddress);
+
+            /**
+             * Creates new firewall rule in the SQL Server.
+             *
+             * @param startIPAddress start IP address for the firewall rule
+             * @param endIPAddress end IP address for the firewall rule
+             * @return Next stage of the SQL Server definition
+             */
+            @Deprecated
+            WithCreate withNewFirewallRule(String startIPAddress, String endIPAddress);
+
+            /**
+             * Creates new firewall rule in the SQL Server.
+             *
+             * @param startIPAddress start IP address for the firewall rule
+             * @param endIPAddress end IP address for the firewall rule
+             * @param firewallRuleName name for the firewall rule
+             * @return Next stage of the SQL Server definition
+             */
+            @Deprecated
+            WithCreate withNewFirewallRule(String startIPAddress, String endIPAddress, String firewallRuleName);
+        }
+
 //        /**
 //         * A SQL Server definition for specifying the firewall rule.
 //         */
@@ -388,8 +447,7 @@ public interface SqlServer extends
             Creatable<SqlServer>,
 //            WithElasticPool,
 //            WithDatabase,
-//            WithFirewallRule,
-            WithAccessFromAzureServices,
+            WithFirewallRule,
             DefinitionWithTags<WithCreate> {
         }
     }
@@ -400,10 +458,9 @@ public interface SqlServer extends
     interface Update extends
             Appliable<SqlServer>,
             UpdateStages.WithAdministratorPassword,
-            UpdateStages.WithAccessFromAzureServices,
 //            UpdateStages.WithElasticPool,
 //            UpdateStages.WithDatabase,
-//            UpdateStages.WithFirewallRule,
+            UpdateStages.WithFirewallRule,
             Resource.UpdateWithTags<Update> {
     }
 
@@ -422,27 +479,6 @@ public interface SqlServer extends
              * @return Next stage of the update.
              */
             Update withAdministratorPassword(String administratorLoginPassword);
-        }
-
-        /**
-         * The stage of the SQL Server definition allowing to specify the Azure services default access to this resource.
-         */
-        interface WithAccessFromAzureServices {
-            /**
-             * Sets the Azure services default access to this server to true; a special firewall rule
-             *   named "AllowAllWindowsAzureIPs" will be added.
-             *
-             * @return Next stage of the update.
-             */
-            Update withAccessFromAzureServices();
-
-            /**
-             * Updates the default access for Azure services to this server to false; the special firewall
-             *   rule named "AllowAllWindowsAzureIPs" will be removed.
-             *
-             * @return Next stage of the update.
-             */
-            Update withoutAccessFromAzureServices();
         }
 
 
@@ -499,47 +535,50 @@ public interface SqlServer extends
 //        }
 //
 //
-//        /**
-//         * A SQL Server definition for specifying the firewall rule.
-//         */
-//        interface WithFirewallRule {
-//            // TODO: add implementation for THIS
-//
-////            /**
-////             * Create new firewall rule in the SQL Server.
-////             *
-////             * @param ipAddress IP address for the firewall rule
-////             * @return Next stage of the SQL Server update
-////             */
-////            Update withNewFirewallRule(String ipAddress);
-////
-////            /**
-////             * Create new firewall rule in the SQL Server.
-////             *
-////             * @param startIPAddress Start IP address for the firewall rule
-////             * @param endIPAddress IP address for the firewall rule
-////             * @return Next stage of the SQL Server update
-////             */
-////            Update withNewFirewallRule(String startIPAddress, String endIPAddress);
-////
-////            /**
-////             * Creates new firewall rule in the SQL Server.
-////             *
-////             * @param startIPAddress start IP address for the firewall rule
-////             * @param endIPAddress end IP address for the firewall rule
-////             * @param firewallRuleName name for the firewall rule
-////             * @return Next stage of the SQL Server update
-////             */
-////            Update withNewFirewallRule(String startIPAddress, String endIPAddress, String firewallRuleName);
-//
-//            /**
-//             * Removes firewall rule from the SQL Server.
-//             *
-//             * @param firewallRuleName name of the firewall rule to be removed
-//             * @return Next stage of the SQL Server update
-//             */
-//            Update withoutFirewallRule(String firewallRuleName);
-//        }
+
+        /**
+         * The stage of the SQL Server update definition allowing to specify the SQL Firewall rules.
+         */
+        interface WithFirewallRule {
+            /**
+             * Create new firewall rule in the SQL Server.
+             *
+             * @param ipAddress IP address for the firewall rule
+             * @return Next stage of the SQL Server update
+             */
+            @Deprecated
+            Update withNewFirewallRule(String ipAddress);
+
+            /**
+             * Create new firewall rule in the SQL Server.
+             *
+             * @param startIPAddress Start IP address for the firewall rule
+             * @param endIPAddress IP address for the firewall rule
+             * @return Next stage of the SQL Server update
+             */
+            @Deprecated
+            Update withNewFirewallRule(String startIPAddress, String endIPAddress);
+
+            /**
+             * Creates new firewall rule in the SQL Server.
+             *
+             * @param startIPAddress start IP address for the firewall rule
+             * @param endIPAddress end IP address for the firewall rule
+             * @param firewallRuleName name for the firewall rule
+             * @return Next stage of the SQL Server update
+             */
+            @Deprecated
+            Update withNewFirewallRule(String startIPAddress, String endIPAddress, String firewallRuleName);
+
+            /**
+             * Removes firewall rule from the SQL Server.
+             *
+             * @param firewallRuleName name of the firewall rule to be removed
+             * @return Next stage of the SQL Server update
+             */
+            @Deprecated
+            Update withoutFirewallRule(String firewallRuleName);
+        }
     }
 }
 
