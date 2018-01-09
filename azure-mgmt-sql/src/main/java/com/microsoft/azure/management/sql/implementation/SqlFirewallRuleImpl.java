@@ -156,6 +156,11 @@ public class SqlFirewallRuleImpl
     }
 
     @Override
+    public String parentId() {
+        return ResourceUtils.parentResourceIdFromResourceId(this.id());
+    }
+
+    @Override
     public SqlFirewallRule apply() {
         return this.applyAsync().toBlocking().last();
     }

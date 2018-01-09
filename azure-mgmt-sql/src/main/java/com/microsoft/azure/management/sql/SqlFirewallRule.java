@@ -7,6 +7,7 @@ package com.microsoft.azure.management.sql;
 
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
+import com.microsoft.azure.management.apigeneration.Method;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.ExternalChildResource;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.IndependentChild;
@@ -61,8 +62,14 @@ public interface SqlFirewallRule
     /**
      * Deletes the firewall rule.
      */
+    @Method
     void delete();
 
+    /**
+     * @return the parent SQL server ID
+     */
+    @Method
+    String parentId();
 
 
     /**
