@@ -17,6 +17,8 @@ import com.microsoft.rest.ServiceFuture;
 import rx.Observable;
 import rx.functions.Func1;
 
+import java.util.Objects;
+
 /**
  * Implementation for SqlFirewallRule.
  */
@@ -44,11 +46,12 @@ public class SqlFirewallRuleImpl
      */
     SqlFirewallRuleImpl(String name, SqlServerImpl parent, FirewallRuleInner innerObject, SqlServerManager sqlServerManager) {
         super(name, parent, innerObject);
+
+        Objects.requireNonNull(parent);
+        Objects.requireNonNull(sqlServerManager);
         this.sqlServerManager = sqlServerManager;
-        if (parent != null) {
-            this.resourceGroupName = parent.resourceGroupName();
-            this.sqlServerName = parent.name();
-        }
+        this.resourceGroupName = parent.resourceGroupName();
+        this.sqlServerName = parent.name();
     }
 
     /**

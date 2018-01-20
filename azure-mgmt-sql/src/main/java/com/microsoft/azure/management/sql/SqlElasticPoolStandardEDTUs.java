@@ -5,5 +5,5 @@
  */
 package com.microsoft.azure.management.sql;
 
-public interface FirewallRules {
+public enum SqlElasticPoolStandardEDTUs {
 }

@@ -5,21 +5,22 @@
  */
 package com.microsoft.azure.management.sql;
 
+import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.apigeneration.Method;
-import com.microsoft.azure.management.resources.fluentcore.arm.models.HasName;
-import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.rest.ServiceCallback;
 import com.microsoft.rest.ServiceFuture;
 import rx.Completable;
 import rx.Observable;
 
+import java.util.List;
 import java.util.Set;
 
 /**
  * Base class for Azure SQL Server child resource operations.
  */
 @Fluent
+@Beta(Beta.SinceVersion.V2_0_0)
 public interface SqlChildrenOperations<T> {
 
     /**
@@ -30,7 +31,7 @@ public interface SqlChildrenOperations<T> {
      * @param name the name of the child resource
      * @return an immutable representation of the resource
      */
-    T get(String resourceGroupName, String sqlServerName, String name);
+    T getBySqlServer(String resourceGroupName, String sqlServerName, String name);
 
     /**
      * Asynchronously gets the information about a child resource from Azure SQL server, identifying it by its name and its resource group.
@@ -40,7 +41,17 @@ public interface SqlChildrenOperations<T> {
      * @param name the name of the child resource
      * @return a representation of the deferred computation of this call returning the found resource
      */
-    Observable<T> getAsync(String resourceGroupName, String sqlServerName, String name);
+    Observable<T> getBySqlServerAsync(String resourceGroupName, String sqlServerName, String name);
+
+    /**
+     * Gets the information about a child resource from Azure SQL server, identifying it by its name and its resource group.
+     *
+     * @param sqlServer the SQL server parent resource
+     * @param name the name of the child resource
+     * @return an immutable representation of the resource
+     */
+    @Deprecated
+    T getBySqlServer(SqlServer sqlServer, String name);
 
     /**
      * Gets the information about a child resource from Azure SQL server using the resource ID.
@@ -65,7 +76,7 @@ public interface SqlChildrenOperations<T> {
      * @param sqlServerName the name of SQL server parent resource
      * @param name the name of the child resource
      */
-    void delete(String resourceGroupName, String sqlServerName, String name);
+    void deleteBySqlServer(String resourceGroupName, String sqlServerName, String name);
 
     /**
      * Asynchronously delete a child resource from Azure SQL server, identifying it by its name and its resource group.
@@ -75,7 +86,7 @@ public interface SqlChildrenOperations<T> {
      * @param name the name of the child resource
      * @return a representation of the deferred computation of this call
      */
-    Completable deleteAsync(String resourceGroupName, String sqlServerName, String name);
+    Completable deleteBySqlServerAsync(String resourceGroupName, String sqlServerName, String name);
 
     /**
      * Deletes a child resource from Azure SQL server, identifying it by its resource ID.
@@ -99,7 +110,7 @@ public interface SqlChildrenOperations<T> {
      * @param sqlServerName the name of parent Azure SQL server.
      * @return the list of resources
      */
-    Set<T> list(String resourceGroupName, String sqlServerName);
+    List<T> listBySqlServer(String resourceGroupName, String sqlServerName);
 
     /**
      * Asynchronously lists Azure SQL child resources of the specified Azure SQL server in the specified resource group.
@@ -108,7 +119,16 @@ public interface SqlChildrenOperations<T> {
      * @param sqlServerName the name of parent Azure SQL server.
      * @return a representation of the deferred computation of this call
      */
-    Observable<T> listAsync(String resourceGroupName, String sqlServerName);
+    Observable<T> listBySqlServerAsync(String resourceGroupName, String sqlServerName);
+
+    /**
+     * Lists Azure SQL child resources of the specified Azure SQL server in the specified resource group.
+     *
+     * @param sqlServer the parent Azure SQL server.
+     * @return the list of resources
+     */
+    @Deprecated
+    List<T> listBySqlServer(SqlServer sqlServer);
 
     /**
      * Base interface for Azure SQL Server child resource create operations.
@@ -214,7 +234,7 @@ public interface SqlChildrenOperations<T> {
          *
          * @return the list of resources
          */
-        Set<T> list();
+        List<T> list();
 
         /**
          * Asynchronously lists Azure SQL child resources.

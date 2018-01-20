@@ -13,6 +13,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.resources.fluentcore.utils.Utils;
 import com.microsoft.azure.management.resources.implementation.ResourceGroupInner;
+import com.microsoft.azure.management.sql.implementation.ElasticPoolInner;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,6 +32,25 @@ public class SqlServerOperationsTests extends SqlServerTest {
     private static final String END_IPADDRESS = "10.102.1.12";
 
     @Test
+    public void canCRUDSqlElasticPool() throws Exception {
+        ElasticPoolInner elasticPoolInner = new ElasticPoolInner();
+        elasticPoolInner.withEdition(ElasticPoolEdition.BASIC);
+        elasticPoolInner.withLocation("centralus");
+//        elasticPoolInner.withZoneRedundant(true);
+        elasticPoolInner.withDatabaseDtuMax(5);
+        elasticPoolInner.withDatabaseDtuMin(5);
+        elasticPoolInner.withDtu(200);
+        elasticPoolInner.withStorageMB(20000);
+
+        sqlServerManager.resourceManager().resourceGroups().define(RG_NAME).withRegion("westus").create();
+
+        SqlServer sqlServer = sqlServerManager.sqlServers().getByResourceGroup("a1-test-sql", "sql112233");
+
+        ElasticPoolInner epResult = sqlServerManager.inner().elasticPools().createOrUpdate("a1-sql-test", "sql112233", "ep1", elasticPoolInner);
+        sqlServerManager.inner().elasticPools().delete("a1-sql-test", "sql112233", epResult.name());
+    }
+
+//    @Test
     public void canCRUDSqlServer() throws Exception {
         // Create
 
@@ -60,15 +80,15 @@ public class SqlServerOperationsTests extends SqlServerTest {
         Assert.assertEquals("v12.0", sqlServer.kind());
         Assert.assertEquals("12.0", sqlServer.version());
 
-        SqlFirewallRule firewallRule = sqlServerManager.sqlServers().firewallRules().get(RG_NAME, SQL_SERVER_NAME, "somefirewallrule1");
+        SqlFirewallRule firewallRule = sqlServerManager.sqlServers().firewallRules().getBySqlServer(RG_NAME, SQL_SERVER_NAME, "somefirewallrule1");
         Assert.assertEquals("0.0.0.1", firewallRule.startIPAddress());
         Assert.assertEquals("0.0.0.1", firewallRule.endIPAddress());
 
-        firewallRule = sqlServerManager.sqlServers().firewallRules().get(RG_NAME, SQL_SERVER_NAME, "AllowAllWindowsAzureIps");
+        firewallRule = sqlServerManager.sqlServers().firewallRules().getBySqlServer(RG_NAME, SQL_SERVER_NAME, "AllowAllWindowsAzureIps");
         Assert.assertNull(firewallRule);
 
         sqlServer.addAccessFromAzureServices();
-        firewallRule = sqlServerManager.sqlServers().firewallRules().get(RG_NAME, SQL_SERVER_NAME, "AllowAllWindowsAzureIps");
+        firewallRule = sqlServerManager.sqlServers().firewallRules().getBySqlServer(RG_NAME, SQL_SERVER_NAME, "AllowAllWindowsAzureIps");
         Assert.assertEquals("0.0.0.0", firewallRule.startIPAddress());
         Assert.assertEquals("0.0.0.0", firewallRule.endIPAddress());
 
@@ -85,7 +105,7 @@ public class SqlServerOperationsTests extends SqlServerTest {
         Assert.assertEquals("0.0.0.3", firewallRule.endIPAddress());
 
         sqlServer.firewallRules().delete("somefirewallrule1");
-        firewallRule = sqlServerManager.sqlServers().firewallRules().get(RG_NAME, SQL_SERVER_NAME, "somefirewallrule1");
+        firewallRule = sqlServerManager.sqlServers().firewallRules().getBySqlServer(RG_NAME, SQL_SERVER_NAME, "somefirewallrule1");
         Assert.assertNull(firewallRule);
 
 

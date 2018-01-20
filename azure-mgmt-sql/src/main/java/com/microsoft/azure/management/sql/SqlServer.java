@@ -16,17 +16,12 @@ import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import com.microsoft.azure.management.sql.implementation.ServerInner;
 import com.microsoft.azure.management.sql.implementation.SqlServerManager;
-import rx.Completable;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 
 /**
  * An immutable client-side representation of an Azure SQL Server.
  */
 @Fluent
+@Beta(Beta.SinceVersion.V2_0_0)
 public interface SqlServer extends
         GroupableResource<SqlServerManager, ServerInner>,
         Refreshable<SqlServer>,
@@ -75,15 +70,15 @@ public interface SqlServer extends
     // Collections
 
     /**
-     * @return returns entry point to manage Firewall rules for this SQL server.
+     * @return returns entry point to manage SQL Firewall rules for this server.
      */
     SqlFirewallRuleOperations.SqlFirewallRuleActionsDefinition firewallRules();
 
-//    /**
-//     * @return returns entry point to manage ElasticPools for this SQL server.
-//     */
-//    ElasticPools elasticPools();
-//
+    /**
+     * @return returns entry point to manage the SQL Elastic Pools for this server.
+     */
+    SqlElasticPoolOperations.SqlElasticPoolActionsDefinition elasticPools();
+
 //    /**
 //     * @return entry point to manage Databases for this SQL server.
 //     */
@@ -268,7 +263,7 @@ public interface SqlServer extends
         DefinitionStages.WithGroup,
         DefinitionStages.WithAdministratorLogin,
         DefinitionStages.WithAdministratorPassword,
-//        DefinitionStages.WithElasticPool,
+        DefinitionStages.WithElasticPool,
 //        DefinitionStages.WithDatabase,
         DefinitionStages.WithFirewallRule,
         DefinitionStages.WithCreate {
@@ -316,42 +311,62 @@ public interface SqlServer extends
             WithCreate withAdministratorPassword(String administratorLoginPassword);
         }
 
-//        /**
-//         * A SQL Server definition for specifying elastic pool.
-//         */
-//        interface WithElasticPool {
-//            /**
-//             * Creates new elastic pool in the SQL Server.
-//             * @param elasticPoolName name of the elastic pool to be created
-//             * @param elasticPoolEdition edition of the elastic pool
-//             * @param databaseNames names of the database to be included in the elastic pool
-//             * @return Next stage of the SQL Server definition
-//             */
-//            @Beta(Beta.SinceVersion.V2_0_0)
-//            WithCreate withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition, String... databaseNames);
-//
-//            /**
-//             * Creates new elastic pool in the SQL Server.
-//             * @param elasticPoolName name of the elastic pool to be created
-//             * @param elasticPoolEdition edition of the elastic pool
-//             * @return Next stage of the SQL Server definition
-//             */
-//            @Beta(Beta.SinceVersion.V2_0_0)
-//            WithCreate withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition);
-//        }
-//
-//        /**
-//         * A SQL Server definition for specifying the databases.
-//         */
-//        interface WithDatabase {
-//            /**
-//             * Creates new database in the SQL Server.
-//             * @param databaseName name of the database to be created
-//             * @return Next stage of the SQL Server definition
-//             */
-//            WithCreate withNewDatabase(String databaseName);
-//        }
-//
+        /**
+         * A SQL Server definition for specifying elastic pool.
+         */
+        interface WithElasticPool {
+            /**
+             * Begins the definition of a new SQL Elastic Pool to be added to this server.
+             *
+             * @param name the name of the new SQL Elastic Pool
+             * @return the first stage of the new SQL Elastic Pool definition
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlElasticPool.DefinitionStages.Blank<WithCreate> defineElasticPool(String name);
+
+            /**
+             * Creates new elastic pool in the SQL Server.
+             * @param elasticPoolName name of the elastic pool to be created
+             * @param elasticPoolEdition edition of the elastic pool
+             * @param databaseNames names of the database to be included in the elastic pool
+             * @return Next stage of the SQL Server definition
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            @Deprecated
+            WithCreate withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition, String... databaseNames);
+
+            /**
+             * Creates new elastic pool in the SQL Server.
+             * @param elasticPoolName name of the elastic pool to be created
+             * @param elasticPoolEdition edition of the elastic pool
+             * @return Next stage of the SQL Server definition
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            @Deprecated
+            WithCreate withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition);
+        }
+
+        /**
+         * A SQL Server definition for specifying the databases.
+         */
+        interface WithDatabase {
+            /**
+             * Begins the definition of a new SQL Database to be added to this server.
+             *
+             * @param name the name of the new SQL Database
+             * @return the first stage of the new SQL Database definition
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.Blank<WithCreate> defineDatabase(String name);
+
+            /**
+             * Creates new database in the SQL Server.
+             * @param databaseName name of the database to be created
+             * @return Next stage of the SQL Server definition
+             */
+            @Deprecated
+            WithCreate withNewDatabase(String databaseName);
+        }
 
         /**
          * The stage of the SQL Server definition allowing to specify the SQL Firewall rules.
@@ -406,38 +421,6 @@ public interface SqlServer extends
             WithCreate withNewFirewallRule(String startIPAddress, String endIPAddress, String firewallRuleName);
         }
 
-//        /**
-//         * A SQL Server definition for specifying the firewall rule.
-//         */
-//        interface WithFirewallRule {
-//            /**
-//             * Creates new firewall rule in the SQL Server.
-//             *
-//             * @param ipAddress ipAddress for the firewall rule
-//             * @return Next stage of the SQL Server definition
-//             */
-//            WithCreate withNewFirewallRule(String ipAddress);
-//
-//            /**
-//             * Creates new firewall rule in the SQL Server.
-//             *
-//             * @param startIPAddress start IP address for the firewall rule
-//             * @param endIPAddress end IP address for the firewall rule
-//             * @return Next stage of the SQL Server definition
-//             */
-//            WithCreate withNewFirewallRule(String startIPAddress, String endIPAddress);
-//
-//            /**
-//             * Creates new firewall rule in the SQL Server.
-//             *
-//             * @param startIPAddress start IP address for the firewall rule
-//             * @param endIPAddress end IP address for the firewall rule
-//             * @param firewallRuleName name for the firewall rule
-//             * @return Next stage of the SQL Server definition
-//             */
-//            WithCreate withNewFirewallRule(String startIPAddress, String endIPAddress, String firewallRuleName);
-//        }
-
         /**
          * A SQL Server definition with sufficient inputs to create a new
          * SQL Server in the cloud, but exposing additional optional inputs to
@@ -445,8 +428,8 @@ public interface SqlServer extends
          */
         interface WithCreate extends
             Creatable<SqlServer>,
-//            WithElasticPool,
-//            WithDatabase,
+            WithElasticPool,
+            WithDatabase,
             WithFirewallRule,
             DefinitionWithTags<WithCreate> {
         }
@@ -458,8 +441,8 @@ public interface SqlServer extends
     interface Update extends
             Appliable<SqlServer>,
             UpdateStages.WithAdministratorPassword,
-//            UpdateStages.WithElasticPool,
-//            UpdateStages.WithDatabase,
+            UpdateStages.WithElasticPool,
+            UpdateStages.WithDatabase,
             UpdateStages.WithFirewallRule,
             Resource.UpdateWithTags<Update> {
     }
@@ -482,59 +465,62 @@ public interface SqlServer extends
         }
 
 
-//        /**
-//         * A SQL Server definition for specifying elastic pool.
-//         */
-//        interface WithElasticPool {
-//            /**
-//             * Create new elastic pool in the SQL Server.
-//             * @param elasticPoolName name of the elastic pool to be created
-//             * @param elasticPoolEdition edition of the elastic pool
-//             * @param databaseNames names of the database to be included in the elastic pool
-//             * @return Next stage of the SQL Server update
-//             */
-//            @Beta(Beta.SinceVersion.V2_0_0)
-//            Update withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition, String... databaseNames);
-//
-//            /**
-//             * Create new elastic pool in the SQL Server.
-//             * @param elasticPoolName name of the elastic pool to be created
-//             * @param elasticPoolEdition edition of the elastic pool
-//             * @return Next stage of the SQL Server update
-//             */
-//            @Beta(Beta.SinceVersion.V2_0_0)
-//            Update withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition);
-//
-//            /**
-//             * Removes elastic pool from the SQL Server.
-//             * @param elasticPoolName name of the elastic pool to be removed
-//             * @return Next stage of the SQL Server update
-//             */
-//            Update withoutElasticPool(String elasticPoolName);
-//        }
-//
-//        /**
-//         * A SQL Server definition for specifying the databases.
-//         */
-//        interface WithDatabase {
-//            // TODO: add implementation for THIS
-//
-////            /**
-////             * Create new database in the SQL Server.
-////             * @param databaseName name of the database to be created
-////             * @return Next stage of the SQL Server update
-////             */
-////            Update withNewDatabase(String databaseName);
-//
-//            /**
-//             * Remove database from the SQL Server.
-//             * @param databaseName name of the database to be removed
-//             * @return Next stage of the SQL Server update
-//             */
-//            Update withoutDatabase(String databaseName);
-//        }
-//
-//
+        /**
+         * A SQL Server definition for specifying elastic pool.
+         */
+        interface WithElasticPool {
+            /**
+             * Create new elastic pool in the SQL Server.
+             * @param elasticPoolName name of the elastic pool to be created
+             * @param elasticPoolEdition edition of the elastic pool
+             * @param databaseNames names of the database to be included in the elastic pool
+             * @return Next stage of the SQL Server update
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            @Deprecated
+            Update withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition, String... databaseNames);
+
+            /**
+             * Create new elastic pool in the SQL Server.
+             * @param elasticPoolName name of the elastic pool to be created
+             * @param elasticPoolEdition edition of the elastic pool
+             * @return Next stage of the SQL Server update
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            @Deprecated
+            Update withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition);
+
+            /**
+             * Removes elastic pool from the SQL Server.
+             * @param elasticPoolName name of the elastic pool to be removed
+             * @return Next stage of the SQL Server update
+             */
+            @Deprecated
+            Update withoutElasticPool(String elasticPoolName);
+        }
+
+        /**
+         * A SQL Server definition for specifying the databases.
+         */
+        interface WithDatabase {
+            /**
+             * Create new database in the SQL Server.
+             * @param databaseName name of the database to be created
+             * @return Next stage of the SQL Server update
+             */
+            @Deprecated
+            Update withNewDatabase(String databaseName);
+
+            /**
+             * Remove database from the SQL Server.
+             * @param databaseName name of the database to be removed
+             * @return Next stage of the SQL Server update
+             */
+            @Deprecated
+            Update withoutDatabase(String databaseName);
+        }
+
+
 
         /**
          * The stage of the SQL Server update definition allowing to specify the SQL Firewall rules.

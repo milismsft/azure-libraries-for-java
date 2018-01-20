@@ -8,6 +8,7 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.TopLevelModifiableResourcesImpl;
+import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
 import com.microsoft.azure.management.sql.SqlFirewallRuleOperations;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.management.sql.SqlServers;
@@ -26,6 +27,7 @@ class SqlServersImpl
         implements SqlServers {
 
     private SqlFirewallRuleOperations firewallRules;
+    private SqlElasticPoolOperations elasticPools;
 
     protected SqlServersImpl(SqlServerManager manager) {
         super(manager.inner().servers(), manager);
@@ -54,9 +56,18 @@ class SqlServersImpl
     @Override
     public SqlFirewallRuleOperations firewallRules() {
         if (firewallRules == null) {
-            firewallRules = new SqlFirewallRuleOperationsImpl(this.manager());
+            this.firewallRules = new SqlFirewallRuleOperationsImpl(this.manager());
         }
 
-        return firewallRules;
+        return this.firewallRules;
+    }
+
+    @Override
+    public SqlElasticPoolOperations elasticPools() {
+        if (elasticPools == null) {
+            this.elasticPools = new SqlElasticPoolOperationsImpl(this.manager());
+        }
+
+        return this.elasticPools;
     }
 }

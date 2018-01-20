@@ -22,12 +22,6 @@ import com.microsoft.azure.Resource;
 @JsonFlatten
 public class ElasticPoolUpdateInner extends Resource {
     /**
-     * Resource tags.
-     */
-    @JsonProperty(value = "tags")
-    private Map<String, String> tags;
-
-    /**
      * The creation date of the elastic pool (ISO8601 format).
      */
     @JsonProperty(value = "properties.creationDate", access = JsonProperty.Access.WRITE_ONLY)
@@ -85,18 +79,7 @@ public class ElasticPoolUpdateInner extends Resource {
      * @return the tags value
      */
     public Map<String, String> tags() {
-        return this.tags;
-    }
-
-    /**
-     * Set the tags value.
-     *
-     * @param tags the tags value to set
-     * @return the ElasticPoolUpdateInner object itself.
-     */
-    public ElasticPoolUpdateInner withTags(Map<String, String> tags) {
-        this.tags = tags;
-        return this;
+        return this.tags();
     }
 
     /**

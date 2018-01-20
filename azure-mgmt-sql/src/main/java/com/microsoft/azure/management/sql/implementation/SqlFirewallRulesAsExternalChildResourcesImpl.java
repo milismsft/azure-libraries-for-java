@@ -15,11 +15,12 @@ import com.microsoft.azure.management.sql.SqlServer;
  */
 @LangDefinition
 public class SqlFirewallRulesAsExternalChildResourcesImpl
-    extends ExternalChildResourcesNonCachedImpl<SqlFirewallRuleImpl,
-    SqlFirewallRule,
-    FirewallRuleInner,
-    SqlServerImpl,
-    SqlServer> {
+    extends
+        ExternalChildResourcesNonCachedImpl<SqlFirewallRuleImpl,
+            SqlFirewallRule,
+            FirewallRuleInner,
+            SqlServerImpl,
+            SqlServer> {
 
     /**
      * Creates a new ExternalNonInlineChildResourcesImpl.
@@ -35,11 +36,11 @@ public class SqlFirewallRulesAsExternalChildResourcesImpl
         return prepareDefine(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 
-    SqlFirewallRuleImpl updateWebhook(String name) {
+    SqlFirewallRuleImpl updateFirewallRule(String name) {
         return prepareUpdate(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 
-    void withoutWebhook(String name) {
+    void withoutFirewallRule(String name) {
         prepareRemove(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 }

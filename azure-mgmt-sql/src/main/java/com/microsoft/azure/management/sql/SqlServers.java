@@ -6,6 +6,7 @@
 
 package com.microsoft.azure.management.sql;
 
+import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.SupportsBatchDeletion;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.SupportsDeletingByResourceGroup;
@@ -39,8 +40,15 @@ public interface SqlServers extends
         HasInner<ServersInner> {
 
     /**
-     * @return the SQL Server Firewall rules API entry point
+     * @return the SQL Server Firewall Rules API entry point
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     SqlFirewallRuleOperations firewallRules();
+
+    /**
+     * @return the SQL Server Elastic Pools API entry point
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    SqlElasticPoolOperations elasticPools();
 
 }

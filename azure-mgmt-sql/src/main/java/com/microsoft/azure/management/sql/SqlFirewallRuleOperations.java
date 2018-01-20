@@ -5,6 +5,7 @@
  */
 package com.microsoft.azure.management.sql;
 
+import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsCreating;
 
@@ -12,6 +13,7 @@ import com.microsoft.azure.management.resources.fluentcore.collection.SupportsCr
  * A representation of the Azure SQL Firewall rule operations.
  */
 @Fluent
+@Beta(Beta.SinceVersion.V2_0_0)
 public interface SqlFirewallRuleOperations extends
     SupportsCreating<SqlFirewallRuleOperations.DefinitionStages.WithSqlServer>,
     SqlChildrenOperations<SqlFirewallRule> {

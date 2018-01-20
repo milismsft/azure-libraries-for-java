@@ -9,15 +9,16 @@ package com.microsoft.azure.management.sql.implementation;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.GroupableResourceImpl;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
-import com.microsoft.azure.management.sql.FirewallRules;
+import com.microsoft.azure.management.sql.ElasticPoolEdition;
+import com.microsoft.azure.management.sql.SqlDatabase;
+import com.microsoft.azure.management.sql.SqlElasticPool;
+import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlFirewallRuleOperations;
 import com.microsoft.azure.management.sql.SqlServer;
 import rx.Completable;
 import rx.Observable;
 import rx.functions.Func1;
-
-import java.util.Set;
 
 /**
  * Implementation for SqlServer and its parent interfaces.
@@ -37,12 +38,16 @@ public class SqlServerImpl
 
     private boolean allowAzureServicesAccess;
     private SqlFirewallRulesAsExternalChildResourcesImpl sqlFirewallRules;
+    private SqlElasticPoolsAsExternalChildResourcesImpl sqlElasticPools;
+    private SqlDatabasesAsExternalChildResourcesImpl sqlDatabases;
 
     protected SqlServerImpl(String name, ServerInner innerObject, SqlServerManager manager) {
         super(name, innerObject, manager);
 
-        allowAzureServicesAccess = true;
-        sqlFirewallRules = new SqlFirewallRulesAsExternalChildResourcesImpl(this, "SqlFirewallRule");
+        this.allowAzureServicesAccess = true;
+        this.sqlFirewallRules = new SqlFirewallRulesAsExternalChildResourcesImpl(this, "SqlFirewallRule");
+        this.sqlElasticPools = new SqlElasticPoolsAsExternalChildResourcesImpl(this, "SqlElasticPool");
+        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this, "SqlDatabase");
     }
 
     @Override
@@ -74,6 +79,8 @@ public class SqlServerImpl
     @Override
     public Completable afterPostRunAsync(boolean isGroupFaulted) {
         this.sqlFirewallRules.clear();
+        this.sqlElasticPools.clear();
+        this.sqlDatabases.clear();
         return Completable.complete();
     }
 
@@ -100,7 +107,7 @@ public class SqlServerImpl
     @Override
     public SqlFirewallRule addAccessFromAzureServices() {
         SqlFirewallRule firewallRule = this.manager().sqlServers().firewallRules()
-                .get(this.resourceGroupName(), this.name(),"AllowAllWindowsAzureIps");
+                .getBySqlServer(this.resourceGroupName(), this.name(),"AllowAllWindowsAzureIps");
         if (firewallRule == null) {
             firewallRule = this.manager().sqlServers().firewallRules()
                 .define("AllowAllWindowsAzureIps")
@@ -115,10 +122,10 @@ public class SqlServerImpl
     @Override
     public void removeAccessFromAzureServices() {
         SqlFirewallRule firewallRule = this.manager().sqlServers().firewallRules()
-            .get(this.resourceGroupName(), this.name(),"AllowAllWindowsAzureIps");
+            .getBySqlServer(this.resourceGroupName(), this.name(),"AllowAllWindowsAzureIps");
         if (firewallRule != null) {
             this.manager().sqlServers().firewallRules()
-                .delete(this.resourceGroupName(), this.name(), "AllowAllWindowsAzureIps");
+                .deleteBySqlServer(this.resourceGroupName(), this.name(), "AllowAllWindowsAzureIps");
         }
     }
 
@@ -144,11 +151,6 @@ public class SqlServerImpl
         allowAzureServicesAccess = false;
         return this;
     }
-
-//    @Override
-//    public SqlFirewallRule.DefinitionStages.Blank<SqlServer.DefinitionStages.WithCreate> defineFirewallRule(String name) {
-//        return this.sqlFirewallRules.defineFirewallRule(name);
-//    }
 
     @Override
     public SqlFirewallRuleImpl defineFirewallRule(String name) {
@@ -176,7 +178,54 @@ public class SqlServerImpl
 
     @Override
     public SqlServerImpl withoutFirewallRule(String firewallRuleName) {
-        sqlFirewallRules.withoutWebhook(firewallRuleName);
+        sqlFirewallRules.withoutFirewallRule(firewallRuleName);
         return this;
+    }
+
+    @Override
+    public SqlElasticPoolOperations.SqlElasticPoolActionsDefinition elasticPools() {
+        return new SqlElasticPoolOperationsImpl(this, this.manager());
+    }
+
+    @Override
+    public SqlElasticPoolImpl defineElasticPool(String name) {
+        return this.sqlElasticPools.defineElasticPool(name);
+    }
+
+    @Override
+    public SqlServerImpl withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition) {
+        return sqlElasticPools
+            .defineElasticPool(elasticPoolName)
+            .withEdition(elasticPoolEdition)
+            .parent();
+    }
+
+    @Override
+    public SqlServerImpl withoutElasticPool(String elasticPoolName) {
+        sqlElasticPools.withoutElasticPool(elasticPoolName);
+        return this;
+    }
+
+    @Override
+    public SqlServerImpl withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition, String... databaseNames) {
+        // call addCreatableDependency for the Elastic Pool external child non-cached item through parent sql server in database
+        // beforeGroupInvoke()
+        return null;
+    }
+
+    @Override
+//    public SqlDatabaseImpl defineDatabase(String name) {
+    public SqlDatabase.DefinitionStages.Blank<SqlServer.DefinitionStages.WithCreate> defineDatabase(String name) {
+        return null;
+    }
+
+    @Override
+    public SqlServerImpl withNewDatabase(String databaseName) {
+        return null;
+    }
+
+    @Override
+    public SqlServerImpl withoutDatabase(String databaseName) {
+        return null;
     }
 }
