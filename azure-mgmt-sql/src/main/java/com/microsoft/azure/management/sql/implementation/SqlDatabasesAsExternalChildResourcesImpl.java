@@ -10,6 +10,8 @@ import com.microsoft.azure.management.resources.fluentcore.arm.collection.implem
 import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlServer;
 
+import java.util.Objects;
+
 /**
  * Represents a SQL Database collection associated with an Azure SQL server.
  */
@@ -22,6 +24,11 @@ public class SqlDatabasesAsExternalChildResourcesImpl
             SqlServerImpl,
             SqlServer> {
 
+    private SqlElasticPoolImpl elasticPoolParent;
+    private String resourceGroupName;
+    private String sqlServerName;
+    private String sqlServerLocation;
+
     /**
      * Creates a new ExternalNonInlineChildResourcesImpl.
      *
@@ -30,6 +37,12 @@ public class SqlDatabasesAsExternalChildResourcesImpl
      */
     protected SqlDatabasesAsExternalChildResourcesImpl(SqlServerImpl parent, String childResourceName) {
         super(parent, parent.taskGroup(), childResourceName);
+        Objects.requireNonNull(parent);
+        this.resourceGroupName = parent.resourceGroupName();
+        this.sqlServerName = parent.name();
+        this.sqlServerLocation = parent.regionName();
+
+        this.elasticPoolParent = null;
     }
 
     /**
@@ -38,19 +51,36 @@ public class SqlDatabasesAsExternalChildResourcesImpl
      * @param parent            the parent Azure resource
      * @param childResourceName the child resource name
      */
-    protected SqlDatabasesAsExternalChildResourcesImpl(SqlElasticPoolImpl parent, String childResourceName) {
+    protected SqlDatabasesAsExternalChildResourcesImpl(String resourceGroupName, String sqlServerName, String sqlServerLocation, SqlElasticPoolImpl parent, String childResourceName) {
         super(null, parent.taskGroup(), childResourceName);
+        this.resourceGroupName = resourceGroupName;
+        this.sqlServerName = sqlServerName;
+        this.sqlServerLocation = sqlServerLocation;
+
+        this.elasticPoolParent = parent;
     }
 
     SqlDatabaseImpl defineElasticPool(String name) {
-        return prepareDefine(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
+        if (this.elasticPoolParent != null) {
+            return prepareIndependentDefine(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, name, new DatabaseInner(), this.parent().manager()));
+        } else {
+            return prepareInlineDefine(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
+        }
     }
 
     SqlDatabaseImpl updateElasticPool(String name) {
-        return prepareUpdate(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
+        if (this.elasticPoolParent != null) {
+            return prepareInlineUpdate(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, name, new DatabaseInner(), this.parent().manager()));
+        } else {
+            return prepareInlineUpdate(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
+        }
     }
 
     void withoutElasticPool(String name) {
-        prepareRemove(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
+        if (this.elasticPoolParent != null) {
+            prepareInlineRemove(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, name, new DatabaseInner(), this.parent().manager()));
+        } else {
+            prepareInlineRemove(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
+        }
     }
 }

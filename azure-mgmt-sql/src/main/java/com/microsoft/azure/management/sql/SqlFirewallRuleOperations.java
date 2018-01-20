@@ -8,6 +8,7 @@ package com.microsoft.azure.management.sql;
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsCreating;
+import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 
 /**
  * A representation of the Azure SQL Firewall rule operations.
@@ -78,8 +79,8 @@ public interface SqlFirewallRuleOperations extends
         /**
          * The final stage of the SQL Firewall Rule definition.
          */
-//        interface WithCreate extends SqlCreatable<SqlFirewallRule> {
-        interface WithCreate extends SqlChildrenCreatableDefinition<SqlFirewallRule> {
+        interface WithCreate extends Creatable<SqlFirewallRule> {
+//        interface WithCreate extends SqlChildrenCreatableDefinition<SqlFirewallRule> {
         }
     }
 

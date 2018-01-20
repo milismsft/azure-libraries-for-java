@@ -33,14 +33,14 @@ public class SqlFirewallRulesAsExternalChildResourcesImpl
     }
 
     SqlFirewallRuleImpl defineFirewallRule(String name) {
-        return prepareDefine(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
+        return prepareInlineDefine(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 
     SqlFirewallRuleImpl updateFirewallRule(String name) {
-        return prepareUpdate(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
+        return prepareInlineUpdate(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 
     void withoutFirewallRule(String name) {
-        prepareRemove(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
+        prepareInlineRemove(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 }

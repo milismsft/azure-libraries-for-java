@@ -9,6 +9,7 @@ import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.apigeneration.Method;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsCreating;
+import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 
 /**
  * A representation of the Azure SQL Elastic Pool operations.
@@ -304,7 +305,8 @@ public interface SqlElasticPoolOperations extends
          * but exposing additional optional inputs to specify.
          */
         interface WithCreate extends
-            SqlChildrenCreatableDefinition<SqlElasticPool>,
+            Creatable<SqlElasticPool>,
+//            SqlChildrenCreatableDefinition<SqlElasticPool>,
             SqlElasticPoolOperations.DefinitionStages.WithDatabaseDtuMin,
             SqlElasticPoolOperations.DefinitionStages.WithDatabaseDtuMax,
             SqlElasticPoolOperations.DefinitionStages.WithDtu,

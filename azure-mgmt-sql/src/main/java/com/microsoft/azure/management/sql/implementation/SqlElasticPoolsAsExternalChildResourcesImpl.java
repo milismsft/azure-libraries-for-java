@@ -43,14 +43,14 @@ public class SqlElasticPoolsAsExternalChildResourcesImpl
     }
 
     SqlElasticPoolImpl defineElasticPool(String name) {
-        return prepareDefine(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        return prepareInlineDefine(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
     }
 
     SqlElasticPoolImpl updateElasticPool(String name) {
-        return prepareUpdate(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        return prepareInlineUpdate(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
     }
 
     void withoutElasticPool(String name) {
-        prepareRemove(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        prepareInlineRemove(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
     }
 }

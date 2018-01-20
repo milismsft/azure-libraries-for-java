@@ -93,7 +93,7 @@ public class SqlElasticPoolImpl
         this.sqlServerName = sqlServerName;
         this.sqlServerLocation = sqlServerLocation;
 
-        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this, "SqlDatabase");
+        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(resourceGroupName, sqlServerName, sqlServerLocation, this, "SqlDatabase");
     }
 
     @Override
@@ -103,6 +103,21 @@ public class SqlElasticPoolImpl
 
     @Override
     public SqlElasticPool apply() {
+        return null;
+    }
+
+    @Override
+    public Observable<SqlElasticPool> createResourceAsync() {
+        return null;
+    }
+
+    @Override
+    public Observable<SqlElasticPool> updateResourceAsync() {
+        return null;
+    }
+
+    @Override
+    public Observable<Void> deleteResourceAsync() {
         return null;
     }
 
@@ -211,55 +226,55 @@ public class SqlElasticPoolImpl
 
     }
 
-    @Override
-    public SqlElasticPool create() {
-        return this.createAsync().toBlocking().last();
-    }
-
-    @Override
-    public ServiceFuture<SqlElasticPool> createAsync(ServiceCallback<SqlElasticPool> callback) {
-        return ServiceFuture.fromBody(this.createAsync(), callback);
-    }
-
-    @Override
-    public Observable<SqlElasticPool> createAsync() {
-        //this.enableCommitMode();
-        //commitAndGetAllAsync();
-
-        final SqlElasticPoolImpl self = this;
-        return this.sqlServerManager.inner().elasticPools()
-            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
-            .map(new Func1<ElasticPoolInner, SqlElasticPool>() {
-                @Override
-                public SqlElasticPool call(ElasticPoolInner inner) {
-                    self.setInner(inner);
-                    return self;
-                }
-            })
-            // TODO: this needs to be converted to work with the new TaskGroup framework
-            .flatMap(new Func1<SqlElasticPool, Observable<SqlElasticPool>>() {
-                @Override
-                public Observable<SqlElasticPool> call(SqlElasticPool sqlElasticPool) {
-                    return self.sqlDatabases.commitAndGetAllAsync()
-                        .map(new Func1<List<SqlDatabaseImpl>, SqlElasticPool>() {
-                            @Override
-                            public SqlElasticPool call(List<SqlDatabaseImpl> databases) {
-                                return self;
-                            }
-                        });
-                }
-            });
-    }
-
-    @Override
-    public Observable<SqlElasticPool> updateAsync() {
-        return null;
-    }
-
-    @Override
-    public Observable<Void> deleteAsync() {
-        return null;
-    }
+//    @Override
+//    public SqlElasticPool create() {
+//        return this.createAsync().toBlocking().last();
+//    }
+//
+//    @Override
+//    public ServiceFuture<SqlElasticPool> createAsync(ServiceCallback<SqlElasticPool> callback) {
+//        return ServiceFuture.fromBody(this.createAsync(), callback);
+//    }
+//
+//    @Override
+//    public Observable<SqlElasticPool> createAsync() {
+//        //this.enableCommitMode();
+//        //commitAndGetAllAsync();
+//
+//        final SqlElasticPoolImpl self = this;
+//        return this.sqlServerManager.inner().elasticPools()
+//            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+//            .map(new Func1<ElasticPoolInner, SqlElasticPool>() {
+//                @Override
+//                public SqlElasticPool call(ElasticPoolInner inner) {
+//                    self.setInner(inner);
+//                    return self;
+//                }
+//            })
+//            // TODO: this needs to be converted to work with the new TaskGroup framework
+//            .flatMap(new Func1<SqlElasticPool, Observable<SqlElasticPool>>() {
+//                @Override
+//                public Observable<SqlElasticPool> call(SqlElasticPool sqlElasticPool) {
+//                    return self.sqlDatabases.commitAndGetAllAsync()
+//                        .map(new Func1<List<SqlDatabaseImpl>, SqlElasticPool>() {
+//                            @Override
+//                            public SqlElasticPool call(List<SqlDatabaseImpl> databases) {
+//                                return self;
+//                            }
+//                        });
+//                }
+//            });
+//    }
+//
+//    @Override
+//    public Observable<SqlElasticPool> updateAsync() {
+//        return null;
+//    }
+//
+//    @Override
+//    public Observable<Void> deleteAsync() {
+//        return null;
+//    }
 
     @Override
     protected Observable<ElasticPoolInner> getInnerAsync() {

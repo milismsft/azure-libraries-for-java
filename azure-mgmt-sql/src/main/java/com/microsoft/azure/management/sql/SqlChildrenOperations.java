@@ -130,39 +130,39 @@ public interface SqlChildrenOperations<T> {
     @Deprecated
     List<T> listBySqlServer(SqlServer sqlServer);
 
-    /**
-     * Base interface for Azure SQL Server child resource create operations.
-     */
-    interface SqlChildrenCreatableDefinition<T> {
-
-        /**
-         * Execute the create request.
-         *
-         * @return the create resource
-         */
-        @Method
-        T create();
-
-        /**
-         * Puts the request into the queue and allow the HTTP client to execute
-         * it when system resources are available.
-         *
-         * @param callback the callback to handle success and failure
-         * @return a handle to cancel the request
-         */
-        @Method
-        ServiceFuture<T> createAsync(final ServiceCallback<T> callback);
-
-        /**
-         * Puts the request into the queue and allow the HTTP client to execute
-         * it when system resources are available.
-         *
-         * @return an observable of the request
-         */
-        @Method
-        Observable<T> createAsync();
-    }
-
+//    /**
+//     * Base interface for Azure SQL Server child resource create operations.
+//     */
+//    interface SqlChildrenCreatableDefinition<T> {
+//
+//        /**
+//         * Execute the create request.
+//         *
+//         * @return the create resource
+//         */
+//        @Method
+//        T create();
+//
+//        /**
+//         * Puts the request into the queue and allow the HTTP client to execute
+//         * it when system resources are available.
+//         *
+//         * @param callback the callback to handle success and failure
+//         * @return a handle to cancel the request
+//         */
+//        @Method
+//        ServiceFuture<T> createAsync(final ServiceCallback<T> callback);
+//
+//        /**
+//         * Puts the request into the queue and allow the HTTP client to execute
+//         * it when system resources are available.
+//         *
+//         * @return an observable of the request
+//         */
+//        @Method
+//        Observable<T> createAsync();
+//    }
+//
     /**
      * Base interface for Azure SQL Server child resource actions.
      */

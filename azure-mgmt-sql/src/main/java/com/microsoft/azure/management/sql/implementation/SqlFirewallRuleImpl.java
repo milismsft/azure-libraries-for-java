@@ -76,49 +76,6 @@ public class SqlFirewallRuleImpl
     }
 
     @Override
-    public SqlFirewallRule create() {
-        return this.createAsync().toBlocking().last();
-    }
-
-    @Override
-    public ServiceFuture<SqlFirewallRule> createAsync(ServiceCallback<SqlFirewallRule> callback) {
-        return ServiceFuture.fromBody(this.createAsync(), callback);
-    }
-
-    @Override
-    public Observable<SqlFirewallRule> createAsync() {
-        final SqlFirewallRuleImpl self = this;
-        return this.sqlServerManager.inner().firewallRules()
-            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
-            .map(new Func1<FirewallRuleInner, SqlFirewallRule>() {
-                @Override
-                public SqlFirewallRule call(FirewallRuleInner inner) {
-                    self.setInner(inner);
-                    return self;
-                }
-            });
-    }
-
-    @Override
-    public Observable<SqlFirewallRule> updateAsync() {
-        final SqlFirewallRuleImpl self = this;
-        return this.sqlServerManager.inner().firewallRules()
-            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
-            .map(new Func1<FirewallRuleInner, SqlFirewallRule>() {
-                @Override
-                public SqlFirewallRule call(FirewallRuleInner inner) {
-                    self.setInner(inner);
-                    return self;
-                }
-            });
-    }
-
-    @Override
-    public Observable<Void> deleteAsync() {
-        return this.sqlServerManager.inner().firewallRules().deleteAsync(this.resourceGroupName, this.sqlServerName, this.name());
-    }
-
-    @Override
     protected Observable<FirewallRuleInner> getInnerAsync() {
         return this.sqlServerManager.inner().firewallRules().getAsync(this.resourceGroupName, this.sqlServerName, this.name());
     }
@@ -155,7 +112,7 @@ public class SqlFirewallRuleImpl
 
     @Override
     public void delete() {
-        this.sqlServerManager.inner().firewallRules().delete(this.resourceGroupName, this.sqlServerName, this.name());
+        this.deleteResourceAsync().toBlocking().last();
     }
 
     @Override
@@ -169,13 +126,46 @@ public class SqlFirewallRuleImpl
     }
 
     @Override
+    public Observable<SqlFirewallRule> createResourceAsync() {
+        final SqlFirewallRuleImpl self = this;
+        return this.sqlServerManager.inner().firewallRules()
+            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+            .map(new Func1<FirewallRuleInner, SqlFirewallRule>() {
+                @Override
+                public SqlFirewallRule call(FirewallRuleInner inner) {
+                    self.setInner(inner);
+                    return self;
+                }
+            });
+    }
+
+    @Override
+    public Observable<SqlFirewallRule> updateResourceAsync() {
+        final SqlFirewallRuleImpl self = this;
+        return this.sqlServerManager.inner().firewallRules()
+            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+            .map(new Func1<FirewallRuleInner, SqlFirewallRule>() {
+                @Override
+                public SqlFirewallRule call(FirewallRuleInner inner) {
+                    self.setInner(inner);
+                    return self;
+                }
+            });
+    }
+
+    @Override
+    public Observable<Void> deleteResourceAsync() {
+        return this.sqlServerManager.inner().firewallRules().deleteAsync(this.resourceGroupName, this.sqlServerName, this.name());
+    }
+
+    @Override
     public Observable<SqlFirewallRule> applyAsync() {
-        return this.updateAsync();
+        return this.updateResourceAsync();
     }
 
     @Override
     public ServiceFuture<SqlFirewallRule> applyAsync(ServiceCallback<SqlFirewallRule> callback) {
-        return ServiceFuture.fromBody(this.updateAsync(), callback);
+        return ServiceFuture.fromBody(this.updateResourceAsync(), callback);
     }
 
     @Override

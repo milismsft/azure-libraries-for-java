@@ -84,6 +84,21 @@ class SqlDatabaseImpl
     }
 
     @Override
+    public Observable<SqlDatabase> createResourceAsync() {
+        return null;
+    }
+
+    @Override
+    public Observable<SqlDatabase> updateResourceAsync() {
+        return null;
+    }
+
+    @Override
+    public Observable<Void> deleteResourceAsync() {
+        return null;
+    }
+
+    @Override
     public Observable<SqlDatabase> applyAsync() {
         return null;
     }
@@ -110,21 +125,6 @@ class SqlDatabaseImpl
 
     @Override
     public SqlDatabaseImpl withEndIPAddress(String endIPAddress) {
-        return null;
-    }
-
-    @Override
-    public Observable<SqlDatabase> createAsync() {
-        return null;
-    }
-
-    @Override
-    public Observable<SqlDatabase> updateAsync() {
-        return null;
-    }
-
-    @Override
-    public Observable<Void> deleteAsync() {
         return null;
     }
 
