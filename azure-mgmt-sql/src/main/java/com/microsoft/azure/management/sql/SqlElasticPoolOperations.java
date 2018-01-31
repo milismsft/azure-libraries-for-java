@@ -272,7 +272,7 @@ public interface SqlElasticPoolOperations extends
         }
 
         /**
-         * The SQL Elastic Pool definition to add the Database in the elastic pool.
+         * The SQL Elastic Pool definition to add the Database in the Elastic Pool.
          */
         interface WithDatabase {
             /**
@@ -298,6 +298,15 @@ public interface SqlElasticPoolOperations extends
              * @return The next stage of the definition.
              */
             SqlElasticPoolOperations.DefinitionStages.WithCreate withExistingDatabase(SqlDatabase database);
+
+            /**
+             * Begins the definition of a new SQL Database to be added to this server.
+             *
+             * @param name the name of the new SQL Database
+             * @return the first stage of the new SQL Database definition
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String name);
         }
 
         /**

@@ -22,35 +22,44 @@ public class SqlElasticPoolsAsExternalChildResourcesImpl
             SqlServerImpl,
             SqlServer> {
 
+    SqlServerManager sqlServerManager;
+
     /**
-     * Creates a new ExternalNonInlineChildResourcesImpl.
+     * Creates a new ExternalChildResourcesNonCachedImpl.
      *
      * @param parent            the parent Azure resource
      * @param childResourceName the child resource name
      */
     protected SqlElasticPoolsAsExternalChildResourcesImpl(SqlServerImpl parent, String childResourceName) {
         super(parent, parent.taskGroup(), childResourceName);
+        this.sqlServerManager = parent.manager();
     }
 
     /**
-     * Creates a new ExternalNonInlineChildResourcesImpl.
+     * Creates a new ExternalChildResourcesNonCachedImpl.
      *
-     * @param parent            the parent Azure resource
-     * @param childResourceName the child resource name
+     * @param sqlServerManager the manager
+     * @param childResourceName the child resource name (for logging)
      */
-    protected SqlElasticPoolsAsExternalChildResourcesImpl(SqlDatabaseImpl parent, String childResourceName) {
-        super(null, parent.taskGroup(), childResourceName);
+    protected SqlElasticPoolsAsExternalChildResourcesImpl(SqlServerManager sqlServerManager,String childResourceName) {
+        super(null, null, childResourceName);
+        this.sqlServerManager = sqlServerManager;
     }
 
-    SqlElasticPoolImpl defineElasticPool(String name) {
+    SqlElasticPoolImpl defineIndependentElasticPool(String name) {
+        // resource group, server name and location will be set by the next method in the Fluent flow
+        return prepareIndependentDefine(new SqlElasticPoolImpl(null, null, null, name, new ElasticPoolInner(), this.sqlServerManager));
+    }
+
+    SqlElasticPoolImpl defineInlineElasticPool(String name) {
         return prepareInlineDefine(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
     }
 
-    SqlElasticPoolImpl updateElasticPool(String name) {
+    SqlElasticPoolImpl updateInlineElasticPool(String name) {
         return prepareInlineUpdate(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
     }
 
-    void withoutElasticPool(String name) {
+    void removeInlineElasticPool(String name) {
         prepareInlineRemove(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
     }
 }

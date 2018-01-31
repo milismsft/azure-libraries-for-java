@@ -15,7 +15,7 @@ import java.util.List;
  * Response containing the Azure SQL Database metric.
  */
 @Fluent
-@Beta(Beta.SinceVersion.V1_2_0)
+@Beta(Beta.SinceVersion.V2_0_0)
 public interface SqlDatabaseMetric {
     /**
      * @return the metric name

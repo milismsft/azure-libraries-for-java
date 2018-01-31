@@ -18,6 +18,8 @@ import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import com.microsoft.azure.management.sql.implementation.ElasticPoolInner;
 
 import org.joda.time.DateTime;
+import rx.Completable;
+import rx.Observable;
 
 import java.util.List;
 
@@ -80,14 +82,39 @@ public interface SqlElasticPool
     int storageCapacityInMB();
 
     /**
-     * @return the elastic pool's database metrics
+     * @return the parent SQL server ID
      */
-    List<SqlDatabaseMetric> listDatabaseMetrics();
+    String parentId();
 
     /**
+     * Lists the database metrics for this SQL Elastic Pool.
+     *
+     * @param filter an OData filter expression that describes a subset of metrics to return
+     * @return the elastic pool's database metrics
+     */
+    List<SqlDatabaseMetric> listDatabaseMetrics(String filter);
+
+    /**
+     * Asynchronously lists the database metrics for this SQL Elastic Pool.
+     *
+     * @param filter an OData filter expression that describes a subset of metrics to return
+     * @return a representation of the deferred computation of this call
+     */
+    Observable<SqlDatabaseMetric> listDatabaseMetricsAsync(String filter);
+
+    /**
+     * Lists the database metric definitions for this SQL Elastic Pool.
+     *
      * @return the elastic pool's metric definitions
      */
     List<SqlDatabaseMetricDefinition> listDatabaseMetricDefinitions();
+
+    /**
+     * Asynchronously lists the database metric definitions for this SQL Elastic Pool.
+     *
+     * @return a representation of the deferred computation of this call
+     */
+    Observable<SqlDatabaseMetricDefinition> listDatabaseMetricDefinitionsAsync();
 
 //    /**
 //     * @return the information about elastic pool activities
@@ -100,9 +127,18 @@ public interface SqlElasticPool
 //    List<ElasticPoolDatabaseActivity> listDatabaseActivities();
 //
     /**
+     * Lists the SQL databases in this SQL Elastic Pool.
+     *
      * @return the information about databases in elastic pool
      */
     List<SqlDatabase> listDatabases();
+
+    /**
+     * Asynchronously lists the SQL databases in this SQL Elastic Pool.
+     *
+     * @return a representation of the deferred computation of this call
+     */
+    Observable<SqlDatabase> listDatabasesAsync();
 
     /**
      * Gets the specific database in the elastic pool.
@@ -129,6 +165,14 @@ public interface SqlElasticPool
     SqlDatabase addExistingDatabase(String databaseName);
 
     /**
+     * Adds an existing SQL Database to the Elastic Pool.
+     *
+     * @param database the database to be added
+     * @return the database
+     */
+    SqlDatabase addExistingDatabase(SqlDatabase database);
+
+    /**
      * Removes an existing SQL Database from the Elastic Pool.
      *
      * @param databaseName name of the database
@@ -137,14 +181,22 @@ public interface SqlElasticPool
     SqlDatabase removeDatabase(String databaseName);
 
     /**
-     * Deletes the elastic pool from the server.
+     * Deletes this SQL Elastic Pool from the parent SQL server.
      */
     @Method
     void delete();
 
+    /**
+     * Deletes this SQL Elastic Pool asynchronously from the parent SQL server.
+     *
+     * @return a representation of the deferred computation of this call
+     */
+    @Method
+    Completable deleteAsync();
+
 
     /**************************************************************
-     * Fluent interfaces to provision a Sql Elastic pool
+     * Fluent interfaces to provision a SQL Elastic Pool
      **************************************************************/
 
     /**

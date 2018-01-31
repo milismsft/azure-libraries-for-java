@@ -65,7 +65,7 @@ public interface SqlChildrenOperations<T> {
      * Asynchronously gets the information about a child resource from Azure SQL server using the resource ID.
      *
      * @param id the ID of the resource.
-     * @return an immutable representation of the resource
+     * @return a representation of the deferred computation of this call
      */
     Observable<T> getByIdAsync(String id);
 

@@ -8,10 +8,11 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.GroupableResourceImpl;
+import com.microsoft.azure.management.resources.fluentcore.dag.FunctionalTaskItem;
+import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.sql.ElasticPoolEdition;
-import com.microsoft.azure.management.sql.SqlDatabase;
-import com.microsoft.azure.management.sql.SqlElasticPool;
+import com.microsoft.azure.management.sql.SqlActiveDirectoryAdministrator;
 import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlFirewallRuleOperations;
@@ -19,6 +20,8 @@ import com.microsoft.azure.management.sql.SqlServer;
 import rx.Completable;
 import rx.Observable;
 import rx.functions.Func1;
+
+import java.util.UUID;
 
 /**
  * Implementation for SqlServer and its parent interfaces.
@@ -36,6 +39,7 @@ public class SqlServerImpl
             SqlServer.Definition,
             SqlServer.Update {
 
+    private FunctionalTaskItem sqlADAdminCreator;
     private boolean allowAzureServicesAccess;
     private SqlFirewallRulesAsExternalChildResourcesImpl sqlFirewallRules;
     private SqlElasticPoolsAsExternalChildResourcesImpl sqlElasticPools;
@@ -44,6 +48,7 @@ public class SqlServerImpl
     protected SqlServerImpl(String name, ServerInner innerObject, SqlServerManager manager) {
         super(name, innerObject, manager);
 
+        this.sqlADAdminCreator = null;
         this.allowAzureServicesAccess = true;
         this.sqlFirewallRules = new SqlFirewallRulesAsExternalChildResourcesImpl(this, "SqlFirewallRule");
         this.sqlElasticPools = new SqlElasticPoolsAsExternalChildResourcesImpl(this, "SqlElasticPool");
@@ -71,13 +76,22 @@ public class SqlServerImpl
 
     @Override
     public void beforeGroupCreateOrUpdate() {
-        if (this.isInCreateMode() && allowAzureServicesAccess) {
-            this.withNewFirewallRule("0.0.0.0", "0.0.0.0", "AllowAllWindowsAzureIps");
+        if (this.isInCreateMode()) {
+            if (allowAzureServicesAccess) {
+                this.sqlFirewallRules
+                    .defineInlineFirewallRule("AllowAllWindowsAzureIps")
+                    .withStartIPAddress("0.0.0.0")
+                    .withEndIPAddress("0.0.0.0");
+            }
+            if (sqlADAdminCreator != null) {
+                this.addPostRunDependent(sqlADAdminCreator);
+            }
         }
     }
 
     @Override
     public Completable afterPostRunAsync(boolean isGroupFaulted) {
+        this.sqlADAdminCreator = null;
         this.sqlFirewallRules.clear();
         this.sqlElasticPools.clear();
         this.sqlDatabases.clear();
@@ -105,7 +119,7 @@ public class SqlServerImpl
     }
 
     @Override
-    public SqlFirewallRule addAccessFromAzureServices() {
+    public SqlFirewallRule setAccessFromAzureServices() {
         SqlFirewallRule firewallRule = this.manager().sqlServers().firewallRules()
                 .getBySqlServer(this.resourceGroupName(), this.name(),"AllowAllWindowsAzureIps");
         if (firewallRule == null) {
@@ -127,6 +141,28 @@ public class SqlServerImpl
             this.manager().sqlServers().firewallRules()
                 .deleteBySqlServer(this.resourceGroupName(), this.name(), "AllowAllWindowsAzureIps");
         }
+    }
+
+    @Override
+    public SqlActiveDirectoryAdministratorImpl setActiveDirectoryAdministrator(String userLogin, String objectId) {
+        ServerAzureADAdministratorInner serverAzureADAdministratorInner = new ServerAzureADAdministratorInner()
+            .withLogin(userLogin)
+            .withSid(UUID.fromString(objectId))
+            .withTenantId(UUID.fromString(this.manager().tenantId()));
+
+        return new SqlActiveDirectoryAdministratorImpl(this.manager().inner().serverAzureADAdministrators().createOrUpdate(this.resourceGroupName(), this.name(), serverAzureADAdministratorInner));
+    }
+
+    @Override
+    public SqlActiveDirectoryAdministratorImpl getActiveDirectoryAdministrator() {
+        ServerAzureADAdministratorInner serverAzureADAdministratorInner = this.manager().inner().serverAzureADAdministrators().get(this.resourceGroupName(), this.name());
+
+        return serverAzureADAdministratorInner != null ? new SqlActiveDirectoryAdministratorImpl(serverAzureADAdministratorInner) : null;
+    }
+
+    @Override
+    public void removeActiveDirectoryAdministrator() {
+        this.manager().inner().serverAzureADAdministrators().delete(this.resourceGroupName(), this.name());
     }
 
     @Override
@@ -153,8 +189,32 @@ public class SqlServerImpl
     }
 
     @Override
+    public SqlServer.DefinitionStages.WithCreate withActiveDirectoryAdministrator(final String userLogin, final String objectId) {
+        final SqlServerImpl self = this;
+        sqlADAdminCreator = new FunctionalTaskItem() {
+            @Override
+            public Observable<Indexable> call(final Context context) {
+                ServerAzureADAdministratorInner serverAzureADAdministratorInner = new ServerAzureADAdministratorInner()
+                    .withLogin(userLogin)
+                    .withSid(UUID.fromString(objectId))
+                    .withTenantId(UUID.fromString(self.manager().tenantId()));
+
+                return self.manager().inner().serverAzureADAdministrators()
+                    .createOrUpdateAsync(self.resourceGroupName(), self.name(), serverAzureADAdministratorInner)
+                    .flatMap(new Func1<ServerAzureADAdministratorInner, Observable<Indexable>>() {
+                        @Override
+                        public Observable<Indexable> call(ServerAzureADAdministratorInner serverAzureADAdministratorInner) {
+                            return context.voidObservable();
+                        }
+                    });
+            }
+        };
+        return this;
+    }
+
+    @Override
     public SqlFirewallRuleImpl defineFirewallRule(String name) {
-        return this.sqlFirewallRules.defineFirewallRule(name);
+        return this.sqlFirewallRules.defineInlineFirewallRule(name);
     }
 
     @Override
@@ -170,7 +230,7 @@ public class SqlServerImpl
     @Override
     public SqlServerImpl withNewFirewallRule(String startIPAddress, String endIPAddress, String firewallRuleName) {
         return sqlFirewallRules
-            .defineFirewallRule(firewallRuleName)
+            .defineInlineFirewallRule(firewallRuleName)
             .withStartIPAddress(startIPAddress)
             .withEndIPAddress(endIPAddress)
             .parent();
@@ -178,7 +238,7 @@ public class SqlServerImpl
 
     @Override
     public SqlServerImpl withoutFirewallRule(String firewallRuleName) {
-        sqlFirewallRules.withoutFirewallRule(firewallRuleName);
+        sqlFirewallRules.removeInlineFirewallRule(firewallRuleName);
         return this;
     }
 
@@ -189,20 +249,20 @@ public class SqlServerImpl
 
     @Override
     public SqlElasticPoolImpl defineElasticPool(String name) {
-        return this.sqlElasticPools.defineElasticPool(name);
+        return this.sqlElasticPools.defineInlineElasticPool(name);
     }
 
     @Override
     public SqlServerImpl withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition) {
         return sqlElasticPools
-            .defineElasticPool(elasticPoolName)
+            .defineInlineElasticPool(elasticPoolName)
             .withEdition(elasticPoolEdition)
             .parent();
     }
 
     @Override
     public SqlServerImpl withoutElasticPool(String elasticPoolName) {
-        sqlElasticPools.withoutElasticPool(elasticPoolName);
+        sqlElasticPools.removeInlineElasticPool(elasticPoolName);
         return this;
     }
 
@@ -214,8 +274,8 @@ public class SqlServerImpl
     }
 
     @Override
-//    public SqlDatabaseImpl defineDatabase(String name) {
-    public SqlDatabase.DefinitionStages.Blank<SqlServer.DefinitionStages.WithCreate> defineDatabase(String name) {
+    public SqlDatabaseImpl defineDatabase(String name) {
+//    public SqlDatabase.DefinitionStages.Blank<SqlServer.DefinitionStages.WithCreate> defineDatabase(String name) {
         return null;
     }
 
@@ -228,4 +288,5 @@ public class SqlServerImpl
     public SqlServerImpl withoutDatabase(String databaseName) {
         return null;
     }
+
 }

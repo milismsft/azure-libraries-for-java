@@ -6,7 +6,9 @@
 package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
+import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
+import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.sql.ElasticPoolEdition;
 import com.microsoft.azure.management.sql.ElasticPoolState;
 import com.microsoft.azure.management.sql.SqlDatabase;
@@ -26,12 +28,12 @@ import com.microsoft.azure.management.sql.SqlElasticPoolStandardMaxEDTUs;
 import com.microsoft.azure.management.sql.SqlElasticPoolStandardMinEDTUs;
 import com.microsoft.azure.management.sql.SqlElasticPoolStandardStorage;
 import com.microsoft.azure.management.sql.SqlServer;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
 import org.joda.time.DateTime;
+import rx.Completable;
 import rx.Observable;
 import rx.functions.Func1;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -88,122 +90,165 @@ public class SqlElasticPoolImpl
      */
     SqlElasticPoolImpl(String resourceGroupName, String sqlServerName, String sqlServerLocation, String name, ElasticPoolInner innerObject, SqlServerManager sqlServerManager) {
         super(name, null, innerObject);
+        Objects.requireNonNull(sqlServerManager);
         this.sqlServerManager = sqlServerManager;
         this.resourceGroupName = resourceGroupName;
         this.sqlServerName = sqlServerName;
         this.sqlServerLocation = sqlServerLocation;
 
-        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(resourceGroupName, sqlServerName, sqlServerLocation, this, "SqlDatabase");
+        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.sqlServerManager, "SqlDatabase");
     }
 
     @Override
     public String id() {
-        return null;
-    }
-
-    @Override
-    public SqlElasticPool apply() {
-        return null;
-    }
-
-    @Override
-    public Observable<SqlElasticPool> createResourceAsync() {
-        return null;
-    }
-
-    @Override
-    public Observable<SqlElasticPool> updateResourceAsync() {
-        return null;
-    }
-
-    @Override
-    public Observable<Void> deleteResourceAsync() {
-        return null;
-    }
-
-    @Override
-    public Observable<SqlElasticPool> applyAsync() {
-        return null;
-    }
-
-    @Override
-    public ServiceFuture<SqlElasticPool> applyAsync(ServiceCallback<SqlElasticPool> callback) {
-        return null;
-    }
-
-    @Override
-    public Update update() {
-        return null;
-    }
-
-    @Override
-    public SqlServer.DefinitionStages.WithCreate attach() {
-        return null;
+        return this.inner().id();
     }
 
     @Override
     public String sqlServerName() {
-        return null;
+        return this.sqlServerName;
     }
 
     @Override
     public DateTime creationDate() {
-        return null;
+        return this.inner().creationDate();
     }
 
     @Override
     public ElasticPoolState state() {
-        return null;
+        return this.inner().state();
     }
 
     @Override
     public ElasticPoolEdition edition() {
-        return null;
+        return this.inner().edition();
     }
 
     @Override
     public int dtu() {
-        return 0;
+        return this.inner().dtu();
     }
 
     @Override
     public int databaseDtuMax() {
-        return 0;
+        return this.inner().databaseDtuMax();
     }
 
     @Override
     public int databaseDtuMin() {
-        return 0;
+        return this.inner().databaseDtuMin();
     }
 
     @Override
     public int storageMB() {
-        return 0;
+        return this.inner().storageMB();
     }
 
     @Override
     public int storageCapacityInMB() {
-        return 0;
+        return this.inner().storageMB();
     }
 
     @Override
-    public List<SqlDatabaseMetric> listDatabaseMetrics() {
-        return null;
+    public String parentId() {
+        return ResourceUtils.parentResourceIdFromResourceId(this.id());
+    }
+
+    @Override
+    public List<SqlDatabaseMetric> listDatabaseMetrics(String filter) {
+        List<SqlDatabaseMetric> databaseMetrics = new ArrayList<>();
+        List<MetricInner> inners = this.sqlServerManager.inner().elasticPools().listMetrics(this.resourceGroupName, this.sqlServerName, this.name(), filter);
+        if (inners != null) {
+            for (MetricInner inner : inners) {
+                databaseMetrics.add(new SqlDatabaseMetricImpl(inner));
+            }
+        }
+
+        return databaseMetrics;
+    }
+
+    @Override
+    public Observable<SqlDatabaseMetric> listDatabaseMetricsAsync(String filter) {
+        return this.sqlServerManager.inner().elasticPools().listMetricsAsync(this.resourceGroupName, this.sqlServerName, this.name(), filter)
+            .flatMap(new Func1<List<MetricInner>, Observable<MetricInner>>() {
+                @Override
+                public Observable<MetricInner> call(List<MetricInner> metricInners) {
+                    return Observable.from(metricInners);
+                }
+            }).map(new Func1<MetricInner, SqlDatabaseMetric>() {
+                @Override
+                public SqlDatabaseMetric call(MetricInner metricInner) {
+                    return new SqlDatabaseMetricImpl(metricInner);
+                }
+            });
     }
 
     @Override
     public List<SqlDatabaseMetricDefinition> listDatabaseMetricDefinitions() {
-        return null;
+        List<SqlDatabaseMetricDefinition> databaseMetricDefinitions = new ArrayList<>();
+        List<MetricDefinitionInner> inners = this.sqlServerManager.inner().elasticPools().listMetricDefinitions(this.resourceGroupName, this.sqlServerName, this.name());
+        if (inners != null) {
+            for (MetricDefinitionInner inner : inners) {
+                databaseMetricDefinitions.add(new SqlDatabaseMetricDefinitionImpl(inner));
+            }
+        }
+
+        return databaseMetricDefinitions;
+    }
+
+    @Override
+    public Observable<SqlDatabaseMetricDefinition> listDatabaseMetricDefinitionsAsync() {
+        return this.sqlServerManager.inner().elasticPools().listMetricDefinitionsAsync(this.resourceGroupName, this.sqlServerName, this.name())
+            .flatMap(new Func1<List<MetricDefinitionInner>, Observable<MetricDefinitionInner>>() {
+                @Override
+                public Observable<MetricDefinitionInner> call(List<MetricDefinitionInner> metricDefinitionInners) {
+                    return Observable.from(metricDefinitionInners);
+                }
+            }).map(new Func1<MetricDefinitionInner, SqlDatabaseMetricDefinition>() {
+                @Override
+                public SqlDatabaseMetricDefinition call(MetricDefinitionInner metricDefinitionInner) {
+                    return new SqlDatabaseMetricDefinitionImpl(metricDefinitionInner);
+                }
+            });
     }
 
     @Override
     public List<SqlDatabase> listDatabases() {
-        return null;
+        List<SqlDatabase> databases = new ArrayList<>();
+        List<DatabaseInner> databaseInners = this.sqlServerManager.inner().databases()
+            .listByElasticPool(this.resourceGroupName, this.sqlServerName, this.name());
+        if (databaseInners != null) {
+            for (DatabaseInner inner : databaseInners) {
+                databases.add(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, inner.name(), inner, this.sqlServerManager));
+            }
+        }
+        return databases;
+    }
+
+    @Override
+    public Observable<SqlDatabase> listDatabasesAsync() {
+        final SqlElasticPoolImpl self = this;
+        return this.sqlServerManager.inner().databases()
+            .listByElasticPoolAsync(self.resourceGroupName, self.sqlServerName, this.name())
+            .flatMap(new Func1<List<DatabaseInner>, Observable<DatabaseInner>>() {
+                @Override
+                public Observable<DatabaseInner> call(List<DatabaseInner> databaseInners) {
+                    return Observable.from(databaseInners);
+                }
+            }).map(new Func1<DatabaseInner, SqlDatabase>() {
+                @Override
+                public SqlDatabase call(DatabaseInner databaseInner) {
+                    return new SqlDatabaseImpl(self.resourceGroupName, self.sqlServerName, databaseInner.name(), databaseInner, self.sqlServerManager);
+                }
+            });
     }
 
     @Override
     public SqlDatabase getDatabase(String databaseName) {
-        return null;
+        DatabaseInner databaseInner = this.sqlServerManager.inner().databases()
+            .get(this.resourceGroupName, this.sqlServerName, this.name());
+
+        return databaseInner != null ? new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, databaseInner.name(), databaseInner, this.sqlServerManager) : null;
     }
 
     @Override
@@ -217,173 +262,200 @@ public class SqlElasticPoolImpl
     }
 
     @Override
+    public SqlDatabase addExistingDatabase(SqlDatabase database) {
+        return null;
+    }
+
+    @Override
     public SqlDatabase removeDatabase(String databaseName) {
         return null;
     }
 
     @Override
     public void delete() {
-
+        this.sqlServerManager.inner().elasticPools().delete(this.resourceGroupName, this.sqlServerName, this.name());
     }
 
-//    @Override
-//    public SqlElasticPool create() {
-//        return this.createAsync().toBlocking().last();
-//    }
-//
-//    @Override
-//    public ServiceFuture<SqlElasticPool> createAsync(ServiceCallback<SqlElasticPool> callback) {
-//        return ServiceFuture.fromBody(this.createAsync(), callback);
-//    }
-//
-//    @Override
-//    public Observable<SqlElasticPool> createAsync() {
-//        //this.enableCommitMode();
-//        //commitAndGetAllAsync();
-//
-//        final SqlElasticPoolImpl self = this;
-//        return this.sqlServerManager.inner().elasticPools()
-//            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
-//            .map(new Func1<ElasticPoolInner, SqlElasticPool>() {
-//                @Override
-//                public SqlElasticPool call(ElasticPoolInner inner) {
-//                    self.setInner(inner);
-//                    return self;
-//                }
-//            })
-//            // TODO: this needs to be converted to work with the new TaskGroup framework
-//            .flatMap(new Func1<SqlElasticPool, Observable<SqlElasticPool>>() {
-//                @Override
-//                public Observable<SqlElasticPool> call(SqlElasticPool sqlElasticPool) {
-//                    return self.sqlDatabases.commitAndGetAllAsync()
-//                        .map(new Func1<List<SqlDatabaseImpl>, SqlElasticPool>() {
-//                            @Override
-//                            public SqlElasticPool call(List<SqlDatabaseImpl> databases) {
-//                                return self;
-//                            }
-//                        });
-//                }
-//            });
-//    }
-//
-//    @Override
-//    public Observable<SqlElasticPool> updateAsync() {
-//        return null;
-//    }
-//
-//    @Override
-//    public Observable<Void> deleteAsync() {
-//        return null;
-//    }
+    @Override
+    public Completable deleteAsync() {
+        return this.deleteResourceAsync().toCompletable();
+    }
 
     @Override
     protected Observable<ElasticPoolInner> getInnerAsync() {
-        return null;
+        return this.sqlServerManager.inner().elasticPools().getAsync(this.resourceGroupName, this.sqlServerName, this.name());
+    }
+
+    @Override
+    public Observable<SqlElasticPool> createResourceAsync() {
+        final SqlElasticPoolImpl self = this;
+        this.inner().withLocation(this.sqlServerLocation);
+        return this.sqlServerManager.inner().elasticPools()
+            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+            .map(new Func1<ElasticPoolInner, SqlElasticPool>() {
+                @Override
+                public SqlElasticPool call(ElasticPoolInner inner) {
+                    self.setInner(inner);
+                    return self;
+                }
+            });
+    }
+
+    @Override
+    public Observable<SqlElasticPool> updateResourceAsync() {
+        final SqlElasticPoolImpl self = this;
+        return this.sqlServerManager.inner().elasticPools()
+            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+            .map(new Func1<ElasticPoolInner, SqlElasticPool>() {
+                @Override
+                public SqlElasticPool call(ElasticPoolInner inner) {
+                    self.setInner(inner);
+                    return self;
+                }
+            });
+    }
+
+    @Override
+    public Observable<Void> deleteResourceAsync() {
+        return this.sqlServerManager.inner().elasticPools().deleteAsync(this.resourceGroupName, this.sqlServerName, this.name());
+    }
+
+    @Override
+    public Update update() {
+        super.prepareUpdate();
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withExistingSqlServer(String resourceGroupName, String sqlServerName, String location) {
-        return null;
+        this.resourceGroupName = resourceGroupName;
+        this.sqlServerName = sqlServerName;
+        this.sqlServerLocation = location;
+
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withSqlServer(SqlServer sqlServer) {
-        return null;
+        this.resourceGroupName = sqlServer.resourceGroupName();
+        this.sqlServerName = sqlServer.name();
+        this.sqlServerLocation = sqlServer.regionName();
+
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withEdition(ElasticPoolEdition edition) {
-        return null;
+        this.inner().withEdition(edition);
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withBasicPool() {
-        return null;
+        this.inner().withEdition(ElasticPoolEdition.BASIC);
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withStandardPool() {
-        return null;
+        this.inner().withEdition(ElasticPoolEdition.STANDARD);
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withPremiumPool() {
-        return null;
+        this.inner().withEdition(ElasticPoolEdition.PREMIUM);
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withReservedDtu(SqlElasticPoolBasicEDTUs eDTU) {
-        return null;
+        this.inner().withDtu(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDatabaseDtuMax(SqlElasticPoolBasicMaxEDTUs eDTU) {
-        return null;
+        this.inner().withDatabaseDtuMax(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDatabaseDtuMin(SqlElasticPoolBasicMinEDTUs eDTU) {
-        return null;
+        this.inner().withDatabaseDtuMin(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withReservedDtu(SqlElasticPoolStandardEDTUs eDTU) {
-        return null;
+        this.inner().withDtu(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDatabaseDtuMax(SqlElasticPoolStandardMaxEDTUs eDTU) {
-        return null;
+        this.inner().withDatabaseDtuMax(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDatabaseDtuMin(SqlElasticPoolStandardMinEDTUs eDTU) {
-        return null;
+        this.inner().withDatabaseDtuMin(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withStorageCapacity(SqlElasticPoolStandardStorage storageCapacity) {
-        return null;
+        this.inner().withDtu(storageCapacity.capacityInMB());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withReservedDtu(SqlElasticPoolPremiumEDTUs eDTU) {
-        return null;
+        this.inner().withDtu(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDatabaseDtuMax(SqlElasticPoolPremiumMaxEDTUs eDTU) {
-        return null;
+        this.inner().withDatabaseDtuMax(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDatabaseDtuMin(SqlElasticPoolPremiumMinEDTUs eDTU) {
-        return null;
+        this.inner().withDatabaseDtuMin(eDTU.value());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withStorageCapacity(SqlElasticPoolPremiumSorage storageCapacity) {
-        return null;
+        this.inner().withDtu(storageCapacity.capacityInMB());
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDatabaseDtuMin(int databaseDtuMin) {
-        return null;
+        this.inner().withDatabaseDtuMin(databaseDtuMin);
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDatabaseDtuMax(int databaseDtuMax) {
-        return null;
+        this.inner().withDatabaseDtuMax(databaseDtuMax);
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withDtu(int dtu) {
-        return null;
+        this.inner().withDtu(dtu);
+        return this;
     }
 
     @Override
     public SqlElasticPoolImpl withStorageCapacity(int storageMB) {
-        return null;
+        this.inner().withStorageMB(storageMB);
+        return this;
     }
 
     @Override
@@ -399,5 +471,15 @@ public class SqlElasticPoolImpl
     @Override
     public SqlElasticPoolImpl withExistingDatabase(SqlDatabase database) {
         return null;
+    }
+
+    @Override
+    public SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String name) {
+        return null;
+    }
+
+    @Override
+    public SqlServerImpl attach() {
+        return parent();
     }
 }

@@ -10,6 +10,8 @@ import com.microsoft.azure.management.resources.fluentcore.arm.collection.implem
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlServer;
 
+import java.util.Objects;
+
 /**
  * Represents a SQL Firewall rules collection associated with an Azure SQL server.
  */
@@ -22,6 +24,8 @@ public class SqlFirewallRulesAsExternalChildResourcesImpl
             SqlServerImpl,
             SqlServer> {
 
+    SqlServerManager sqlServerManager;
+
     /**
      * Creates a new ExternalNonInlineChildResourcesImpl.
      *
@@ -30,17 +34,34 @@ public class SqlFirewallRulesAsExternalChildResourcesImpl
      */
     protected SqlFirewallRulesAsExternalChildResourcesImpl(SqlServerImpl parent, String childResourceName) {
         super(parent, parent.taskGroup(), childResourceName);
+        this.sqlServerManager = parent.manager();
     }
 
-    SqlFirewallRuleImpl defineFirewallRule(String name) {
+    /**
+     * Creates a new ExternalChildResourcesNonCachedImpl.
+     *
+     * @param sqlServerManager the manager
+     * @param childResourceName the child resource name (for logging)
+     */
+    protected SqlFirewallRulesAsExternalChildResourcesImpl(SqlServerManager sqlServerManager, String childResourceName) {
+        super(null, null, childResourceName);
+        this.sqlServerManager = sqlServerManager;
+    }
+
+    SqlFirewallRuleImpl defineIndependentFirewallRule(String name) {
+        // resource group and server name will be set by the next method in the Fluent flow
+        return prepareIndependentDefine(new SqlFirewallRuleImpl(null, null, name, new FirewallRuleInner(), this.sqlServerManager));
+    }
+
+    SqlFirewallRuleImpl defineInlineFirewallRule(String name) {
         return prepareInlineDefine(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 
-    SqlFirewallRuleImpl updateFirewallRule(String name) {
+    SqlFirewallRuleImpl updateInlineFirewallRule(String name) {
         return prepareInlineUpdate(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 
-    void withoutFirewallRule(String name) {
+    void removeInlineFirewallRule(String name) {
         prepareInlineRemove(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
     }
 }

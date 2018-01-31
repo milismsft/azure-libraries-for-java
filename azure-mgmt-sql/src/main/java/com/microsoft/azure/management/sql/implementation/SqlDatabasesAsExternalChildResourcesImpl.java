@@ -24,63 +24,47 @@ public class SqlDatabasesAsExternalChildResourcesImpl
             SqlServerImpl,
             SqlServer> {
 
-    private SqlElasticPoolImpl elasticPoolParent;
-    private String resourceGroupName;
-    private String sqlServerName;
-    private String sqlServerLocation;
+    SqlServerManager sqlServerManager;
 
     /**
-     * Creates a new ExternalNonInlineChildResourcesImpl.
+     * Creates a new ExternalChildResourcesNonCachedImpl.
      *
      * @param parent            the parent Azure resource
      * @param childResourceName the child resource name
      */
     protected SqlDatabasesAsExternalChildResourcesImpl(SqlServerImpl parent, String childResourceName) {
         super(parent, parent.taskGroup(), childResourceName);
-        Objects.requireNonNull(parent);
-        this.resourceGroupName = parent.resourceGroupName();
-        this.sqlServerName = parent.name();
-        this.sqlServerLocation = parent.regionName();
 
-        this.elasticPoolParent = null;
+        this.sqlServerManager = parent.manager();
     }
 
     /**
-     * Creates a new ExternalNonInlineChildResourcesImpl.
+     * Creates a new ExternalChildResourcesNonCachedImpl.
      *
-     * @param parent            the parent Azure resource
-     * @param childResourceName the child resource name
+     * @param sqlServerManager the manager
+     * @param childResourceName the child resource name (for logging)
      */
-    protected SqlDatabasesAsExternalChildResourcesImpl(String resourceGroupName, String sqlServerName, String sqlServerLocation, SqlElasticPoolImpl parent, String childResourceName) {
-        super(null, parent.taskGroup(), childResourceName);
-        this.resourceGroupName = resourceGroupName;
-        this.sqlServerName = sqlServerName;
-        this.sqlServerLocation = sqlServerLocation;
+    protected SqlDatabasesAsExternalChildResourcesImpl(SqlServerManager sqlServerManager, String childResourceName) {
+        super(null, null, childResourceName);
 
-        this.elasticPoolParent = parent;
+        Objects.requireNonNull(sqlServerManager);
+        this.sqlServerManager = sqlServerManager;
     }
 
-    SqlDatabaseImpl defineElasticPool(String name) {
-        if (this.elasticPoolParent != null) {
-            return prepareIndependentDefine(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, name, new DatabaseInner(), this.parent().manager()));
-        } else {
-            return prepareInlineDefine(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
-        }
+    SqlDatabaseImpl defineIndependentDatabase(String name) {
+        // resource group and server name will be set by the next method in the Fluent flow
+        return prepareIndependentDefine(new SqlDatabaseImpl(null, null, name, new DatabaseInner(), this.sqlServerManager));
     }
 
-    SqlDatabaseImpl updateElasticPool(String name) {
-        if (this.elasticPoolParent != null) {
-            return prepareInlineUpdate(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, name, new DatabaseInner(), this.parent().manager()));
-        } else {
-            return prepareInlineUpdate(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
-        }
+    SqlDatabaseImpl defineInlineDatabase(String name) {
+        return prepareInlineDefine(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
     }
 
-    void withoutElasticPool(String name) {
-        if (this.elasticPoolParent != null) {
-            prepareInlineRemove(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, name, new DatabaseInner(), this.parent().manager()));
-        } else {
-            prepareInlineRemove(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
-        }
+    SqlDatabaseImpl updateInlineDatabase(String name) {
+        return prepareInlineUpdate(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
+    }
+
+    void removeInlineDatabase(String name) {
+        prepareInlineRemove(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
     }
 }

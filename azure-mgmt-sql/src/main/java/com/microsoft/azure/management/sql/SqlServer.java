@@ -8,6 +8,7 @@ package com.microsoft.azure.management.sql;
 
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
+import com.microsoft.azure.management.apigeneration.Method;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.GroupableResource;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.Resource;
 import com.microsoft.azure.management.resources.fluentcore.model.Appliable;
@@ -58,14 +59,44 @@ public interface SqlServer extends
      *
      * @return the SQL Firewall rule
      */
-    SqlFirewallRule addAccessFromAzureServices();
+    @Method
+    SqlFirewallRule setAccessFromAzureServices();
 
     /**
      * Sets the Azure services default access to this server to false.
      * <p>
      * The firewall rule named "AllowAllWindowsAzureIps" will be removed from the SQL server.
      */
+    @Method
     void removeAccessFromAzureServices();
+
+    /**
+     * Sets an Active Directory administrator to this server.
+     * <p>
+     * Azure Active Directory authentication allows you to centrally manage identity and access
+     *   to your Azure SQL Database V12.
+     *
+     * @param userLogin the user or group login; it can be the name or the email address
+     * @param id the user or group unique ID
+     * @return a representation of a SQL Server Active Directory administrator object
+     */
+    @Method
+    SqlActiveDirectoryAdministrator setActiveDirectoryAdministrator(String userLogin, String id);
+
+    /**
+     * Gets the Active Directory administrator for this server.
+     *
+     * @return a representation of a SQL Server Active Directory administrator object (null if one is not set)
+     */
+    @Method
+    SqlActiveDirectoryAdministrator getActiveDirectoryAdministrator();
+
+    /**
+     * Removes the Active Directory administrator from this server.
+     */
+    @Method
+    void removeActiveDirectoryAdministrator();
+
 
     // Collections
 
@@ -312,6 +343,23 @@ public interface SqlServer extends
         }
 
         /**
+         * A SQL Server definition setting the Active Directory administrator.
+         */
+        interface WithActiveDirectoryAdministrator {
+            /**
+             * Sets the SQL Active Directory administrator.
+             * <p>
+             * Azure Active Directory authentication allows you to centrally manage identity and access
+             *   to your Azure SQL Database V12.
+             *
+             * @param userLogin the user or group login; it can be the name or the email address
+             * @param id the user or group unique ID
+             * @return Next stage of the SQL Server definition
+             */
+            WithCreate withActiveDirectoryAdministrator(String userLogin, String id);
+        }
+
+        /**
          * A SQL Server definition for specifying elastic pool.
          */
         interface WithElasticPool {
@@ -428,6 +476,7 @@ public interface SqlServer extends
          */
         interface WithCreate extends
             Creatable<SqlServer>,
+            WithActiveDirectoryAdministrator,
             WithElasticPool,
             WithDatabase,
             WithFirewallRule,

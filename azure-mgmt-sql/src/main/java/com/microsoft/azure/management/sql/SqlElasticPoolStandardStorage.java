@@ -109,7 +109,7 @@ public enum SqlElasticPoolStandardStorage {
     /**
      * @return the maximum allowed storage capacity in MB for the SQL Elastic Pool
      */
-    public int value() {
+    public int capacityInMB() {
         return this.capacityInGB * 1024;
     }
 }

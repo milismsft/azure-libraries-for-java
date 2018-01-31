@@ -16,6 +16,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
 import com.microsoft.azure.management.sql.implementation.FirewallRuleInner;
+import rx.Completable;
 
 /**
  * An immutable client-side representation of an Azure SQL Server Firewall Rule.
@@ -65,6 +66,18 @@ public interface SqlFirewallRule
     @Method
     void delete();
 
+    /**
+     * Deletes the firewall rule asynchronously.
+     *
+     * @return a representation of the deferred computation of this call
+     */
+    @Method
+    Completable deleteAsync();
+
+
+    /**************************************************************
+     * Fluent interfaces to provision a SQL Firewall Rule
+     **************************************************************/
 
     /**
      * Container interface for all the definitions that need to be implemented.

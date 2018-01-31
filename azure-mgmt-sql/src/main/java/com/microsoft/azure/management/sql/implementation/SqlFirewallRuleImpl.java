@@ -12,8 +12,7 @@ import com.microsoft.azure.management.resources.fluentcore.arm.models.implementa
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlFirewallRuleOperations;
 import com.microsoft.azure.management.sql.SqlServer;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
+import rx.Completable;
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -65,6 +64,7 @@ public class SqlFirewallRuleImpl
      */
     SqlFirewallRuleImpl(String resourceGroupName, String sqlServerName, String name, FirewallRuleInner innerObject, SqlServerManager sqlServerManager) {
         super(name, null, innerObject);
+        Objects.requireNonNull(sqlServerManager);
         this.sqlServerManager = sqlServerManager;
         this.resourceGroupName = resourceGroupName;
         this.sqlServerName = sqlServerName;
@@ -82,6 +82,8 @@ public class SqlFirewallRuleImpl
 
     @Override
     public SqlFirewallRuleImpl update() {
+        super.prepareUpdate();
+
         return this;
     }
 
@@ -116,13 +118,13 @@ public class SqlFirewallRuleImpl
     }
 
     @Override
-    public String parentId() {
-        return ResourceUtils.parentResourceIdFromResourceId(this.id());
+    public Completable deleteAsync() {
+        return this.deleteResourceAsync().toCompletable();
     }
 
     @Override
-    public SqlFirewallRule apply() {
-        return this.applyAsync().toBlocking().last();
+    public String parentId() {
+        return ResourceUtils.parentResourceIdFromResourceId(this.id());
     }
 
     @Override
@@ -156,16 +158,6 @@ public class SqlFirewallRuleImpl
     @Override
     public Observable<Void> deleteResourceAsync() {
         return this.sqlServerManager.inner().firewallRules().deleteAsync(this.resourceGroupName, this.sqlServerName, this.name());
-    }
-
-    @Override
-    public Observable<SqlFirewallRule> applyAsync() {
-        return this.updateResourceAsync();
-    }
-
-    @Override
-    public ServiceFuture<SqlFirewallRule> applyAsync(ServiceCallback<SqlFirewallRule> callback) {
-        return ServiceFuture.fromBody(this.updateResourceAsync(), callback);
     }
 
     @Override

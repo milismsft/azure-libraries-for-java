@@ -40,7 +40,7 @@ public abstract class SqlServerTest extends TestBase {
                 .withSubscription(defaultSubscription);
 
         sqlServerManager = SqlServerManager
-                .authenticate(restClient, defaultSubscription);
+                .authenticate(restClient, domain, defaultSubscription);
     }
 
     @Override
