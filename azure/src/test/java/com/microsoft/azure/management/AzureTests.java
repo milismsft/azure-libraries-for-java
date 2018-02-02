@@ -892,6 +892,16 @@ public class AzureTests extends TestBase {
      * @throws Exception
      */
     @Test
+    public void testNetworkWithAccessFromServiceToSubnet() throws Exception {
+        new TestNetwork.WithAccessFromServiceToSubnet()
+                .runTest(azure.networks(), azure.resourceGroups());
+    }
+
+    /**
+     * Tests virtual network peering
+     * @throws Exception
+     */
+    @Test
     public void testNetworkPeerings() throws Exception {
         new TestNetwork.WithPeering()
             .runTest(azure.networks(), azure.resourceGroups());
@@ -1134,6 +1144,16 @@ public class AzureTests extends TestBase {
     @Test
     public void testVirtualNetworkGatewayVNetToVNet() throws Exception {
         new TestVirtualNetworkGateway.VNetToVNet(azure.virtualNetworkGateways().manager())
+                .runTest(azure.virtualNetworkGateways(), azure.resourceGroups());
+    }
+
+    /**
+     * Tests the virtual network gateway Point-to-Site connection.
+     * @throws Exception
+     */
+    @Test
+    public void testVirtualNetworkGatewayPointToSite() throws Exception {
+        new TestVirtualNetworkGateway.PointToSite(azure.virtualNetworkGateways().manager())
                 .runTest(azure.virtualNetworkGateways(), azure.resourceGroups());
     }
 

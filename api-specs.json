@@ -15,7 +15,7 @@
     "dir": "azure-mgmt-keyvault",
     "source": "specification/keyvault/resource-manager/readme.md",
     "package": "com.microsoft.azure.management.keyvault",
-    "args": "--payload-flattening-threshold=1 --tag=package-2015-06"
+    "args": "--payload-flattening-threshold=1 --tag=package-2016-10"
   },
   "automation": {
     "dir": "azure-mgmt-automation",
@@ -106,28 +106,28 @@
     "dir": "azure-mgmt-datalake-analytics",
     "source": "specification/datalake-analytics/resource-manager/readme.md",
     "package": "com.microsoft.azure.management.datalake.analytics",
-    "args": "--tag=package-2016-11",
+    "args": "--payload-flattening-threshold=2 --tag=package-2016-11",
     "fluent": false
   },
   "datalake.analytics.catalog": {
     "dir": "azure-mgmt-datalake-analytics",
     "source": "specification/datalake-analytics/data-plane/readme.md",
     "package": "com.microsoft.azure.management.datalake.analytics",
-    "args": "--tag=package-catalog-2016-11",
+    "args": "--payload-flattening-threshold=2 --tag=package-catalog-2016-11",
     "fluent": false
   },
   "datalake.analytics.job": {
     "dir": "azure-mgmt-datalake-analytics",
     "source": "specification/datalake-analytics/data-plane/readme.md",
     "package": "com.microsoft.azure.management.datalake.analytics",
-    "args": "--tag=package-job-2016-11",
+    "args": "--payload-flattening-threshold=2 --tag=package-job-2017-09-preview",
     "fluent": false
   },
   "datalake.store.account": {
     "dir": "azure-mgmt-datalake-store",
     "source": "specification/datalake-store/resource-manager/readme.md",
     "package": "com.microsoft.azure.management.datalake.store",
-    "args": "--tag=package-2016-11",
+    "args": "--payload-flattening-threshold=2 --tag=package-2016-11",
     "fluent": false
   },
   "devtestlab": {
@@ -194,13 +194,7 @@
     "dir": "azure-mgmt-monitor",
     "source": "specification/monitor/resource-manager/readme.md",
     "package": "com.microsoft.azure.management.monitor",
-    "args": "--payload-flattening-threshold=1 --tag=package-2017-08"
-  },
-  "monitor-dataplane": {
-    "dir": "azure-mgmt-monitor",
-    "source": "specification/monitor/data-plane/readme.md",
-    "package": "com.microsoft.azure.management.monitor",
-    "args": "--payload-flattening-threshold=1 --service-name=Monitor --tag=package-2016-09"
+    "args": "--payload-flattening-threshold=1 --tag=package-2017-09"
   },
   "network": {
     "dir": "azure-mgmt-network",
