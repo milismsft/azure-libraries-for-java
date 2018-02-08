@@ -29,10 +29,10 @@ public class SqlElasticPoolOperationsImpl
         SqlElasticPoolOperations.SqlElasticPoolActionsDefinition {
 
     private SqlServerManager manager;
-    private SqlServer sqlServer;
+    private SqlServerImpl sqlServer;
     private SqlElasticPoolsAsExternalChildResourcesImpl sqlElasticPools;
 
-    public SqlElasticPoolOperationsImpl(SqlServer parent, SqlServerManager manager) {
+    public SqlElasticPoolOperationsImpl(SqlServerImpl parent, SqlServerManager manager) {
         Objects.requireNonNull(manager);
         this.sqlServer = parent;
         this.manager = manager;

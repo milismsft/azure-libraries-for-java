@@ -6,6 +6,7 @@
 package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
+import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
 import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
@@ -35,6 +36,7 @@ import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -47,6 +49,7 @@ public class SqlElasticPoolImpl
     implements
         SqlElasticPool,
         SqlElasticPool.SqlElasticPoolDefinition<SqlServer.DefinitionStages.WithCreate>,
+        SqlElasticPoolOperations.DefinitionStages.WithCreate,
         SqlElasticPool.Update,
         SqlElasticPoolOperations.SqlElasticPoolOperationsDefinition {
 
@@ -96,7 +99,7 @@ public class SqlElasticPoolImpl
         this.sqlServerName = sqlServerName;
         this.sqlServerLocation = sqlServerLocation;
 
-        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.sqlServerManager, "SqlDatabase");
+        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
     }
 
     @Override
@@ -152,6 +155,16 @@ public class SqlElasticPoolImpl
     @Override
     public String parentId() {
         return ResourceUtils.parentResourceIdFromResourceId(this.id());
+    }
+
+    @Override
+    public String regionName() {
+        return this.sqlServerLocation;
+    }
+
+    @Override
+    public Region region() {
+        return Region.findByLabelOrName(this.regionName());
     }
 
     @Override
@@ -219,7 +232,7 @@ public class SqlElasticPoolImpl
             .listByElasticPool(this.resourceGroupName, this.sqlServerName, this.name());
         if (databaseInners != null) {
             for (DatabaseInner inner : databaseInners) {
-                databases.add(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, inner.name(), inner, this.sqlServerManager));
+                databases.add(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation, inner.name(), inner, this.sqlServerManager));
             }
         }
         return databases;
@@ -238,7 +251,7 @@ public class SqlElasticPoolImpl
             }).map(new Func1<DatabaseInner, SqlDatabase>() {
                 @Override
                 public SqlDatabase call(DatabaseInner databaseInner) {
-                    return new SqlDatabaseImpl(self.resourceGroupName, self.sqlServerName, databaseInner.name(), databaseInner, self.sqlServerManager);
+                    return new SqlDatabaseImpl(self.resourceGroupName, self.sqlServerName, self.sqlServerLocation, databaseInner.name(), databaseInner, self.sqlServerManager);
                 }
             });
     }
@@ -248,7 +261,7 @@ public class SqlElasticPoolImpl
         DatabaseInner databaseInner = this.sqlServerManager.inner().databases()
             .get(this.resourceGroupName, this.sqlServerName, this.name());
 
-        return databaseInner != null ? new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, databaseInner.name(), databaseInner, this.sqlServerManager) : null;
+        return databaseInner != null ? new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation, databaseInner.name(), databaseInner, this.sqlServerManager) : null;
     }
 
     @Override
@@ -313,6 +326,19 @@ public class SqlElasticPoolImpl
                     return self;
                 }
             });
+    }
+
+    @Override
+    public void beforeGroupCreateOrUpdate() {
+    }
+
+    @Override
+    public Completable afterPostRunAsync(boolean isGroupFaulted) {
+        if (this.sqlDatabases != null) {
+            this.sqlDatabases.clear();
+        }
+
+        return Completable.complete();
     }
 
     @Override
@@ -460,22 +486,63 @@ public class SqlElasticPoolImpl
 
     @Override
     public SqlElasticPoolImpl withNewDatabase(String databaseName) {
-        return null;
+        if (this.sqlDatabases == null) {
+            this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
+
+        }
+        return new SqlDatabaseForElasticPoolImpl(this, this.sqlDatabases
+            .defineInlineDatabase(databaseName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation))
+            .attach();
     }
 
     @Override
     public SqlElasticPoolImpl withExistingDatabase(String databaseName) {
-        return null;
+        if (this.sqlDatabases == null) {
+            this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
+
+        }
+        return new SqlDatabaseForElasticPoolImpl(this, this.sqlDatabases
+            .patchUpdateDatabase(databaseName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation))
+            .attach();
     }
 
     @Override
     public SqlElasticPoolImpl withExistingDatabase(SqlDatabase database) {
-        return null;
+        if (this.sqlDatabases == null) {
+            this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
+
+        }
+        return new SqlDatabaseForElasticPoolImpl(this, this.sqlDatabases
+            .patchUpdateDatabase(database.name()).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation))
+            .attach();
     }
 
     @Override
-    public SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String name) {
-        return null;
+    public SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String databaseName) {
+        if (this.sqlDatabases == null) {
+            this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
+
+        }
+        return new SqlDatabaseForElasticPoolImpl(this, this.sqlDatabases
+            .defineInlineDatabase(databaseName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation));
+    }
+
+    @Override
+    public SqlElasticPoolImpl withTags(Map<String, String> tags) {
+        this.inner().withTags(tags);
+        return this;
+    }
+
+    @Override
+    public SqlElasticPoolImpl withTag(String key, String value) {
+        this.inner().getTags().put(key, value);
+        return this;
+    }
+
+    @Override
+    public SqlElasticPoolImpl withoutTag(String key) {
+        this.inner().getTags().remove(key);
+        return this;
     }
 
     @Override

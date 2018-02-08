@@ -7,6 +7,7 @@ package com.microsoft.azure.management.sql;
 
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
+import com.microsoft.azure.management.resources.fluentcore.arm.models.Resource;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsCreating;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 
@@ -42,17 +43,18 @@ public interface SqlDatabaseOperations extends
              *
              * @param resourceGroupName the name of the resource group the parent SQL server
              * @param sqlServerName     the parent SQL server name
+             * @param location          the parent SQL server location
              * @return The next stage of the definition.
              */
-            WithIPAddressRange withExistingSqlServer(String resourceGroupName, String sqlServerName);
+            WithIPAddressRange withExistingSqlServer(String resourceGroupName, String sqlServerName, String location);
 
             /**
-             * Sets the parent SQL server for the new Firewall rule.
+             * Sets the parent SQL server for the new SQL Database.
              *
-             * @param sqlServerId the parent SQL server ID
+             * @param sqlServer the parent SQL server ID
              * @return The next stage of the definition.
              */
-            WithIPAddressRange withSqlServerId(String sqlServerId);
+            WithIPAddressRange withSqlServer(SqlServer sqlServer);
         }
 
         /**
@@ -102,7 +104,9 @@ public interface SqlDatabaseOperations extends
         /**
          * The final stage of the SQL Database definition.
          */
-        interface WithCreate extends Creatable<SqlDatabase> {
+        interface WithCreate extends
+            Resource.DefinitionWithTags<SqlDatabase>,
+            Creatable<SqlDatabase> {
         }
     }
 

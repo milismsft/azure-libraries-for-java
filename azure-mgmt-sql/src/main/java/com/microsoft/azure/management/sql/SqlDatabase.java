@@ -8,9 +8,12 @@ package com.microsoft.azure.management.sql;
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.apigeneration.Method;
+import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.ExternalChildResource;
+import com.microsoft.azure.management.resources.fluentcore.arm.models.Resource;
 import com.microsoft.azure.management.resources.fluentcore.model.Appliable;
 import com.microsoft.azure.management.resources.fluentcore.model.Attachable;
+import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
 import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
@@ -160,6 +163,16 @@ public interface SqlDatabase
     String parentId();
 
     /**
+     * @return the name of the region the resource is in
+     */
+    String regionName();
+
+    /**
+     * @return the region the resource is in
+     */
+    Region region();
+
+    /**
      * Deletes the database from the server.
      */
     @Method
@@ -183,7 +196,10 @@ public interface SqlDatabase
      */
     interface SqlDatabaseDefinition<ParentT> extends
         SqlDatabase.DefinitionStages.Blank<ParentT>,
-        SqlDatabase.DefinitionStages.WithAttach<ParentT> {
+        SqlDatabase.DefinitionStages.WithSourceDatabaseId<ParentT>,
+        SqlDatabase.DefinitionStages.WithCreateMode<ParentT>,
+        SqlDatabase.DefinitionStages.WithAttachForElasticPool<ParentT>,
+        SqlDatabase.DefinitionStages.WithAttachFinal<ParentT> {
     }
 
     /**
@@ -196,20 +212,86 @@ public interface SqlDatabase
          * @param <ParentT> the stage of the parent definition to return to after attaching this definition
          */
         interface Blank<ParentT> extends
-            SqlDatabase.DefinitionStages.WithIPAddress<ParentT> {
+            SqlDatabase.DefinitionStages.WithSourceDatabaseId<ParentT> {
         }
 
         /**
-         * The SQL Firewall Rule definition to set the IP address for the parent SQL Server.
+         * The SQL Database definition to set the source database id for database.
          */
-        interface WithIPAddress<ParentT> {
+        interface WithSourceDatabaseId<ParentT> extends WithAttachForElasticPool<ParentT> {
             /**
-             * Sets the ending IP address of SQL server's firewall rule.
+             * Sets the resource if of source database for the SQL Database.
+             * Collation, Edition, and MaxSizeBytes must remain the same while the link is
+             * active. Values specified for these parameters will be ignored.
              *
-             * @param ipAddress IP address in IPv4 format.
+             * @param sourceDatabaseId id of the source database
              * @return The next stage of the definition.
              */
-            SqlDatabase.DefinitionStages.WithAttach<ParentT> withIPAddress(String ipAddress);
+            WithCreateMode<ParentT> withSourceDatabase(String sourceDatabaseId);
+
+            /**
+             * Sets the resource if of source database for the SQL Database.
+             * Collation, Edition, and MaxSizeBytes must remain the same while the link is
+             * active. Values specified for these parameters will be ignored.
+             *
+             * @param sourceDatabase instance of the source database
+             * @return The next stage of the definition.
+             */
+            WithCreateMode<ParentT> withSourceDatabase(SqlDatabase sourceDatabase);
+        }
+
+        /**
+         * The SQL Database definition to set the create mode for database.
+         */
+        interface WithCreateMode<ParentT> {
+            /**
+             * Sets the create mode for the SQL Database.
+             *
+             * @param createMode create mode for the database, should not be default in this flow
+             * @return The next stage of the definition.
+             */
+            WithAttachFinal<ParentT> withMode(CreateMode createMode);
+        }
+
+        /**
+         * The SQL Database definition to set the collation for database.
+         */
+        interface WithCollation<ParentT> {
+            /**
+             * Sets the collation for the SQL Database.
+             * <p>
+             * Default collation for an Azure SQL Database is "SQL_Latin1_General_CP1_CI_AS"
+             *
+             * @param collation collation to be set for database
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withCollation(String collation);
+        }
+
+        /**
+         * The SQL Database definition to set the Max Size in Bytes for database.
+         */
+        interface WithMaxSizeBytes<ParentT> {
+            /**
+             * Sets the max size in bytes for SQL Database.
+             *
+             * @param maxSizeBytes max size of the Azure SQL Database expressed in bytes. Note: Only
+             * the following sizes are supported (in addition to limitations being
+             * placed on each edition): { 100 MB | 500 MB |1 GB | 5 GB | 10 GB | 20
+             * GB | 30 GB … 150 GB | 200 GB … 500 GB }
+             * @return The next stage of the definition.
+             */
+            WithAttachForElasticPool<ParentT> withMaxSizeBytes(long maxSizeBytes);
+        }
+
+        /** The final stage of the SQL Database definition with an SQL Elastic Pool.
+         *
+         * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+         */
+        interface WithAttachForElasticPool<ParentT> extends
+            WithCollation<ParentT>,
+            WithMaxSizeBytes<ParentT>,
+            WithAttachFinal<ParentT> {
         }
 
         /** The final stage of the SQL Database definition.
@@ -218,7 +300,7 @@ public interface SqlDatabase
          * can be attached to the parent SQL Server definition.
          * @param <ParentT> the stage of the parent definition to return to after attaching this definition
          */
-        interface WithAttach<ParentT> extends
+        interface WithAttachFinal<ParentT> extends
             Attachable.InDefinition<ParentT> {
         }
     }
@@ -228,7 +310,11 @@ public interface SqlDatabase
      * The template for a SqlDatabase update operation, containing all the settings that can be modified.
      */
     interface Update extends
-        SqlDatabase.UpdateStages.WithEndIPAddress,
+        UpdateStages.WithEdition,
+        UpdateStages.WithElasticPoolName,
+        UpdateStages.WithMaxSizeBytes,
+        UpdateStages.WithServiceObjective,
+        Resource.UpdateWithTags<SqlDatabase>,
         Appliable<SqlDatabase> {
     }
 
@@ -238,16 +324,80 @@ public interface SqlDatabase
     interface UpdateStages {
 
         /**
-         * The SQL Firewall Rule definition to set the starting IP Address for the server.
+         * The SQL Database definition to set the edition for database.
          */
-        interface WithEndIPAddress {
+        interface WithEdition {
             /**
-             * Sets the ending IP address of SQL server's firewall rule.
+             * Sets the edition for the SQL Database.
              *
-             * @param endIPAddress end IP address in IPv4 format.
+             * @param edition edition to be set for database
              * @return The next stage of the update.
              */
-            SqlDatabase.Update withEndIPAddress(String endIPAddress);
+            Update withEdition(DatabaseEdition edition);
+        }
+
+        /**
+         * The SQL Database definition to set the Max Size in Bytes for database.
+         */
+        interface WithMaxSizeBytes {
+            /**
+             * Sets the max size in bytes for SQL Database.
+             * @param maxSizeBytes max size of the Azure SQL Database expressed in bytes. Note: Only
+             * the following sizes are supported (in addition to limitations being
+             * placed on each edition): { 100 MB | 500 MB |1 GB | 5 GB | 10 GB | 20
+             * GB | 30 GB … 150 GB | 200 GB … 500 GB }
+             * @return The next stage of the update.
+             */
+            Update withMaxSizeBytes(long maxSizeBytes);
+        }
+
+        /**
+         * The SQL Database definition to set the service level objective.
+         */
+        interface WithServiceObjective {
+            /**
+             * Sets the service level objective for the SQL Database.
+             *
+             * @param serviceLevelObjective service level objected for the SQL Database
+             * @return The next stage of the update.
+             */
+            Update withServiceObjective(ServiceObjectiveName serviceLevelObjective);
+        }
+
+        /**
+         * The SQL Database definition to set the elastic pool for database.
+         */
+        interface WithElasticPoolName {
+            /**
+             * Removes database from it's elastic pool.
+             *
+             * @return The next stage of the update.
+             */
+            WithEdition withoutElasticPool();
+
+            /**
+             * Sets the existing elastic pool for the SQLDatabase.
+             *
+             * @param elasticPoolName for the SQL Database
+             * @return The next stage of the update.
+             */
+            Update withExistingElasticPool(String elasticPoolName);
+
+            /**
+             * Sets the existing elastic pool for the SQLDatabase.
+             *
+             * @param sqlElasticPool for the SQL Database
+             * @return The next stage of the update.
+             */
+            Update withExistingElasticPool(SqlElasticPool sqlElasticPool);
+
+            /**
+             * Sets the new elastic pool for the SQLDatabase, this will create a new elastic pool while creating database.
+             *
+             * @param sqlElasticPool creatable definition for new elastic pool to be created for the SQL Database
+             * @return The next stage of the update.
+             */
+            Update withNewElasticPool(Creatable<SqlElasticPool> sqlElasticPool);
         }
     }
 }

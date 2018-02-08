@@ -58,6 +58,37 @@ public class SqlServerOperationsTests extends SqlServerTest {
 
         sqlServerManager.resourceManager().resourceGroups().define(RG_NAME).withRegion("westus").create();
 
+//        SqlElasticPool elasticPool = sqlServerManager.sqlServers().elasticPools()
+//            .define("ep1")
+//            .withSqlServer(sqlServer)
+//            .withBasicPool()
+//            .withReservedDtu(SqlElasticPoolBasicEDTUs.eDTU_200)
+//            .withDatabaseDtuMax(SqlElasticPoolBasicMaxEDTUs.eDTU_5)
+//            .withDatabaseDtuMin(SqlElasticPoolBasicMinEDTUs.eDTU_5)
+//            .create();
+//
+//        Assert.assertNotNull(elasticPool);
+//        Assert.assertEquals(ElasticPoolEdition.BASIC, elasticPool.edition());
+//        Assert.assertEquals(200, elasticPool.dtu());
+//        Assert.assertEquals(5, elasticPool.databaseDtuMax());
+//        Assert.assertEquals(5, elasticPool.databaseDtuMin());
+//
+//        elasticPool.delete();
+
+        DatabaseInner databaseInner = new DatabaseInner();
+
+        SqlElasticPool elasticPool2 = sqlServerManager.sqlServers().elasticPools()
+            .define("ep2")
+            .withSqlServer(sqlServer)
+            .withBasicPool()
+            .withNewDatabase("db2")
+            .defineDatabase("db3")
+                .attach()
+            .withExistingDatabase("db4")
+            .create();
+
+        elasticPool2.delete();
+
 //        ElasticPoolInner elasticPoolInner = new ElasticPoolInner();
 //        elasticPoolInner.withEdition(ElasticPoolEdition.BASIC);
 //        elasticPoolInner.withLocation("westus");
@@ -71,27 +102,7 @@ public class SqlServerOperationsTests extends SqlServerTest {
 //        ElasticPoolInner epResult = sqlServerManager.inner().elasticPools().createOrUpdate("a1-test-sql", "mysql112233", "ep1", elasticPoolInner);
 //        sqlServerManager.inner().elasticPools().delete("a1-test-sql", "mysql112233", epResult.name());
 
-        SqlElasticPool elasticPool = sqlServerManager.sqlServers().elasticPools()
-            .define("ep1")
-            .withSqlServer(sqlServer)
-            .withBasicPool()
-            .withReservedDtu(SqlElasticPoolBasicEDTUs.eDTU_200)
-            .withDatabaseDtuMax(SqlElasticPoolBasicMaxEDTUs.eDTU_5)
-            .withDatabaseDtuMin(SqlElasticPoolBasicMinEDTUs.eDTU_5)
-            .create();
-
-        Assert.assertNotNull(elasticPool);
-        Assert.assertEquals(ElasticPoolEdition.BASIC, elasticPool.edition());
-        Assert.assertEquals(200, elasticPool.dtu());
-        Assert.assertEquals(5, elasticPool.databaseDtuMax());
-        Assert.assertEquals(5, elasticPool.databaseDtuMin());
-
-        elasticPool.delete();
-
-        DatabaseInner databaseInner = new DatabaseInner();
-
-
-        //        canCRUDSqlServer();
+//                canCRUDSqlServer();
     }
 
 //    @Test

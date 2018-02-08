@@ -9,7 +9,9 @@ package com.microsoft.azure.management.sql;
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.apigeneration.Method;
+import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.ExternalChildResource;
+import com.microsoft.azure.management.resources.fluentcore.arm.models.Resource;
 import com.microsoft.azure.management.resources.fluentcore.model.Appliable;
 import com.microsoft.azure.management.resources.fluentcore.model.Attachable;
 import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
@@ -85,6 +87,16 @@ public interface SqlElasticPool
      * @return the parent SQL server ID
      */
     String parentId();
+
+    /**
+     * @return the name of the region the resource is in
+     */
+    String regionName();
+
+    /**
+     * @return the region the resource is in
+     */
+    Region region();
 
     /**
      * Lists the database metrics for this SQL Elastic Pool.
@@ -458,11 +470,11 @@ public interface SqlElasticPool
          * @param <ParentT> the stage of the parent definition to return to after attaching this definition
          */
         interface WithAttach<ParentT> extends
-                Attachable.InDefinition<ParentT>,
                 WithDatabaseDtuMin<ParentT>,
                 WithDatabaseDtuMax<ParentT>,
                 WithDtu<ParentT>,
-                WithStorageCapacity<ParentT> {
+                WithStorageCapacity<ParentT>,
+                Attachable.InDefinition<ParentT> {
         }
     }
 
@@ -476,6 +488,7 @@ public interface SqlElasticPool
             UpdateStages.WithDtu,
             UpdateStages.WithStorageCapacity,
             UpdateStages.WithDatabase,
+            Resource.UpdateWithTags<SqlElasticPool>,
             Appliable<SqlElasticPool> {
     }
 

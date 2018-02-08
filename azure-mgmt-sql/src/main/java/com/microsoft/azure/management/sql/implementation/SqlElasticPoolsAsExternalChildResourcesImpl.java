@@ -7,6 +7,7 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.ExternalChildResourcesNonCachedImpl;
+import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.sql.SqlElasticPool;
 import com.microsoft.azure.management.sql.SqlServer;
 
@@ -41,8 +42,20 @@ public class SqlElasticPoolsAsExternalChildResourcesImpl
      * @param sqlServerManager the manager
      * @param childResourceName the child resource name (for logging)
      */
-    protected SqlElasticPoolsAsExternalChildResourcesImpl(SqlServerManager sqlServerManager,String childResourceName) {
+    protected SqlElasticPoolsAsExternalChildResourcesImpl(SqlServerManager sqlServerManager, String childResourceName) {
         super(null, null, childResourceName);
+        this.sqlServerManager = sqlServerManager;
+    }
+
+    /**
+     * Creates a new ExternalChildResourcesNonCachedImpl.
+     *
+     * @param parentTaskGroup the parent task group
+     * @param sqlServerManager the manager
+     * @param childResourceName the child resource name (for logging)
+     */
+    protected SqlElasticPoolsAsExternalChildResourcesImpl(TaskGroup parentTaskGroup, SqlServerManager sqlServerManager, String childResourceName) {
+        super(null, parentTaskGroup, childResourceName);
         this.sqlServerManager = sqlServerManager;
     }
 
@@ -52,14 +65,29 @@ public class SqlElasticPoolsAsExternalChildResourcesImpl
     }
 
     SqlElasticPoolImpl defineInlineElasticPool(String name) {
-        return prepareInlineDefine(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        if (this.parent() == null) {
+            // resource group and server name will be set by the next method in the Fluent flow
+            return prepareInlineDefine(new SqlElasticPoolImpl(null, null, null, name, new ElasticPoolInner(), this.sqlServerManager));
+        } else {
+            return prepareInlineDefine(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        }
     }
 
     SqlElasticPoolImpl updateInlineElasticPool(String name) {
-        return prepareInlineUpdate(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        if (this.parent() == null) {
+            // resource group and server name will be set by the next method in the Fluent flow
+            return prepareInlineUpdate(new SqlElasticPoolImpl(null, null, null, name, new ElasticPoolInner(), this.sqlServerManager));
+        } else {
+            return prepareInlineUpdate(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        }
     }
 
     void removeInlineElasticPool(String name) {
-        prepareInlineRemove(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        if (this.parent() == null) {
+            // resource group and server name will be set by the next method in the Fluent flow
+            prepareInlineRemove(new SqlElasticPoolImpl(null, null, null, name, new ElasticPoolInner(), this.sqlServerManager));
+        } else {
+            prepareInlineRemove(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
+        }
     }
 }

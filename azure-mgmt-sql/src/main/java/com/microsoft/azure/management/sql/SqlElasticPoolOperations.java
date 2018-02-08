@@ -8,6 +8,7 @@ package com.microsoft.azure.management.sql;
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.apigeneration.Method;
+import com.microsoft.azure.management.resources.fluentcore.arm.models.Resource;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsCreating;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 
@@ -302,11 +303,11 @@ public interface SqlElasticPoolOperations extends
             /**
              * Begins the definition of a new SQL Database to be added to this server.
              *
-             * @param name the name of the new SQL Database
+             * @param databaseName the name of the new SQL Database
              * @return the first stage of the new SQL Database definition
              */
             @Beta(Beta.SinceVersion.V2_0_0)
-            SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String name);
+            SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String databaseName);
         }
 
         /**
@@ -314,13 +315,13 @@ public interface SqlElasticPoolOperations extends
          * but exposing additional optional inputs to specify.
          */
         interface WithCreate extends
-            Creatable<SqlElasticPool>,
-//            SqlChildrenCreatableDefinition<SqlElasticPool>,
             SqlElasticPoolOperations.DefinitionStages.WithDatabaseDtuMin,
             SqlElasticPoolOperations.DefinitionStages.WithDatabaseDtuMax,
             SqlElasticPoolOperations.DefinitionStages.WithDtu,
             SqlElasticPoolOperations.DefinitionStages.WithStorageCapacity,
-            SqlElasticPoolOperations.DefinitionStages.WithDatabase {
+            SqlElasticPoolOperations.DefinitionStages.WithDatabase,
+            Resource.DefinitionWithTags<SqlElasticPool>,
+            Creatable<SqlElasticPool> {
         }
     }
 

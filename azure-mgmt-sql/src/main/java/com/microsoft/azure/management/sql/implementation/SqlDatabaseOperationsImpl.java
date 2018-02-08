@@ -8,6 +8,7 @@ package com.microsoft.azure.management.sql.implementation;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
+import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
 import com.microsoft.azure.management.sql.SqlServer;
@@ -31,26 +32,26 @@ public class SqlDatabaseOperationsImpl
     SqlDatabaseOperations.SqlDatabaseActionsDefinition {
 
     private SqlServerManager manager;
-    private SqlServer sqlServer;
+    private SqlServerImpl sqlServer;
     private SqlDatabasesAsExternalChildResourcesImpl sqlDatabases;
 
-    public SqlDatabaseOperationsImpl(SqlServer parent, SqlServerManager manager) {
+    public SqlDatabaseOperationsImpl(SqlServerImpl parent, SqlServerManager manager) {
         Objects.requireNonNull(manager);
         this.sqlServer = parent;
         this.manager = manager;
-        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(manager, "SqlDatabase");
+        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.sqlServer.taskGroup(), manager, "SqlDatabase");
     }
 
     public SqlDatabaseOperationsImpl(SqlServerManager manager) {
         Objects.requireNonNull(manager);
         this.manager = manager;
-        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(manager, "SqlDatabase");
+        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(null, manager, "SqlDatabase");
     }
 
     @Override
     public SqlDatabase getBySqlServer(String resourceGroupName, String sqlServerName, String name) {
         DatabaseInner inner = this.manager.inner().databases().get(resourceGroupName, sqlServerName, name);
-        return (inner != null) ? new SqlDatabaseImpl(resourceGroupName, sqlServerName, inner.name(), inner, manager) : null;
+        return (inner != null) ? new SqlDatabaseImpl(resourceGroupName, sqlServerName, inner.location(), inner.name(), inner, manager) : null;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class SqlDatabaseOperationsImpl
             .map(new Func1<DatabaseInner, SqlDatabase>() {
                 @Override
                 public SqlDatabase call(DatabaseInner inner) {
-                    return new SqlDatabaseImpl(resourceGroupName, sqlServerName, inner.name(), inner, manager);
+                    return new SqlDatabaseImpl(resourceGroupName, sqlServerName, inner.location(), inner.name(), inner, manager);
                 }
             });
     }
@@ -150,7 +151,7 @@ public class SqlDatabaseOperationsImpl
     public List<SqlDatabase> listBySqlServer(String resourceGroupName, String sqlServerName) {
         List<SqlDatabase> databasesSet = new ArrayList<>();
         for (DatabaseInner inner : this.manager.inner().databases().listByServer(resourceGroupName, sqlServerName)) {
-            databasesSet.add(new SqlDatabaseImpl(resourceGroupName, sqlServerName, inner.name(), inner, manager));
+            databasesSet.add(new SqlDatabaseImpl(resourceGroupName, sqlServerName, inner.location(), inner.name(), inner, manager));
         }
         return Collections.unmodifiableList(databasesSet);
     }
@@ -166,7 +167,7 @@ public class SqlDatabaseOperationsImpl
             .map(new Func1<DatabaseInner, SqlDatabase>() {
                 @Override
                 public SqlDatabase call(DatabaseInner inner) {
-                    return new SqlDatabaseImpl(resourceGroupName, sqlServerName, inner.name(), inner, manager);
+                    return new SqlDatabaseImpl(resourceGroupName, sqlServerName, inner.location(), inner.name(), inner, manager);
                 }
             });
     }
