@@ -74,7 +74,7 @@ public final class KubernetesVersion extends ExpandableStringEnum<KubernetesVers
     }
 
     /**
-     * @return known SkuName values
+     * @return known Kubernetes version values
      */
     public static Collection<KubernetesVersion> values() {
         return values(KubernetesVersion.class);
