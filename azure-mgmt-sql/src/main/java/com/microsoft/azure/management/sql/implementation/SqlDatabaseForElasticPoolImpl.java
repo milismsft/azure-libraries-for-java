@@ -60,11 +60,13 @@ public class SqlDatabaseForElasticPoolImpl
 
     @Override
     public SqlDatabaseForElasticPoolImpl withCollation(String collation) {
+        this.sqlDatabase.withCollation(collation);
         return this;
     }
 
     @Override
     public SqlDatabaseForElasticPoolImpl withMaxSizeBytes(long maxSizeBytes) {
+        this.sqlDatabase.withMaxSizeBytes(maxSizeBytes);
         return this;
     }
 }

@@ -10,8 +10,10 @@ import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
+import com.microsoft.azure.management.resources.fluentcore.dag.FunctionalTaskItem;
 import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
+import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.sql.CreateMode;
 import com.microsoft.azure.management.sql.DatabaseEdition;
 import com.microsoft.azure.management.sql.ServiceObjectiveName;
@@ -42,6 +44,8 @@ class SqlDatabaseImpl
         SqlDatabase,
         SqlDatabase.SqlDatabaseDefinition<SqlServer.DefinitionStages.WithCreate>,
         SqlDatabase.Update,
+        SqlDatabaseOperations.DefinitionStages.WithExistingDatabase,
+        SqlDatabaseOperations.DefinitionStages.WithCreateWithElasticPoolOptions,
         SqlDatabaseOperations.SqlDatabaseOperationsDefinition {
 
     private SqlElasticPoolsAsExternalChildResourcesImpl sqlElasticPools;
@@ -321,78 +325,95 @@ class SqlDatabaseImpl
     }
 
     @Override
-    public SqlDatabaseImpl withIPAddressRange(String startIPAddress, String endIPAddress) {
-        return null;
-    }
-
-    @Override
     public SqlServerImpl attach() {
         return this.parent();
     }
 
     @Override
-    public UpdateStages.WithEdition withoutElasticPool() {
-        return null;
+    public SqlDatabaseImpl withoutElasticPool() {
+        this.inner().withElasticPoolName(null);
+
+        return this;
     }
 
     @Override
     public SqlDatabaseImpl withExistingElasticPool(String elasticPoolName) {
-        return null;
+        this.inner().withElasticPoolName(elasticPoolName);
+
+        return this;
     }
 
     @Override
     public SqlDatabaseImpl withExistingElasticPool(SqlElasticPool sqlElasticPool) {
-        return null;
+        this.inner().withElasticPoolName(sqlElasticPool.name());
+
+        return this;
     }
 
     @Override
-    public SqlDatabaseImpl withNewElasticPool(Creatable<SqlElasticPool> sqlElasticPool) {
-        return null;
+    public SqlDatabaseImpl withNewElasticPool(final Creatable<SqlElasticPool> sqlElasticPool) {
+        this.addDependency(sqlElasticPool);
+
+        return this;
     }
 
     @Override
-    public SqlDatabaseImpl withExistingDatabase(SqlElasticPool elasticPool) {
-        return null;
-    }
+    public SqlElasticPoolForDatabaseImpl defineElasticPool(String elasticPoolName) {
+        if (this.sqlElasticPools == null) {
+            this.sqlElasticPools = new SqlElasticPoolsAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlElasticPool");
+        }
 
-    @Override
-    public SqlElasticPoolForDatabaseImpl defineElasticPool(String name) {
-        return null;
+        return new SqlElasticPoolForDatabaseImpl(this, this.sqlElasticPools
+            .defineIndependentElasticPool(elasticPoolName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation));
     }
 
     @Override
     public SqlDatabaseImpl withSourceDatabase(String sourceDatabaseId) {
-        return null;
+        this.inner().withSourceDatabaseId(sourceDatabaseId);
+
+        return this;
     }
 
     @Override
     public SqlDatabaseImpl withSourceDatabase(SqlDatabase sourceDatabase) {
-        return null;
+        return this.withSourceDatabase(sourceDatabase.id());
     }
 
     @Override
     public SqlDatabaseImpl withMode(CreateMode createMode) {
-        return null;
+        this.inner().withCreateMode(createMode);
+
+        return this;
     }
 
     @Override
     public SqlDatabaseImpl withCollation(String collation) {
-        return null;
+        this.inner().withCollation(collation);
+
+        return this;
     }
 
     @Override
     public SqlDatabaseImpl withMaxSizeBytes(long maxSizeBytes) {
-        return null;
+        this.inner().withMaxSizeBytes(Long.toString(maxSizeBytes));
+
+        return this;
     }
 
     @Override
     public SqlDatabaseImpl withEdition(DatabaseEdition edition) {
-        return null;
+        this.inner().withElasticPoolName(null);
+        this.inner().withEdition(edition);
+
+        return this;
     }
 
     @Override
     public SqlDatabaseImpl withServiceObjective(ServiceObjectiveName serviceLevelObjective) {
-        return null;
+        this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveName(serviceLevelObjective);
+
+        return this;
     }
 
     @Override

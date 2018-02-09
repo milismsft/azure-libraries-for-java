@@ -75,32 +75,26 @@ public class SqlServerOperationsTests extends SqlServerTest {
 //
 //        elasticPool.delete();
 
-        DatabaseInner databaseInner = new DatabaseInner();
-
-        SqlElasticPool elasticPool2 = sqlServerManager.sqlServers().elasticPools()
-            .define("ep2")
+        SqlDatabase db5 = sqlServerManager.sqlServers().databases()
+            .define("db5")
             .withSqlServer(sqlServer)
-            .withBasicPool()
-            .withNewDatabase("db2")
-            .defineDatabase("db3")
+            .defineElasticPool("ep3")
+                .withBasicPool()
                 .attach()
-            .withExistingDatabase("db4")
             .create();
 
-        elasticPool2.delete();
+//        SqlElasticPool elasticPool2 = sqlServerManager.sqlServers().elasticPools()
+//            .define("ep2")
+//            .withSqlServer(sqlServer)
+//            .withBasicPool()
+//            .withNewDatabase("db2")
+//            .defineDatabase("db3")
+//                .attach()
+//            .withExistingDatabase("db4")
+//            .create();
+//
+//        elasticPool2.delete();
 
-//        ElasticPoolInner elasticPoolInner = new ElasticPoolInner();
-//        elasticPoolInner.withEdition(ElasticPoolEdition.BASIC);
-//        elasticPoolInner.withLocation("westus");
-////        elasticPoolInner.withZoneRedundant(true);
-//        elasticPoolInner.withDatabaseDtuMax(5);
-//        elasticPoolInner.withDatabaseDtuMin(5);
-//        elasticPoolInner.withDtu(200);
-//        elasticPoolInner.withStorageMB(20000);
-//
-//
-//        ElasticPoolInner epResult = sqlServerManager.inner().elasticPools().createOrUpdate("a1-test-sql", "mysql112233", "ep1", elasticPoolInner);
-//        sqlServerManager.inner().elasticPools().delete("a1-test-sql", "mysql112233", epResult.name());
 
 //                canCRUDSqlServer();
     }

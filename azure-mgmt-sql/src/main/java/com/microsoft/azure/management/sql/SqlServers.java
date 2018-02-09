@@ -51,4 +51,10 @@ public interface SqlServers extends
     @Beta(Beta.SinceVersion.V2_0_0)
     SqlElasticPoolOperations elasticPools();
 
+    /**
+     * @return the SQL Server Database API entry point
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    SqlDatabaseOperations databases();
+
 }

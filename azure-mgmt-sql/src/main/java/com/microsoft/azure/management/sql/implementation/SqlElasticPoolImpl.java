@@ -488,8 +488,8 @@ public class SqlElasticPoolImpl
     public SqlElasticPoolImpl withNewDatabase(String databaseName) {
         if (this.sqlDatabases == null) {
             this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
-
         }
+
         return new SqlDatabaseForElasticPoolImpl(this, this.sqlDatabases
             .defineInlineDatabase(databaseName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation))
             .attach();
@@ -499,8 +499,8 @@ public class SqlElasticPoolImpl
     public SqlElasticPoolImpl withExistingDatabase(String databaseName) {
         if (this.sqlDatabases == null) {
             this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
-
         }
+
         return new SqlDatabaseForElasticPoolImpl(this, this.sqlDatabases
             .patchUpdateDatabase(databaseName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation))
             .attach();
@@ -510,8 +510,8 @@ public class SqlElasticPoolImpl
     public SqlElasticPoolImpl withExistingDatabase(SqlDatabase database) {
         if (this.sqlDatabases == null) {
             this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
-
         }
+
         return new SqlDatabaseForElasticPoolImpl(this, this.sqlDatabases
             .patchUpdateDatabase(database.name()).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation))
             .attach();
@@ -521,8 +521,8 @@ public class SqlElasticPoolImpl
     public SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String databaseName) {
         if (this.sqlDatabases == null) {
             this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
-
         }
+
         return new SqlDatabaseForElasticPoolImpl(this, this.sqlDatabases
             .defineInlineDatabase(databaseName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation));
     }
