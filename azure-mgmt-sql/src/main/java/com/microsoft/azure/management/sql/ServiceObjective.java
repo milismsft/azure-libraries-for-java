@@ -25,11 +25,16 @@ public interface ServiceObjective extends
         HasResourceGroup,
         HasName,
         HasId {
+    /**
+     * @return name of the SQL Server to which this service objective belongs
+     */
+    @Deprecated
+    String sqlServerName();
 
     /**
      * @return the name for the service objective.
      */
-    String name();
+    String serviceObjectiveName();
 
     /**
      * @return whether the service level objective is the default service objective
@@ -42,13 +47,13 @@ public interface ServiceObjective extends
     boolean isSystem();
 
     /**
-     * @return whether the service level objective is enabled
-     */
-    boolean isEnabled();
-
-    /**
      * @return the description for the service level objective
      */
     String description();
+
+    /**
+     * @return whether the service level objective is enabled
+     */
+    boolean enabled();
 }
 

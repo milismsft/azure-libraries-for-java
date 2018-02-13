@@ -15,22 +15,22 @@ import com.microsoft.azure.management.apigeneration.Fluent;
 @Beta(Beta.SinceVersion.V2_0_0)
 public interface SqlActiveDirectoryAdministrator {
     /**
-     * The type of administrator.
+     * @return the type of administrator.
      */
     String administratorType();
 
     /**
-     * The server administrator login value.
+     * @return the server administrator login value.
      */
     String signInName();
 
     /**
-     * The server administrator ID.
+     * @return the server administrator ID.
      */
     String id();
 
     /**
-     * The server Active Directory Administrator tenant ID.
+     * @return the server Active Directory Administrator tenant ID.
      */
     String tenantId();
 }

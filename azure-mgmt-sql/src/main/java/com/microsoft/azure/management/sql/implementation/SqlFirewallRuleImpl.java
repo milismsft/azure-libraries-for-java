@@ -131,7 +131,7 @@ public class SqlFirewallRuleImpl
     public Observable<SqlFirewallRule> createResourceAsync() {
         final SqlFirewallRuleImpl self = this;
         return this.sqlServerManager.inner().firewallRules()
-            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(), this.inner())
             .map(new Func1<FirewallRuleInner, SqlFirewallRule>() {
                 @Override
                 public SqlFirewallRule call(FirewallRuleInner inner) {
@@ -145,7 +145,7 @@ public class SqlFirewallRuleImpl
     public Observable<SqlFirewallRule> updateResourceAsync() {
         final SqlFirewallRuleImpl self = this;
         return this.sqlServerManager.inner().firewallRules()
-            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(), this.inner())
             .map(new Func1<FirewallRuleInner, SqlFirewallRule>() {
                 @Override
                 public SqlFirewallRule call(FirewallRuleInner inner) {

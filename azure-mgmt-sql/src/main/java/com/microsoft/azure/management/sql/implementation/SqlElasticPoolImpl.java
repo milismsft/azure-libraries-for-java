@@ -10,6 +10,8 @@ import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
 import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
+import com.microsoft.azure.management.sql.ElasticPoolActivity;
+import com.microsoft.azure.management.sql.ElasticPoolDatabaseActivity;
 import com.microsoft.azure.management.sql.ElasticPoolEdition;
 import com.microsoft.azure.management.sql.ElasticPoolState;
 import com.microsoft.azure.management.sql.SqlDatabase;
@@ -35,6 +37,7 @@ import rx.Observable;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -168,6 +171,67 @@ public class SqlElasticPoolImpl
     }
 
     @Override
+    public List<ElasticPoolActivity> listActivities() {
+        List<ElasticPoolActivity> elasticPoolActivities = new ArrayList<>();
+        List<ElasticPoolActivityInner> elasticPoolActivityInners = this.sqlServerManager.inner()
+            .elasticPoolActivities().listByElasticPool(this.resourceGroupName, this.sqlServerName, this.name());
+        if (elasticPoolActivityInners != null) {
+            for (ElasticPoolActivityInner inner : elasticPoolActivityInners) {
+                elasticPoolActivities.add(new ElasticPoolActivityImpl(inner));
+            }
+        }
+        return Collections.unmodifiableList(elasticPoolActivities);
+    }
+
+    @Override
+    public Observable<ElasticPoolActivity> listActivitiesAsync() {
+        return this.sqlServerManager.inner()
+            .elasticPoolActivities().listByElasticPoolAsync(this.resourceGroupName, this.sqlServerName, this.name())
+            .flatMap(new Func1<List<ElasticPoolActivityInner>, Observable<ElasticPoolActivityInner>>() {
+                @Override
+                public Observable<ElasticPoolActivityInner> call(List<ElasticPoolActivityInner> elasticPoolActivityInners) {
+                    return Observable.from(elasticPoolActivityInners);
+                }
+            })
+            .map(new Func1<ElasticPoolActivityInner, ElasticPoolActivity>() {
+                @Override
+                public ElasticPoolActivity call(ElasticPoolActivityInner elasticPoolActivityInner) {
+                    return new ElasticPoolActivityImpl(elasticPoolActivityInner);
+                }
+            });
+    }
+
+    @Override
+    public List<ElasticPoolDatabaseActivity> listDatabaseActivities() {
+        List<ElasticPoolDatabaseActivity> elasticPoolDatabaseActivities = new ArrayList<>();
+        List<ElasticPoolDatabaseActivityInner> elasticPoolDatabaseActivityInners = this.sqlServerManager.inner()
+            .elasticPoolDatabaseActivities().listByElasticPool(this.resourceGroupName, this.sqlServerName, this.name());
+        if (elasticPoolDatabaseActivityInners != null) {
+            for (ElasticPoolDatabaseActivityInner inner : elasticPoolDatabaseActivityInners) {
+                elasticPoolDatabaseActivities.add(new ElasticPoolDatabaseActivityImpl(inner));
+            }
+        }
+        return Collections.unmodifiableList(elasticPoolDatabaseActivities);
+    }
+
+    @Override
+    public Observable<ElasticPoolDatabaseActivity> listDatabaseActivitiesAsync() {
+        return this.sqlServerManager.inner()
+            .elasticPoolDatabaseActivities().listByElasticPoolAsync(this.resourceGroupName, this.sqlServerName, this.name())
+            .flatMap(new Func1<List<ElasticPoolDatabaseActivityInner>, Observable<ElasticPoolDatabaseActivityInner>>() {
+                @Override
+                public Observable<ElasticPoolDatabaseActivityInner> call(List<ElasticPoolDatabaseActivityInner> elasticPoolDatabaseActivityInners) {
+                    return Observable.from(elasticPoolDatabaseActivityInners);
+                }
+            }).map(new Func1<ElasticPoolDatabaseActivityInner, ElasticPoolDatabaseActivity>() {
+                @Override
+                public ElasticPoolDatabaseActivity call(ElasticPoolDatabaseActivityInner elasticPoolDatabaseActivityInner) {
+                    return new ElasticPoolDatabaseActivityImpl(elasticPoolDatabaseActivityInner);
+                }
+            });
+    }
+
+    @Override
     public List<SqlDatabaseMetric> listDatabaseMetrics(String filter) {
         List<SqlDatabaseMetric> databaseMetrics = new ArrayList<>();
         List<MetricInner> inners = this.sqlServerManager.inner().elasticPools().listMetrics(this.resourceGroupName, this.sqlServerName, this.name(), filter);
@@ -177,7 +241,7 @@ public class SqlElasticPoolImpl
             }
         }
 
-        return databaseMetrics;
+        return Collections.unmodifiableList(databaseMetrics);
     }
 
     @Override
@@ -206,7 +270,7 @@ public class SqlElasticPoolImpl
             }
         }
 
-        return databaseMetricDefinitions;
+        return Collections.unmodifiableList(databaseMetricDefinitions);
     }
 
     @Override
@@ -235,7 +299,7 @@ public class SqlElasticPoolImpl
                 databases.add(new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation, inner.name(), inner, this.sqlServerManager));
             }
         }
-        return databases;
+        return Collections.unmodifiableList(databases);
     }
 
     @Override
@@ -304,7 +368,7 @@ public class SqlElasticPoolImpl
         final SqlElasticPoolImpl self = this;
         this.inner().withLocation(this.sqlServerLocation);
         return this.sqlServerManager.inner().elasticPools()
-            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(), this.inner())
             .map(new Func1<ElasticPoolInner, SqlElasticPool>() {
                 @Override
                 public SqlElasticPool call(ElasticPoolInner inner) {
@@ -318,7 +382,7 @@ public class SqlElasticPoolImpl
     public Observable<SqlElasticPool> updateResourceAsync() {
         final SqlElasticPoolImpl self = this;
         return this.sqlServerManager.inner().elasticPools()
-            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(),this.inner())
+            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(), this.inner())
             .map(new Func1<ElasticPoolInner, SqlElasticPool>() {
                 @Override
                 public SqlElasticPool call(ElasticPoolInner inner) {
@@ -326,6 +390,10 @@ public class SqlElasticPoolImpl
                     return self;
                 }
             });
+    }
+
+    void addParentDependency(TaskGroup.HasTaskGroup parentDependency) {
+        this.addDependency(parentDependency);
     }
 
     @Override

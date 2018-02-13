@@ -33,7 +33,7 @@ public class SqlElasticPoolForDatabaseImpl
     private SqlElasticPoolImpl sqlElasticPool;
     private SqlDatabaseImpl sqlDatabase;
 
-    public SqlElasticPoolForDatabaseImpl(SqlDatabaseImpl sqlDatabase, SqlElasticPoolImpl sqlElasticPool) {
+    SqlElasticPoolForDatabaseImpl(SqlDatabaseImpl sqlDatabase, SqlElasticPoolImpl sqlElasticPool) {
         this.sqlDatabase = sqlDatabase;
         this.sqlElasticPool = sqlElasticPool;
     }

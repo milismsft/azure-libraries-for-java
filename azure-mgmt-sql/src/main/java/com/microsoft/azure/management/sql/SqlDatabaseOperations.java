@@ -208,8 +208,65 @@ public interface SqlDatabaseOperations extends
              */
             @Deprecated
             SqlDatabaseOperations.DefinitionStages.WithCreate withEdition(DatabaseEdition edition);
-        }
 
+            /**
+             * Sets a "Basic" edition for the SQL Database.
+             *
+             * @return The next stage of the definition
+             */
+            SqlDatabaseOperations.DefinitionStages.WithCreate withBasicEdition();
+
+            /**
+             * Sets a "Standard" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            SqlDatabaseOperations.DefinitionStages.WithCreate withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective);
+
+            /**
+             * Sets a "Standard" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            SqlDatabaseOperations.DefinitionStages.WithCreate withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity);
+
+            /**
+             * Sets a "Premium" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            SqlDatabaseOperations.DefinitionStages.WithCreate withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective);
+
+            /**
+             * Sets a "Premium" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            SqlDatabaseOperations.DefinitionStages.WithCreate withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity);
+
+            /**
+             * Sets a "PremiumRS" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            SqlDatabaseOperations.DefinitionStages.WithCreate withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective);
+
+            /**
+             * Sets a "PremiumRS" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            SqlDatabaseOperations.DefinitionStages.WithCreate withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity);
+        }
 
         /**
          * The SQL Database definition to set the Max Size in Bytes for database.
@@ -286,5 +343,12 @@ public interface SqlDatabaseOperations extends
      * Grouping of the Azure SQL Database rule common actions.
      */
     interface SqlDatabaseActionsDefinition extends SqlChildrenActionsDefinition<SqlDatabase> {
+        /**
+         * Begins the definition of a new SQL Database to be added to this server.
+         *
+         * @param databaseName the name of the new SQL Database
+         * @return the first stage of the new SQL Database definition
+         */
+        SqlDatabaseOperations.DefinitionStages.WithAllDifferentOptions define(String databaseName);
     }
 }

@@ -8,7 +8,15 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.sql.CreateMode;
+import com.microsoft.azure.management.sql.DatabaseEdition;
+import com.microsoft.azure.management.sql.ServiceObjectiveName;
 import com.microsoft.azure.management.sql.SqlDatabase;
+import com.microsoft.azure.management.sql.SqlDatabasePremiumRSServiceObjective;
+import com.microsoft.azure.management.sql.SqlDatabasePremiumRSStorage;
+import com.microsoft.azure.management.sql.SqlDatabasePremiumServiceObjective;
+import com.microsoft.azure.management.sql.SqlDatabasePremiumStorage;
+import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
+import com.microsoft.azure.management.sql.SqlDatabaseStandardStorage;
 import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
 
 import java.util.Objects;
@@ -24,7 +32,7 @@ public class SqlDatabaseForElasticPoolImpl
     private SqlDatabaseImpl sqlDatabase;
     private SqlElasticPoolImpl sqlElasticPool;
 
-    public SqlDatabaseForElasticPoolImpl(SqlElasticPoolImpl sqlElasticPool, SqlDatabaseImpl sqlDatabase) {
+    SqlDatabaseForElasticPoolImpl(SqlElasticPoolImpl sqlElasticPool, SqlDatabaseImpl sqlDatabase) {
         Objects.requireNonNull(sqlElasticPool);
         Objects.requireNonNull(sqlDatabase);
         Objects.requireNonNull(sqlDatabase.inner());
@@ -67,6 +75,69 @@ public class SqlDatabaseForElasticPoolImpl
     @Override
     public SqlDatabaseForElasticPoolImpl withMaxSizeBytes(long maxSizeBytes) {
         this.sqlDatabase.withMaxSizeBytes(maxSizeBytes);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withEdition(DatabaseEdition edition) {
+        this.sqlDatabase.withEdition(edition);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withBasicEdition() {
+        this.sqlDatabase.withEdition(DatabaseEdition.BASIC);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective) {
+        this.sqlDatabase.withEdition(DatabaseEdition.STANDARD);
+        this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity) {
+        this.sqlDatabase.withEdition(DatabaseEdition.STANDARD);
+        this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacityInMB());
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective) {
+        this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM);
+        this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity) {
+        this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM);
+        this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacityInMB());
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective) {
+        this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM_RS);
+        this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity) {
+        this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM_RS);
+        this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacityInMB());
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withServiceObjective(ServiceObjectiveName serviceLevelObjective) {
+        this.sqlDatabase.withServiceObjective(serviceLevelObjective);
         return this;
     }
 }

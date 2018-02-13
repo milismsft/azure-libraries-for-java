@@ -7,9 +7,13 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.ExternalChildResourcesNonCachedImpl;
+import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
 import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.sql.SqlElasticPool;
 import com.microsoft.azure.management.sql.SqlServer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a SQL Elastic Pool collection associated with an Azure SQL server.
@@ -89,5 +93,16 @@ public class SqlElasticPoolsAsExternalChildResourcesImpl
         } else {
             prepareInlineRemove(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
         }
+    }
+
+    List<SqlElasticPoolImpl> getChildren(ExternalChildResourceImpl.PendingOperation pendingOperation) {
+        List<SqlElasticPoolImpl> results = new ArrayList<>();
+        for (SqlElasticPoolImpl child : this.childCollection.values()) {
+            if (child.pendingOperation() == pendingOperation) {
+                results.add(child);
+            }
+        }
+
+        return results;
     }
 }

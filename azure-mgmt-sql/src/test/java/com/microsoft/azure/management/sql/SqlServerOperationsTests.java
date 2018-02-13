@@ -6,26 +6,10 @@
 
 package com.microsoft.azure.management.sql;
 
-import com.microsoft.azure.management.resources.core.TestUtilities;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
-import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
-import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
-import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
-import com.microsoft.azure.management.resources.fluentcore.utils.Utils;
-import com.microsoft.azure.management.resources.implementation.ResourceGroupInner;
-import com.microsoft.azure.management.sql.implementation.DatabaseInner;
-import com.microsoft.azure.management.sql.implementation.ElasticPoolInner;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-import rx.Observable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 public class SqlServerOperationsTests extends SqlServerTest {
@@ -154,7 +138,7 @@ public class SqlServerOperationsTests extends SqlServerTest {
         firewallRule = sqlServerManager.sqlServers().firewallRules().getBySqlServer(RG_NAME, SQL_SERVER_NAME, "AllowAllWindowsAzureIps");
         Assert.assertNull(firewallRule);
 
-        sqlServer.setAccessFromAzureServices();
+        sqlServer.enableAccessFromAzureServices();
         firewallRule = sqlServerManager.sqlServers().firewallRules().getBySqlServer(RG_NAME, SQL_SERVER_NAME, "AllowAllWindowsAzureIps");
         Assert.assertEquals("0.0.0.0", firewallRule.startIPAddress());
         Assert.assertEquals("0.0.0.0", firewallRule.endIPAddress());
@@ -181,5 +165,13 @@ public class SqlServerOperationsTests extends SqlServerTest {
         firewallRule = sqlServerManager.sqlServers().firewallRules().getBySqlServer(RG_NAME, SQL_SERVER_NAME, "somefirewallrule1");
         Assert.assertNull(firewallRule);
 
+        firewallRule = sqlServer.firewallRules().define("somefirewallrule2")
+            .withIPAddress("0.0.0.4")
+            .create();
+
+        Assert.assertEquals("0.0.0.4", firewallRule.startIPAddress());
+        Assert.assertEquals("0.0.0.4", firewallRule.endIPAddress());
+
+        firewallRule.delete();
     }
 }

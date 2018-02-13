@@ -29,8 +29,7 @@ public interface SqlElasticPoolOperations extends
         SqlElasticPoolOperations.DefinitionStages.WithEdition,
         SqlElasticPoolOperations.DefinitionStages.WithBasicEdition,
         SqlElasticPoolOperations.DefinitionStages.WithStandardEdition,
-        SqlElasticPoolOperations.DefinitionStages.WithPremiumEdition
-    {
+        SqlElasticPoolOperations.DefinitionStages.WithPremiumEdition {
     }
 
     /**
@@ -326,8 +325,15 @@ public interface SqlElasticPoolOperations extends
     }
 
     /**
-     * Grouping of the Azure SQL Server Firewall rule common actions.
+     * Grouping of the Azure SQL Elastic Pool common actions.
      */
     interface SqlElasticPoolActionsDefinition extends SqlChildrenActionsDefinition<SqlElasticPool> {
+        /**
+         * Begins the definition of a new SQL Elastic Pool to be added to this server.
+         *
+         * @param elasticPoolName the name of the new SQL Elastic Pool
+         * @return the first stage of the new SQL Elastic Pool definition
+         */
+        SqlElasticPoolOperations.DefinitionStages.WithEdition define(String elasticPoolName);
     }
 }

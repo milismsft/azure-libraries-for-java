@@ -58,6 +58,7 @@ public interface SqlFirewallRule
     /**
      * @return the parent SQL server ID
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     String parentId();
 
     /**
@@ -71,6 +72,7 @@ public interface SqlFirewallRule
      *
      * @return a representation of the deferred computation of this call
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     @Method
     Completable deleteAsync();
 
@@ -81,7 +83,10 @@ public interface SqlFirewallRule
 
     /**
      * Container interface for all the definitions that need to be implemented.
+     *
+     * @param <ParentT> the stage of the parent definition to return to after attaching this definition
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     interface SqlFirewallRuleDefinition<ParentT> extends
             SqlFirewallRule.DefinitionStages.Blank<ParentT>,
             SqlFirewallRule.DefinitionStages.WithIPAddress<ParentT>,
@@ -98,6 +103,7 @@ public interface SqlFirewallRule
          *
          * @param <ParentT> the stage of the parent definition to return to after attaching this definition
          */
+        @Beta(Beta.SinceVersion.V2_0_0)
         interface Blank<ParentT> extends
             SqlFirewallRule.DefinitionStages.WithIPAddressRange<ParentT>,
             SqlFirewallRule.DefinitionStages.WithIPAddress<ParentT> {
@@ -106,6 +112,7 @@ public interface SqlFirewallRule
         /**
          * The SQL Firewall Rule definition to set the IP address range for the parent SQL Server.
          */
+        @Beta(Beta.SinceVersion.V2_0_0)
         interface WithIPAddressRange<ParentT> {
             /**
              * Sets the starting IP address of SQL server's Firewall Rule.
@@ -120,6 +127,7 @@ public interface SqlFirewallRule
         /**
          * The SQL Firewall Rule definition to set the IP address for the parent SQL Server.
          */
+        @Beta(Beta.SinceVersion.V2_0_0)
         interface WithIPAddress<ParentT> {
             /**
              * Sets the ending IP address of SQL server's Firewall Rule.
@@ -136,6 +144,7 @@ public interface SqlFirewallRule
          * can be attached to the parent SQL Server definition.
          * @param <ParentT> the stage of the parent definition to return to after attaching this definition
          */
+        @Beta(Beta.SinceVersion.V2_0_0)
         interface WithAttach<ParentT> extends
             Attachable.InDefinition<ParentT> {
         }

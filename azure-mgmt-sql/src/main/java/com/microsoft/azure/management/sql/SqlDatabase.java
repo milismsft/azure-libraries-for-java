@@ -21,6 +21,8 @@ import com.microsoft.azure.management.sql.implementation.DatabaseInner;
 import org.joda.time.DateTime;
 import rx.Completable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -114,49 +116,6 @@ public interface SqlDatabase
      */
     String defaultSecondaryLocation();
 
-//    /**
-//     * @return the upgradeHint value
-//     */
-//    UpgradeHintInterface getUpgradeHint();
-
-    /**
-     * @return true if this Database is SqlWarehouse
-     */
-    boolean isDataWarehouse();
-
-//    /**
-//     * @return SqlWarehouse instance for more operations
-//     */
-//    @Method
-//    SqlWarehouse asWarehouse();
-//
-//    /**
-//     * @return returns the list of all restore points on the database
-//     */
-//    List<RestorePoint> listRestorePoints();
-//
-//    /**
-//     * @return returns the list of usages (DatabaseMetrics) of the database
-//     */
-//    List<DatabaseMetric> listUsages();
-//
-//    /**
-//     * Gets an Azure SQL Database Transparent Data Encryption for the database.
-//     *
-//     * @return an Azure SQL Database Transparent Data Encryption for the database
-//     */
-//    TransparentDataEncryption getTransparentDataEncryption();
-//
-//    /**
-//     * @return information about service tier advisors for specified database
-//     */
-//    Map<String, ServiceTierAdvisor> listServiceTierAdvisors();
-//
-//    /**
-//     * @return all the replication links associated with the database
-//     */
-//    Map<String, ReplicationLink> listReplicationLinks();
-
     /**
      * @return the parent SQL server ID
      */
@@ -173,6 +132,50 @@ public interface SqlDatabase
     Region region();
 
     /**
+     * @return the upgradeHint value
+     */
+    @Deprecated
+    UpgradeHintInterface getUpgradeHint();
+
+    /**
+     * @return true if this Database is SqlWarehouse
+     */
+    boolean isDataWarehouse();
+
+    /**
+     * @return SqlWarehouse instance for more operations
+     */
+    @Method
+    SqlWarehouse asWarehouse();
+
+    /**
+     * @return returns the list of all restore points on the database
+     */
+    List<RestorePoint> listRestorePoints();
+
+//    /**
+//     * @return returns the list of usages (DatabaseMetrics) of the database
+//     */
+//    List<DatabaseMetric> listUsages();
+//
+//    /**
+//     * Gets an Azure SQL Database Transparent Data Encryption for the database.
+//     *
+//     * @return an Azure SQL Database Transparent Data Encryption for the database
+//     */
+//    TransparentDataEncryption getTransparentDataEncryption();
+//
+//    /**
+//     * @return information about service tier advisors for specified database
+//     */
+//    Map<String, ServiceTierAdvisor> listServiceTierAdvisors();
+
+    /**
+     * @return all the replication links associated with the database
+     */
+    Map<String, ReplicationLink> listReplicationLinks();
+
+    /**
      * Deletes the database from the server.
      */
     @Method
@@ -183,6 +186,7 @@ public interface SqlDatabase
      *
      * @return a representation of the deferred computation of this call
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     @Method
     Completable deleteAsync();
 
@@ -193,6 +197,8 @@ public interface SqlDatabase
 
     /**
      * Container interface for all the definitions that need to be implemented.
+     *
+     * @param <ParentT> the stage of the parent definition to return to after attaching this definition
      */
     interface SqlDatabaseDefinition<ParentT> extends
         SqlDatabase.DefinitionStages.Blank<ParentT>,
@@ -254,18 +260,89 @@ public interface SqlDatabase
         }
 
         /**
-         * The SQL Database definition to set the collation for database.
+         * The SQL Database definition to set the edition for database.
          */
-        interface WithCollation<ParentT> {
+        interface WithEdition<ParentT> {
             /**
-             * Sets the collation for the SQL Database.
-             * <p>
-             * Default collation for an Azure SQL Database is "SQL_Latin1_General_CP1_CI_AS"
+             * Sets the edition for the SQL Database.
              *
-             * @param collation collation to be set for database
+             * @param edition edition to be set for database
              * @return The next stage of the definition
              */
-            WithAttachForElasticPool<ParentT> withCollation(String collation);
+            @Deprecated
+            WithAttachForElasticPool<ParentT> withEdition(DatabaseEdition edition);
+
+            /**
+             * Sets a "Basic" edition for the SQL Database.
+             *
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withBasicEdition();
+
+            /**
+             * Sets a "Standard" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective);
+
+            /**
+             * Sets a "Standard" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity);
+
+            /**
+             * Sets a "Premium" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective);
+
+            /**
+             * Sets a "Premium" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity);
+
+            /**
+             * Sets a "PremiumRS" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective);
+
+            /**
+             * Sets a "PremiumRS" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity);
+        }
+
+        /**
+         * The SQL Database definition to set the service level objective.
+         */
+        interface WithServiceObjective<ParentT> {
+            /**
+             * Sets the service level objective for the SQL Database.
+             *
+             * @param serviceLevelObjective service level objected for the SQL Database
+             * @return The next stage of the definition.
+             */
+            @Deprecated
+            WithAttachForElasticPool<ParentT> withServiceObjective(ServiceObjectiveName serviceLevelObjective);
         }
 
         /**
@@ -281,7 +358,23 @@ public interface SqlDatabase
              * GB | 30 GB … 150 GB | 200 GB … 500 GB }
              * @return The next stage of the definition.
              */
+            @Deprecated
             WithAttachForElasticPool<ParentT> withMaxSizeBytes(long maxSizeBytes);
+        }
+
+        /**
+         * The SQL Database definition to set the collation for database.
+         */
+        interface WithCollation<ParentT> {
+            /**
+             * Sets the collation for the SQL Database.
+             * <p>
+             * Default collation for an Azure SQL Database is "SQL_Latin1_General_CP1_CI_AS"
+             *
+             * @param collation collation to be set for database
+             * @return The next stage of the definition
+             */
+            WithAttachForElasticPool<ParentT> withCollation(String collation);
         }
 
         /** The final stage of the SQL Database definition with an SQL Elastic Pool.
@@ -290,6 +383,8 @@ public interface SqlDatabase
          */
         interface WithAttachForElasticPool<ParentT> extends
             WithCollation<ParentT>,
+            WithEdition<ParentT>,
+            WithServiceObjective<ParentT>,
             WithMaxSizeBytes<ParentT>,
             WithAttachFinal<ParentT> {
         }
@@ -333,7 +428,65 @@ public interface SqlDatabase
              * @param edition edition to be set for database
              * @return The next stage of the update.
              */
+            @Deprecated
             Update withEdition(DatabaseEdition edition);
+            /**
+             * Sets a "Basic" edition for the SQL Database.
+             *
+             * @return The next stage of the definition
+             */
+            Update withBasicEdition();
+
+            /**
+             * Sets a "Standard" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            Update withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective);
+
+            /**
+             * Sets a "Standard" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            Update withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity);
+
+            /**
+             * Sets a "Premium" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            Update withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective);
+
+            /**
+             * Sets a "Premium" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            Update withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity);
+
+            /**
+             * Sets a "PremiumRS" edition for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @return The next stage of the definition
+             */
+            Update withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective);
+
+            /**
+             * Sets a "PremiumRS" edition and maximum storage capacity for the SQL Database.
+             *
+             * @param serviceObjective edition to be set for database
+             * @param maxStorageCapacity edition to be set for database
+             * @return The next stage of the definition
+             */
+            Update withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity);
         }
 
         /**
@@ -348,6 +501,7 @@ public interface SqlDatabase
              * GB | 30 GB … 150 GB | 200 GB … 500 GB }
              * @return The next stage of the update.
              */
+            @Deprecated
             Update withMaxSizeBytes(long maxSizeBytes);
         }
 
@@ -361,6 +515,7 @@ public interface SqlDatabase
              * @param serviceLevelObjective service level objected for the SQL Database
              * @return The next stage of the update.
              */
+            @Deprecated
             Update withServiceObjective(ServiceObjectiveName serviceLevelObjective);
         }
 

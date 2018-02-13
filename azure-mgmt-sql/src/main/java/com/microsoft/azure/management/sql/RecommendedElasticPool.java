@@ -18,6 +18,7 @@ import com.microsoft.azure.management.sql.implementation.RecommendedElasticPoolI
 import com.microsoft.azure.management.sql.implementation.SqlServerManager;
 
 import org.joda.time.DateTime;
+import rx.Observable;
 
 import java.util.List;
 
@@ -32,6 +33,12 @@ public interface RecommendedElasticPool extends
         HasName,
         HasId,
         HasManager<SqlServerManager> {
+
+    /**
+     * @return name of the SQL Server to which this database belongs
+     */
+    @Deprecated
+    String sqlServerName();
 
     /**
      * @return the edition of the Azure SQL Recommended Elastic Pool. The
@@ -82,28 +89,44 @@ public interface RecommendedElasticPool extends
     double maxObservedStorageMB();
 
     /**
+     * @return the list of Azure SQL Databases in this pool. Expanded property.
+     */
+    List<SqlDatabase> databases();
+
+    /**
+     * Fetches list of databases by making call to Azure.
+     * @return list of the databases in recommended elastic pool
+     */
+    List<SqlDatabase> listDatabases();
+
+    /**
+     * Fetches list of databases by making call to Azure.
+     * @return a representation of the deferred computation of the databases in this recommended elastic pool
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<SqlDatabase> listDatabasesAsync();
+
+    /**
+     * Get a specific database in the recommended database.
+     *
+     * @param databaseName name of the database to be fetched
+     * @return information on the database recommended in recommended elastic pool
+     */
+    SqlDatabase getDatabase(String databaseName);
+
+    /**
+     * Get a specific database in the recommended database.
+     *
+     * @param databaseName name of the database to be fetched
+     * @return a representation of the deferred computation to get the database in the recommended elastic pool
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<SqlDatabase> getDatabaseAsync(String databaseName);
+
+    /**
      * Fetches list of metrics information by making call to Azure.
      * @return list of the databases in recommended elastic pool
      */
     List<RecommendedElasticPoolMetric> listMetrics();
-
-//    /**
-//     * @return the list of Azure SQL Databases in this pool. Expanded property.
-//     */
-//    List<SqlDatabase> databases();
-//
-//    /**
-//     * Fetches list of databases by making call to Azure.
-//     * @return list of the databases in recommended elastic pool
-//     */
-//    List<SqlDatabase> listDatabases();
-//
-//    /**
-//     * Get a specific database in the recommended database.
-//     *
-//     * @param databaseName name of the database to be fetched
-//     * @return information on the database recommended in recommended elastic pool
-//     */
-//    SqlDatabase getDatabase(String databaseName);
 
 }

@@ -10,8 +10,6 @@ import com.microsoft.azure.management.resources.fluentcore.arm.collection.implem
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlServer;
 
-import java.util.Objects;
-
 /**
  * Represents a SQL Firewall rules collection associated with an Azure SQL server.
  */

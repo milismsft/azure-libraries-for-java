@@ -7,17 +7,15 @@ package com.microsoft.azure.management.sql;
 
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
-import com.microsoft.azure.management.apigeneration.Method;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
 import rx.Completable;
 import rx.Observable;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Base class for Azure SQL Server child resource operations.
+ *
+ * @param <T> the FluentT interface of the SQL server child resource
  */
 @Fluent
 @Beta(Beta.SinceVersion.V2_0_0)
@@ -165,6 +163,8 @@ public interface SqlChildrenOperations<T> {
 //
     /**
      * Base interface for Azure SQL Server child resource actions.
+     *
+     * @param <T> the FluentT interface of the SQL server child resource
      */
     interface SqlChildrenActionsDefinition<T> {
         /**

@@ -10,25 +10,34 @@ import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
-import com.microsoft.azure.management.resources.fluentcore.dag.FunctionalTaskItem;
 import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
-import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.sql.CreateMode;
 import com.microsoft.azure.management.sql.DatabaseEdition;
+import com.microsoft.azure.management.sql.ReplicationLink;
+import com.microsoft.azure.management.sql.RestorePoint;
 import com.microsoft.azure.management.sql.ServiceObjectiveName;
 import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
+import com.microsoft.azure.management.sql.SqlDatabasePremiumRSServiceObjective;
+import com.microsoft.azure.management.sql.SqlDatabasePremiumRSStorage;
+import com.microsoft.azure.management.sql.SqlDatabasePremiumServiceObjective;
+import com.microsoft.azure.management.sql.SqlDatabasePremiumStorage;
+import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
+import com.microsoft.azure.management.sql.SqlDatabaseStandardStorage;
 import com.microsoft.azure.management.sql.SqlElasticPool;
-import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
 import com.microsoft.azure.management.sql.SqlServer;
-import com.microsoft.rest.ServiceCallback;
-import com.microsoft.rest.ServiceFuture;
+import com.microsoft.azure.management.sql.SqlWarehouse;
+import com.microsoft.azure.management.sql.UpgradeHintInterface;
 import org.joda.time.DateTime;
 import rx.Completable;
 import rx.Observable;
 import rx.functions.Func1;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -51,10 +60,10 @@ class SqlDatabaseImpl
     private SqlElasticPoolsAsExternalChildResourcesImpl sqlElasticPools;
     private TaskGroup.HasTaskGroup parentSqlElasticPool;
 
-    private SqlServerManager sqlServerManager;
-    private String resourceGroupName;
-    private String sqlServerName;
-    private String sqlServerLocation;
+    protected SqlServerManager sqlServerManager;
+    protected String resourceGroupName;
+    protected String sqlServerName;
+    protected String sqlServerLocation;
     private boolean isPatchUpdate;
 
     /**
@@ -194,8 +203,58 @@ class SqlDatabaseImpl
 
     @Override
     public boolean isDataWarehouse() {
-        return false;
+        return this.inner().edition().toString().equalsIgnoreCase(DatabaseEdition.DATA_WAREHOUSE.toString());
     }
+
+    @Override
+    public SqlWarehouse asWarehouse() {
+        if (this.isDataWarehouse()) {
+            return (SqlWarehouse) this;
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<RestorePoint> listRestorePoints() {
+        List<RestorePoint> restorePoints = new ArrayList<>();
+        List<RestorePointInner> restorePointInners = this.sqlServerManager.inner()
+            .restorePoints().listByDatabase(this.resourceGroupName, this.sqlServerName, this.name());
+        if (restorePointInners != null) {
+            for (RestorePointInner inner : restorePointInners) {
+                restorePoints.add(new RestorePointImpl(this.resourceGroupName, this.sqlServerName, inner));
+            }
+        }
+        return Collections.unmodifiableList(restorePoints);
+    }
+
+    @Override
+    public Map<String, ReplicationLink> listReplicationLinks() {
+        Map<String, ReplicationLink> replicationLinkMap = new HashMap<>();
+        List<ReplicationLinkInner> replicationLinkInners = this.sqlServerManager.inner()
+            .replicationLinks().listByDatabase(this.resourceGroupName, this.sqlServerName, this.name());
+        if (replicationLinkInners != null) {
+            for (ReplicationLinkInner inner : replicationLinkInners) {
+                replicationLinkMap.put(inner.name(), new ReplicationLinkImpl(this.resourceGroupName, this.sqlServerName, inner, this.sqlServerManager));
+            }
+        }
+        return Collections.unmodifiableMap(replicationLinkMap);
+    }
+
+//    @Override
+//    public List<DatabaseMetric> listUsages() {
+//        return null;
+//    }
+//
+//    @Override
+//    public TransparentDataEncryption getTransparentDataEncryption() {
+//        return null;
+//    }
+//
+//    @Override
+//    public Map<String, ServiceTierAdvisor> listServiceTierAdvisors() {
+//        return null;
+//    }
 
     @Override
     public String parentId() {
@@ -212,8 +271,9 @@ class SqlDatabaseImpl
         return Region.findByLabelOrName(this.regionName());
     }
 
-    void addParentDependency(TaskGroup.HasTaskGroup parentDependency) {
-        this.addDependency(parentDependency);
+    @Override
+    public UpgradeHintInterface getUpgradeHint() {
+        return null;
     }
 
     SqlDatabaseImpl withPatchUpdate() {
@@ -224,6 +284,10 @@ class SqlDatabaseImpl
     @Override
     protected Observable<DatabaseInner> getInnerAsync() {
         return this.sqlServerManager.inner().databases().getAsync(this.resourceGroupName, this.sqlServerName, this.name());
+    }
+
+    void addParentDependency(TaskGroup.HasTaskGroup parentDependency) {
+        this.addDependency(parentDependency);
     }
 
     @Override
@@ -405,6 +469,57 @@ class SqlDatabaseImpl
         this.inner().withElasticPoolName(null);
         this.inner().withEdition(edition);
 
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withBasicEdition() {
+        this.inner().withEdition(DatabaseEdition.BASIC);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective) {
+        this.inner().withEdition(DatabaseEdition.STANDARD);
+        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity) {
+        this.inner().withEdition(DatabaseEdition.STANDARD);
+        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacityInMB()));
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective) {
+        this.inner().withEdition(DatabaseEdition.PREMIUM);
+        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity) {
+        this.inner().withEdition(DatabaseEdition.PREMIUM);
+        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacityInMB()));
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective) {
+        this.inner().withEdition(DatabaseEdition.PREMIUM_RS);
+        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity) {
+        this.inner().withEdition(DatabaseEdition.PREMIUM_RS);
+        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
+        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacityInMB()));
         return this;
     }
 

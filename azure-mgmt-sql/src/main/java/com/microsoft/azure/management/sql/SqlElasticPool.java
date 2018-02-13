@@ -81,22 +81,55 @@ public interface SqlElasticPool
     /**
      * @return the storage capacity limit for the SQL Azure Database Elastic Pool in MB
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     int storageCapacityInMB();
 
     /**
      * @return the parent SQL server ID
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     String parentId();
 
     /**
      * @return the name of the region the resource is in
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     String regionName();
 
     /**
      * @return the region the resource is in
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     Region region();
+
+
+    // Actions
+
+    /**
+     * @return the information about elastic pool activities
+     */
+    @Method
+    List<ElasticPoolActivity> listActivities();
+
+    /**
+     * @return a representation of the deferred computation of the information about elastic pool activities
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    @Method
+    Observable<ElasticPoolActivity> listActivitiesAsync();
+
+    /**
+     * @return the information about elastic pool database activities
+     */
+    @Method
+    List<ElasticPoolDatabaseActivity> listDatabaseActivities();
+
+    /**
+     * @return the information about elastic pool database activities
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    @Method
+    Observable<ElasticPoolDatabaseActivity> listDatabaseActivitiesAsync();
 
     /**
      * Lists the database metrics for this SQL Elastic Pool.
@@ -104,6 +137,7 @@ public interface SqlElasticPool
      * @param filter an OData filter expression that describes a subset of metrics to return
      * @return the elastic pool's database metrics
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     List<SqlDatabaseMetric> listDatabaseMetrics(String filter);
 
     /**
@@ -112,6 +146,7 @@ public interface SqlElasticPool
      * @param filter an OData filter expression that describes a subset of metrics to return
      * @return a representation of the deferred computation of this call
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     Observable<SqlDatabaseMetric> listDatabaseMetricsAsync(String filter);
 
     /**
@@ -119,6 +154,7 @@ public interface SqlElasticPool
      *
      * @return the elastic pool's metric definitions
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     List<SqlDatabaseMetricDefinition> listDatabaseMetricDefinitions();
 
     /**
@@ -126,18 +162,9 @@ public interface SqlElasticPool
      *
      * @return a representation of the deferred computation of this call
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     Observable<SqlDatabaseMetricDefinition> listDatabaseMetricDefinitionsAsync();
 
-//    /**
-//     * @return the information about elastic pool activities
-//     */
-//    List<ElasticPoolActivity> listActivities();
-//
-//    /**
-//     * @return the information about elastic pool database activities
-//     */
-//    List<ElasticPoolDatabaseActivity> listDatabaseActivities();
-//
     /**
      * Lists the SQL databases in this SQL Elastic Pool.
      *
@@ -150,6 +177,7 @@ public interface SqlElasticPool
      *
      * @return a representation of the deferred computation of this call
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     Observable<SqlDatabase> listDatabasesAsync();
 
     /**
@@ -166,6 +194,7 @@ public interface SqlElasticPool
      * @param databaseName name of the database
      * @return the database
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     SqlDatabase addNewDatabase(String databaseName);
 
     /**
@@ -174,6 +203,7 @@ public interface SqlElasticPool
      * @param databaseName name of the database
      * @return the database
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     SqlDatabase addExistingDatabase(String databaseName);
 
     /**
@@ -182,6 +212,7 @@ public interface SqlElasticPool
      * @param database the database to be added
      * @return the database
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     SqlDatabase addExistingDatabase(SqlDatabase database);
 
     /**
@@ -190,6 +221,7 @@ public interface SqlElasticPool
      * @param databaseName name of the database
      * @return the database
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     SqlDatabase removeDatabase(String databaseName);
 
     /**
@@ -213,6 +245,8 @@ public interface SqlElasticPool
 
     /**
      * Container interface for all the definitions that need to be implemented.
+     *
+     * @param <ParentT> the stage of the parent definition to return to after attaching this definition
      */
     interface SqlElasticPoolDefinition<ParentT> extends
             DefinitionStages.Blank<ParentT>,

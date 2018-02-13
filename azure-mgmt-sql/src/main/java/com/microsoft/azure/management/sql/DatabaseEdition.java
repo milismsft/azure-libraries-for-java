@@ -31,6 +31,9 @@ public final class DatabaseEdition extends ExpandableStringEnum<DatabaseEdition>
     /** Static value Premium for DatabaseEdition. */
     public static final DatabaseEdition PREMIUM = fromString("Premium");
 
+    /** Static value PremiumRS for DatabaseEdition. */
+    public static final DatabaseEdition PREMIUM_RS = fromString("PremiumRS");
+
     /** Static value Free for DatabaseEdition. */
     public static final DatabaseEdition FREE = fromString("Free");
 

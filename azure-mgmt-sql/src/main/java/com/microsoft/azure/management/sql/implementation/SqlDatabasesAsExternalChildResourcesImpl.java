@@ -7,10 +7,13 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.ExternalChildResourcesNonCachedImpl;
+import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
 import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlServer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -107,5 +110,16 @@ public class SqlDatabasesAsExternalChildResourcesImpl
         } else {
             prepareInlineRemove(new SqlDatabaseImpl(name, this.parent(), new DatabaseInner(), this.parent().manager()));
         }
+    }
+
+    List<SqlDatabaseImpl> getChildren(ExternalChildResourceImpl.PendingOperation pendingOperation) {
+        List<SqlDatabaseImpl> results = new ArrayList<>();
+        for (SqlDatabaseImpl child : this.childCollection.values()) {
+            if (child.pendingOperation() == pendingOperation) {
+                results.add(child);
+            }
+        }
+
+        return results;
     }
 }

@@ -7,8 +7,6 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
-import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
-import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
 import com.microsoft.azure.management.sql.SqlServer;
@@ -18,7 +16,6 @@ import rx.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,14 +32,14 @@ public class SqlDatabaseOperationsImpl
     private SqlServerImpl sqlServer;
     private SqlDatabasesAsExternalChildResourcesImpl sqlDatabases;
 
-    public SqlDatabaseOperationsImpl(SqlServerImpl parent, SqlServerManager manager) {
+    SqlDatabaseOperationsImpl(SqlServerImpl parent, SqlServerManager manager) {
         Objects.requireNonNull(manager);
         this.sqlServer = parent;
         this.manager = manager;
         this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.sqlServer.taskGroup(), manager, "SqlDatabase");
     }
 
-    public SqlDatabaseOperationsImpl(SqlServerManager manager) {
+    SqlDatabaseOperationsImpl(SqlServerManager manager) {
         Objects.requireNonNull(manager);
         this.manager = manager;
         this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(null, manager, "SqlDatabase");
@@ -163,7 +160,8 @@ public class SqlDatabaseOperationsImpl
                 @Override
                 public Observable<DatabaseInner> call(List<DatabaseInner> databaseInners) {
                     return Observable.from(databaseInners);
-                }})
+                }
+            })
             .map(new Func1<DatabaseInner, SqlDatabase>() {
                 @Override
                 public SqlDatabase call(DatabaseInner inner) {
@@ -200,7 +198,7 @@ public class SqlDatabaseOperationsImpl
     }
 
     @Override
-    public SqlDatabaseOperations.DefinitionStages.WithSqlServer define(String name) {
+    public SqlDatabaseImpl define(String name) {
         return this.sqlDatabases.defineIndependentDatabase(name);
     }
 }

@@ -8,7 +8,6 @@ package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.collection.implementation.TopLevelModifiableResourcesImpl;
-import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
 import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
 import com.microsoft.azure.management.sql.SqlFirewallRuleOperations;

@@ -85,8 +85,15 @@ public interface SqlFirewallRuleOperations extends
     }
 
     /**
-     * Grouping of the Azure SQL Server Firewall rule common actions.
+     * Grouping of the Azure SQL Server Firewall Rule common actions.
      */
     interface SqlFirewallRuleActionsDefinition extends SqlChildrenActionsDefinition<SqlFirewallRule> {
+        /**
+         * Begins the definition of a new SQL Firewall rule to be added to this server.
+         *
+         * @param firewallRuleName the name of the new SQL Firewall rule
+         * @return the first stage of the new SQL Firewall rule definition
+         */
+        SqlFirewallRuleOperations.DefinitionStages.WithIPAddressRange define(String firewallRuleName);
     }
 }

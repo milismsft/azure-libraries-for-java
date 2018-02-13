@@ -32,14 +32,14 @@ public class SqlFirewallRuleOperationsImpl
     private SqlServer sqlServer;
     private SqlFirewallRulesAsExternalChildResourcesImpl sqlFirewallRules;
 
-    public SqlFirewallRuleOperationsImpl(SqlServer parent, SqlServerManager sqlServerManager) {
+    SqlFirewallRuleOperationsImpl(SqlServer parent, SqlServerManager sqlServerManager) {
         Objects.requireNonNull(sqlServerManager);
         this.sqlServer = parent;
         this.sqlServerManager = sqlServerManager;
         this.sqlFirewallRules = new SqlFirewallRulesAsExternalChildResourcesImpl(sqlServerManager, "SqlFirewallRule");
     }
 
-    public SqlFirewallRuleOperationsImpl(SqlServerManager sqlServerManager) {
+    SqlFirewallRuleOperationsImpl(SqlServerManager sqlServerManager) {
         Objects.requireNonNull(sqlServerManager);
         this.sqlServerManager = sqlServerManager;
         this.sqlFirewallRules = new SqlFirewallRulesAsExternalChildResourcesImpl(sqlServerManager, "SqlFirewallRule");
@@ -160,7 +160,8 @@ public class SqlFirewallRuleOperationsImpl
                 @Override
                 public Observable<FirewallRuleInner> call(List<FirewallRuleInner> firewallRuleInners) {
                     return Observable.from(firewallRuleInners);
-                }})
+                }
+            })
             .map(new Func1<FirewallRuleInner, SqlFirewallRule>() {
                 @Override
                 public SqlFirewallRule call(FirewallRuleInner inner) {
@@ -197,7 +198,7 @@ public class SqlFirewallRuleOperationsImpl
     }
 
     @Override
-    public SqlFirewallRuleOperations.DefinitionStages.WithSqlServer define(String name) {
+    public SqlFirewallRuleImpl define(String name) {
         return sqlFirewallRules.defineIndependentFirewallRule(name);
     }
 }

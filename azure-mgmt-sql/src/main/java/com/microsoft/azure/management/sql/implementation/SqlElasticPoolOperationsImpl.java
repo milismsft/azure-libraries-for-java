@@ -32,14 +32,14 @@ public class SqlElasticPoolOperationsImpl
     private SqlServerImpl sqlServer;
     private SqlElasticPoolsAsExternalChildResourcesImpl sqlElasticPools;
 
-    public SqlElasticPoolOperationsImpl(SqlServerImpl parent, SqlServerManager manager) {
+    SqlElasticPoolOperationsImpl(SqlServerImpl parent, SqlServerManager manager) {
         Objects.requireNonNull(manager);
         this.sqlServer = parent;
         this.manager = manager;
         this.sqlElasticPools = new SqlElasticPoolsAsExternalChildResourcesImpl(manager, "SqlElasticPool");
     }
 
-    public SqlElasticPoolOperationsImpl(SqlServerManager manager) {
+    SqlElasticPoolOperationsImpl(SqlServerManager manager) {
         Objects.requireNonNull(manager);
         this.manager = manager;
         this.sqlElasticPools = new SqlElasticPoolsAsExternalChildResourcesImpl(manager, "SqlElasticPool");
@@ -176,7 +176,8 @@ public class SqlElasticPoolOperationsImpl
                 @Override
                 public Observable<ElasticPoolInner> call(List<ElasticPoolInner> elasticPoolInners) {
                     return Observable.from(elasticPoolInners);
-                }})
+                }
+            })
             .map(new Func1<ElasticPoolInner, SqlElasticPool>() {
                 @Override
                 public SqlElasticPool call(ElasticPoolInner inner) {
@@ -197,7 +198,7 @@ public class SqlElasticPoolOperationsImpl
     }
 
     @Override
-    public SqlElasticPoolOperations.DefinitionStages.WithSqlServer define(String name) {
+    public SqlElasticPoolImpl define(String name) {
         return sqlElasticPools.defineIndependentElasticPool(name);
     }
 }
