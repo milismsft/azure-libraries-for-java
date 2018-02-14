@@ -19,7 +19,7 @@ public interface SqlDatabaseMetricDefinition {
     /**
      * @return the name of the metric
      */
-    MetricName name();
+    String name();
 
     /**
      * @return the primary aggregation type
@@ -39,5 +39,5 @@ public interface SqlDatabaseMetricDefinition {
     /**
      * @return the metric availabilities
      */
-    List<MetricAvailability> metricAvailabilities();
+    List<SqlDatabaseMetricAvailability> metricAvailabilities();
 }

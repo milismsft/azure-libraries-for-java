@@ -8,15 +8,17 @@ package com.microsoft.azure.management.sql.implementation;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.model.implementation.WrapperImpl;
 import com.microsoft.azure.management.sql.MetricAvailability;
-import com.microsoft.azure.management.sql.MetricName;
 import com.microsoft.azure.management.sql.PrimaryAggregationType;
+import com.microsoft.azure.management.sql.SqlDatabaseMetricAvailability;
 import com.microsoft.azure.management.sql.SqlDatabaseMetricDefinition;
 import com.microsoft.azure.management.sql.UnitDefinitionType;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * Response containing the SQL Elastic Pool database metric definitions.
+ * Response containing the SQL database metric definitions.
  */
 @LangDefinition
 public class SqlDatabaseMetricDefinitionImpl extends WrapperImpl<MetricDefinitionInner> implements SqlDatabaseMetricDefinition {
@@ -25,8 +27,8 @@ public class SqlDatabaseMetricDefinitionImpl extends WrapperImpl<MetricDefinitio
     }
 
     @Override
-    public MetricName name() {
-        return this.inner().name();
+    public String name() {
+        return this.inner().name().value();
     }
 
     @Override
@@ -45,7 +47,13 @@ public class SqlDatabaseMetricDefinitionImpl extends WrapperImpl<MetricDefinitio
     }
 
     @Override
-    public List<MetricAvailability> metricAvailabilities() {
-        return this.inner().metricAvailabilities();
+    public List<SqlDatabaseMetricAvailability> metricAvailabilities() {
+        List<SqlDatabaseMetricAvailability> sqlDatabaseMetricAvailabilities = new ArrayList<>();
+        if (this.inner().metricAvailabilities() != null) {
+            for (MetricAvailability metricAvailability : this.inner().metricAvailabilities()) {
+                sqlDatabaseMetricAvailabilities.add(new SqlDatabaseMetricAvailabilityImpl(metricAvailability));
+            }
+        }
+        return Collections.unmodifiableList(sqlDatabaseMetricAvailabilities);
     }
 }

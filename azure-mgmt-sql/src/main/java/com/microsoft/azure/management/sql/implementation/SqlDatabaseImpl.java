@@ -14,10 +14,14 @@ import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.sql.CreateMode;
 import com.microsoft.azure.management.sql.DatabaseEdition;
+import com.microsoft.azure.management.sql.DatabaseMetric;
 import com.microsoft.azure.management.sql.ReplicationLink;
 import com.microsoft.azure.management.sql.RestorePoint;
 import com.microsoft.azure.management.sql.ServiceObjectiveName;
+import com.microsoft.azure.management.sql.ServiceTierAdvisor;
 import com.microsoft.azure.management.sql.SqlDatabase;
+import com.microsoft.azure.management.sql.SqlDatabaseMetric;
+import com.microsoft.azure.management.sql.SqlDatabaseMetricDefinition;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
 import com.microsoft.azure.management.sql.SqlDatabasePremiumRSServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabasePremiumRSStorage;
@@ -28,6 +32,7 @@ import com.microsoft.azure.management.sql.SqlDatabaseStandardStorage;
 import com.microsoft.azure.management.sql.SqlElasticPool;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.management.sql.SqlWarehouse;
+import com.microsoft.azure.management.sql.TransparentDataEncryption;
 import com.microsoft.azure.management.sql.UpgradeHintInterface;
 import org.joda.time.DateTime;
 import rx.Completable;
@@ -167,6 +172,11 @@ class SqlDatabaseImpl
     }
 
     @Override
+    public DatabaseEdition edition() {
+        return this.inner().edition();
+    }
+
+    @Override
     public UUID requestedServiceObjectiveId() {
         return null;
     }
@@ -229,6 +239,25 @@ class SqlDatabaseImpl
     }
 
     @Override
+    public Observable<RestorePoint> listRestorePointsAsync() {
+        final SqlDatabaseImpl self = this;
+        return this.sqlServerManager.inner()
+            .restorePoints().listByDatabaseAsync(this.resourceGroupName, this.sqlServerName, this.name())
+            .flatMap(new Func1<List<RestorePointInner>, Observable<RestorePointInner>>() {
+                @Override
+                public Observable<RestorePointInner> call(List<RestorePointInner> restorePointInners) {
+                    return Observable.from(restorePointInners);
+                }
+            })
+            .map(new Func1<RestorePointInner, RestorePoint>() {
+                @Override
+                public RestorePoint call(RestorePointInner restorePointInner) {
+                    return new RestorePointImpl(self.resourceGroupName, self.sqlServerName, restorePointInner);
+                }
+            });
+    }
+
+    @Override
     public Map<String, ReplicationLink> listReplicationLinks() {
         Map<String, ReplicationLink> replicationLinkMap = new HashMap<>();
         List<ReplicationLinkInner> replicationLinkInners = this.sqlServerManager.inner()
@@ -241,20 +270,146 @@ class SqlDatabaseImpl
         return Collections.unmodifiableMap(replicationLinkMap);
     }
 
-//    @Override
-//    public List<DatabaseMetric> listUsages() {
-//        return null;
-//    }
-//
-//    @Override
-//    public TransparentDataEncryption getTransparentDataEncryption() {
-//        return null;
-//    }
-//
-//    @Override
-//    public Map<String, ServiceTierAdvisor> listServiceTierAdvisors() {
-//        return null;
-//    }
+    @Override
+    public Observable<ReplicationLink> listReplicationLinksAsync() {
+        final SqlDatabaseImpl self = this;
+        return this.sqlServerManager.inner()
+            .replicationLinks().listByDatabaseAsync(this.resourceGroupName, this.sqlServerName, this.name())
+            .flatMap(new Func1<List<ReplicationLinkInner>, Observable<ReplicationLinkInner>>() {
+                @Override
+                public Observable<ReplicationLinkInner> call(List<ReplicationLinkInner> replicationLinkInners) {
+                    return Observable.from(replicationLinkInners);
+                }
+            })
+            .map(new Func1<ReplicationLinkInner, ReplicationLink>() {
+                @Override
+                public ReplicationLink call(ReplicationLinkInner replicationLinkInner) {
+                    return new ReplicationLinkImpl(self.resourceGroupName, self.sqlServerName, replicationLinkInner, self.sqlServerManager);
+                }
+            });
+    }
+
+    @Override
+    public List<DatabaseMetric> listUsages() {
+        // This method was deprecated in favor of the other database metric related methods
+        return Collections.unmodifiableList(new ArrayList<DatabaseMetric>());
+    }
+
+    @Override
+    public List<SqlDatabaseMetric> listMetrics(String filter) {
+        List<SqlDatabaseMetric> sqlDatabaseMetrics = new ArrayList<>();
+        List<MetricInner> metricInners = this.sqlServerManager.inner().databases()
+            .listMetrics(this.resourceGroupName, this.sqlServerName, this.name(), filter);
+        if (metricInners != null) {
+            for (MetricInner metricInner : metricInners) {
+                sqlDatabaseMetrics.add(new SqlDatabaseMetricImpl(metricInner));
+            }
+        }
+        return Collections.unmodifiableList(sqlDatabaseMetrics);
+    }
+
+    @Override
+    public Observable<SqlDatabaseMetric> listMetricsAsync(final String filter) {
+        return this.sqlServerManager.inner().databases()
+            .listMetricsAsync(this.resourceGroupName, this.sqlServerName, this.name(), filter)
+            .flatMap(new Func1<List<MetricInner>, Observable<MetricInner>>() {
+                @Override
+                public Observable<MetricInner> call(List<MetricInner> metricInners) {
+                    return Observable.from(metricInners);
+                }
+            })
+            .map(new Func1<MetricInner, SqlDatabaseMetric>() {
+                @Override
+                public SqlDatabaseMetric call(MetricInner metricInner) {
+                    return new SqlDatabaseMetricImpl(metricInner);
+                }
+            });
+    }
+
+    @Override
+    public List<SqlDatabaseMetricDefinition> listMetricDefinitions() {
+        List<SqlDatabaseMetricDefinition> sqlDatabaseMetricDefinitions = new ArrayList<>();
+        List<MetricDefinitionInner> metricDefinitionInners = this.sqlServerManager.inner().databases()
+            .listMetricDefinitions(this.resourceGroupName, this.sqlServerName, this.name());
+        if (metricDefinitionInners != null) {
+            for (MetricDefinitionInner metricDefinitionInner : metricDefinitionInners) {
+                sqlDatabaseMetricDefinitions.add(new SqlDatabaseMetricDefinitionImpl(metricDefinitionInner));
+            }
+        }
+
+        return Collections.unmodifiableList(sqlDatabaseMetricDefinitions);
+    }
+
+    @Override
+    public Observable<SqlDatabaseMetricDefinition> listMetricDefinitionsAsync() {
+        return this.sqlServerManager.inner().databases()
+            .listMetricDefinitionsAsync(this.resourceGroupName, this.sqlServerName, this.name())
+            .flatMap(new Func1<List<MetricDefinitionInner>, Observable<MetricDefinitionInner>>() {
+                @Override
+                public Observable<MetricDefinitionInner> call(List<MetricDefinitionInner> metricDefinitionInners) {
+                    return Observable.from(metricDefinitionInners);
+                }
+            })
+            .map(new Func1<MetricDefinitionInner, SqlDatabaseMetricDefinition>() {
+                @Override
+                public SqlDatabaseMetricDefinition call(MetricDefinitionInner metricDefinitionInner) {
+                    return new SqlDatabaseMetricDefinitionImpl(metricDefinitionInner);
+                }
+            });
+    }
+
+    @Override
+    public TransparentDataEncryption getTransparentDataEncryption() {
+        TransparentDataEncryptionInner transparentDataEncryptionInner = this.sqlServerManager.inner()
+            .transparentDataEncryptions().get(this.resourceGroupName, this.sqlServerName, this.name());
+        return new TransparentDataEncryptionImpl(this.resourceGroupName, this.sqlServerName, transparentDataEncryptionInner, this.sqlServerManager);
+    }
+
+    @Override
+    public Observable<TransparentDataEncryption> getTransparentDataEncryptionAsync() {
+        final SqlDatabaseImpl self = this;
+        return this.sqlServerManager.inner()
+            .transparentDataEncryptions().getAsync(this.resourceGroupName, this.sqlServerName, this.name())
+            .map(new Func1<TransparentDataEncryptionInner, TransparentDataEncryption>() {
+                @Override
+                public TransparentDataEncryption call(TransparentDataEncryptionInner transparentDataEncryptionInner) {
+                    return new TransparentDataEncryptionImpl(self.resourceGroupName, self.sqlServerName, transparentDataEncryptionInner, self.sqlServerManager);
+                }
+            });
+    }
+
+    @Override
+    public Map<String, ServiceTierAdvisor> listServiceTierAdvisors() {
+        Map<String, ServiceTierAdvisor> serviceTierAdvisorMap = new HashMap<>();
+        List<ServiceTierAdvisorInner> serviceTierAdvisorInners = this.sqlServerManager.inner()
+            .serviceTierAdvisors().listByDatabase(this.resourceGroupName, this.sqlServerName, this.name());
+        if (serviceTierAdvisorInners != null) {
+            for (ServiceTierAdvisorInner serviceTierAdvisorInner : serviceTierAdvisorInners) {
+                serviceTierAdvisorMap.put(serviceTierAdvisorInner.name(),
+                    new ServiceTierAdvisorImpl(this.resourceGroupName, this.sqlServerName, serviceTierAdvisorInner, this.sqlServerManager));
+            }
+        }
+        return Collections.unmodifiableMap(serviceTierAdvisorMap);
+    }
+
+    @Override
+    public Observable<ServiceTierAdvisor> listServiceTierAdvisorsAsync() {
+        final SqlDatabaseImpl self = this;
+        return this.sqlServerManager.inner()
+            .serviceTierAdvisors().listByDatabaseAsync(this.resourceGroupName, this.sqlServerName, this.name())
+            .flatMap(new Func1<List<ServiceTierAdvisorInner>, Observable<ServiceTierAdvisorInner>>() {
+                @Override
+                public Observable<ServiceTierAdvisorInner> call(List<ServiceTierAdvisorInner> serviceTierAdvisorInners) {
+                    return Observable.from(serviceTierAdvisorInners);
+                }
+            })
+            .map(new Func1<ServiceTierAdvisorInner, ServiceTierAdvisor>() {
+                @Override
+                public ServiceTierAdvisor call(ServiceTierAdvisorInner serviceTierAdvisorInner) {
+                    return new ServiceTierAdvisorImpl(self.resourceGroupName, self.sqlServerName, serviceTierAdvisorInner, self.sqlServerManager);
+                }
+            });
+    }
 
     @Override
     public String parentId() {

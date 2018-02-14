@@ -20,7 +20,7 @@ public interface SqlDatabaseMetric {
     /**
      * @return the metric name
      */
-    MetricName name();
+    String name();
 
     /**
      * @return the start time
@@ -45,5 +45,5 @@ public interface SqlDatabaseMetric {
     /**
      * @return the metric values
      */
-    List<MetricValue> metricValues();
+    List<SqlDatabaseMetricValue> metricValues();
 }

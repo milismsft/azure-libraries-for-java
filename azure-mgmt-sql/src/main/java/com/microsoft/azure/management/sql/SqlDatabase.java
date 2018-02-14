@@ -20,6 +20,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import com.microsoft.azure.management.sql.implementation.DatabaseInner;
 import org.joda.time.DateTime;
 import rx.Completable;
+import rx.Observable;
 
 import java.util.List;
 import java.util.Map;
@@ -71,10 +72,10 @@ public interface SqlDatabase
      */
     DateTime earliestRestoreDate();
 
-//    /**
-//     * @return the edition of the Azure SQL Database
-//     */
-//    DatabaseEditions edition();
+    /**
+     * @return the edition of the Azure SQL Database
+     */
+    DatabaseEdition edition();
 
     /**
      *
@@ -149,31 +150,97 @@ public interface SqlDatabase
     SqlWarehouse asWarehouse();
 
     /**
-     * @return returns the list of all restore points on the database
+     * @return the list of all restore points on this database
      */
+    @Method
     List<RestorePoint> listRestorePoints();
 
-//    /**
-//     * @return returns the list of usages (DatabaseMetrics) of the database
-//     */
-//    List<DatabaseMetric> listUsages();
-//
-//    /**
-//     * Gets an Azure SQL Database Transparent Data Encryption for the database.
-//     *
-//     * @return an Azure SQL Database Transparent Data Encryption for the database
-//     */
-//    TransparentDataEncryption getTransparentDataEncryption();
-//
-//    /**
-//     * @return information about service tier advisors for specified database
-//     */
-//    Map<String, ServiceTierAdvisor> listServiceTierAdvisors();
+    /**
+     * @return the list of all restore points on this database
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<RestorePoint> listRestorePointsAsync();
 
     /**
-     * @return all the replication links associated with the database
+     * @return the list of usages (DatabaseMetrics) of this database
      */
+    @Method
+    @Deprecated
+    List<DatabaseMetric> listUsages();
+
+    /**
+     * @param filter an OData filter expression that describes a subset of metrics to return.
+     * @return the list of metrics for this database
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    List<SqlDatabaseMetric> listMetrics(String filter);
+
+    /**
+     * @param filter an OData filter expression that describes a subset of metrics to return.
+     * @return a representation of the deferred computation of the metrics for this database
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<SqlDatabaseMetric> listMetricsAsync(String filter);
+
+    /**
+     * @return the list of metric definitions for this database
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    List<SqlDatabaseMetricDefinition> listMetricDefinitions();
+
+    /**
+     * @return a representation of the deferred computation of the metric definitions for this database
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<SqlDatabaseMetricDefinition> listMetricDefinitionsAsync();
+
+    /**
+     * Gets an Azure SQL Database Transparent Data Encryption for this database.
+     *
+     * @return an Azure SQL Database Transparent Data Encryption for this database
+     */
+    @Method
+    TransparentDataEncryption getTransparentDataEncryption();
+
+    /**
+     * Gets an Azure SQL Database Transparent Data Encryption for this database.
+     *
+     * @return a representation of the deferred computation of an Azure SQL Database Transparent Data Encryption for this database
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<TransparentDataEncryption> getTransparentDataEncryptionAsync();
+
+    /**
+     * @return information about service tier advisors for the current database
+     */
+    @Method
+    Map<String, ServiceTierAdvisor> listServiceTierAdvisors();
+
+    /**
+     * @return a representation of the deferred computation of the information about service tier advisors for this database
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<ServiceTierAdvisor> listServiceTierAdvisorsAsync();
+
+    /**
+     * @return all the replication links associated with this database
+     */
+    @Method
     Map<String, ReplicationLink> listReplicationLinks();
+
+    /**
+     * @return a representation of the deferred computation of all the replication links associated with this database
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<ReplicationLink> listReplicationLinksAsync();
 
     /**
      * Deletes the database from the server.
@@ -186,8 +253,8 @@ public interface SqlDatabase
      *
      * @return a representation of the deferred computation of this call
      */
-    @Beta(Beta.SinceVersion.V2_0_0)
     @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
     Completable deleteAsync();
 
 
