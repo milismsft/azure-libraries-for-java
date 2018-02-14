@@ -293,7 +293,19 @@ public interface SqlDatabase
          */
         interface WithSourceDatabaseId<ParentT> extends WithAttachForElasticPool<ParentT> {
             /**
+             * Creates a new database from a previously deleted database (see restorable dropped database).
+             * <p>
+             * Collation, Edition, and MaxSizeBytes must remain the same while the link is
+             * active. Values specified for these parameters will be ignored.
+             *
+             * @param restorableDroppedDatabase the restorable dropped database
+             * @return The next stage of the definition.
+             */
+            WithAttachFinal<ParentT> fromRestorableDroppedDatabase(SqlRestorableDroppedDatabase restorableDroppedDatabase);
+
+            /**
              * Sets the resource if of source database for the SQL Database.
+             * <p>
              * Collation, Edition, and MaxSizeBytes must remain the same while the link is
              * active. Values specified for these parameters will be ignored.
              *
@@ -304,6 +316,7 @@ public interface SqlDatabase
 
             /**
              * Sets the resource if of source database for the SQL Database.
+             * <p>
              * Collation, Edition, and MaxSizeBytes must remain the same while the link is
              * active. Values specified for these parameters will be ignored.
              *

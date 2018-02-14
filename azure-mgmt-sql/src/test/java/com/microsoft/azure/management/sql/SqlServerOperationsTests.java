@@ -10,6 +10,7 @@ import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.UUID;
 
 public class SqlServerOperationsTests extends SqlServerTest {
@@ -33,7 +34,7 @@ public class SqlServerOperationsTests extends SqlServerTest {
                     .withAdministratorLogin("adminsql")
                     .withAdministratorPassword("passSQL1")
                     .withActiveDirectoryAdministrator("DSEng", id)
-                    .withoutAccessFromAzureServices()
+//                    .withoutAccessFromAzureServices()
                     .defineFirewallRule("somefirewallrule1")
                         .withIPAddressRange("0.0.0.1", "255.255.255.255")
                         .attach()
@@ -59,13 +60,23 @@ public class SqlServerOperationsTests extends SqlServerTest {
 //
 //        elasticPool.delete();
 
-        SqlDatabase db5 = sqlServerManager.sqlServers().databases()
-            .define("db5")
+        List<SqlRestorableDroppedDatabase> restorableDroppedDatabases = sqlServer.listRestorableDroppedDatabases();
+        SqlRestorableDroppedDatabase restorableDroppedDatabase = restorableDroppedDatabases.get(0);
+
+        SqlDatabase db = sqlServerManager.sqlServers().databases().define("test-restore")
             .withSqlServer(sqlServer)
-            .defineElasticPool("ep3")
-                .withBasicPool()
-                .attach()
+            .withSourceDatabase(restorableDroppedDatabase.id())
+            .withMode(CreateMode.RESTORE)
             .create();
+
+        db.delete();
+//        SqlDatabase db5 = sqlServerManager.sqlServers().databases()
+//            .define("db5")
+//            .withSqlServer(sqlServer)
+//            .defineElasticPool("ep3")
+//                .withBasicPool()
+//                .attach()
+//            .create();
 
 //        SqlElasticPool elasticPool2 = sqlServerManager.sqlServers().elasticPools()
 //            .define("ep2")

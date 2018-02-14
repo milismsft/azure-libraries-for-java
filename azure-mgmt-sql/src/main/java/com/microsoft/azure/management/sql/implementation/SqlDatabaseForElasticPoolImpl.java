@@ -18,6 +18,7 @@ import com.microsoft.azure.management.sql.SqlDatabasePremiumStorage;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardStorage;
 import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
+import com.microsoft.azure.management.sql.SqlRestorableDroppedDatabase;
 
 import java.util.Objects;
 
@@ -46,6 +47,12 @@ public class SqlDatabaseForElasticPoolImpl
     public SqlElasticPoolImpl attach() {
 //        this.sqlDatabase.addParentDependency(this.sqlElasticPool);
         return this.sqlElasticPool;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl fromRestorableDroppedDatabase(SqlRestorableDroppedDatabase restorableDroppedDatabase) {
+        return this.withSourceDatabase(restorableDroppedDatabase.id())
+            .withMode(CreateMode.RESTORE);
     }
 
     @Override

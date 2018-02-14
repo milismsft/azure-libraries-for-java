@@ -17,6 +17,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import com.microsoft.azure.management.sql.implementation.ServerInner;
 import com.microsoft.azure.management.sql.implementation.SqlServerManager;
+import rx.Observable;
 
 import java.util.List;
 import java.util.Map;
@@ -80,6 +81,19 @@ public interface SqlServer extends
      * @return list of recommended elastic pools for the server
      */
     Map<String, RecommendedElasticPool> listRecommendedElasticPools();
+
+    /**
+     * @return the list of all restorable dropped databases
+     */
+    @Method
+    List<SqlRestorableDroppedDatabase> listRestorableDroppedDatabases();
+
+    /**
+     * @return the list of all restorable dropped databases
+     */
+    @Method
+    @Beta(Beta.SinceVersion.V2_0_0)
+    Observable<SqlRestorableDroppedDatabase> listRestorableDroppedDatabasesAsync();
 
 //    /**
 //     * @return entry point to manage Failover Groups for this SQL server.

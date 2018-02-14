@@ -20,6 +20,7 @@ import com.microsoft.azure.management.sql.SqlDatabaseOperations;
 import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlFirewallRuleOperations;
+import com.microsoft.azure.management.sql.SqlRestorableDroppedDatabase;
 import com.microsoft.azure.management.sql.SqlServer;
 import rx.Completable;
 import rx.Observable;
@@ -181,6 +182,38 @@ public class SqlServerImpl
         }
 
         return Collections.unmodifiableMap(recommendedElasticPoolMap);
+    }
+
+    @Override
+    public List<SqlRestorableDroppedDatabase> listRestorableDroppedDatabases() {
+        List<SqlRestorableDroppedDatabase> sqlRestorableDroppedDatabases = new ArrayList<>();
+        List<RestorableDroppedDatabaseInner> restorableDroppedDatabasesInners = this.manager().inner()
+            .restorableDroppedDatabases().listByServer(this.resourceGroupName(), this.name());
+        if (restorableDroppedDatabasesInners != null) {
+            for (RestorableDroppedDatabaseInner restorableDroppedDatabaseInner : restorableDroppedDatabasesInners) {
+                sqlRestorableDroppedDatabases.add(new SqlRestorableDroppedDatabaseImpl(this.resourceGroupName(), this.name(), restorableDroppedDatabaseInner, this.manager()));
+            }
+        }
+        return Collections.unmodifiableList(sqlRestorableDroppedDatabases);
+    }
+
+    @Override
+    public Observable<SqlRestorableDroppedDatabase> listRestorableDroppedDatabasesAsync() {
+        final SqlServerImpl self = this;
+        return this.manager().inner()
+            .restorableDroppedDatabases().listByServerAsync(this.resourceGroupName(), this.name())
+            .flatMap(new Func1<List<RestorableDroppedDatabaseInner>, Observable<RestorableDroppedDatabaseInner>>() {
+                @Override
+                public Observable<RestorableDroppedDatabaseInner> call(List<RestorableDroppedDatabaseInner> restorableDroppedDatabaseInners) {
+                    return Observable.from(restorableDroppedDatabaseInners);
+                }
+            })
+            .map(new Func1<RestorableDroppedDatabaseInner, SqlRestorableDroppedDatabase>() {
+                @Override
+                public SqlRestorableDroppedDatabase call(RestorableDroppedDatabaseInner restorableDroppedDatabaseInner) {
+                    return new SqlRestorableDroppedDatabaseImpl(self.resourceGroupName(), self.name(), restorableDroppedDatabaseInner, self.manager());
+                }
+            });
     }
 
     @Override

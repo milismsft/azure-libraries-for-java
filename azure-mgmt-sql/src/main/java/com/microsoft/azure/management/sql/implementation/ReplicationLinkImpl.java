@@ -3,7 +3,6 @@
  * Licensed under the MIT License. See License.txt in the project root for
  * license information.
  */
-
 package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
@@ -20,7 +19,7 @@ import rx.Completable;
 import rx.Observable;
 
 /**
- * Implementation for SqlServer and its parent interfaces.
+ * Implementation for SQL replication link interface.
  */
 @LangDefinition
 class ReplicationLinkImpl

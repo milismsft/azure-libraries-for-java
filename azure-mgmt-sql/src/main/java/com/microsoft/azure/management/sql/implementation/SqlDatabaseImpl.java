@@ -30,6 +30,7 @@ import com.microsoft.azure.management.sql.SqlDatabasePremiumStorage;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardStorage;
 import com.microsoft.azure.management.sql.SqlElasticPool;
+import com.microsoft.azure.management.sql.SqlRestorableDroppedDatabase;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.management.sql.SqlWarehouse;
 import com.microsoft.azure.management.sql.TransparentDataEncryption;
@@ -584,6 +585,12 @@ class SqlDatabaseImpl
 
         return new SqlElasticPoolForDatabaseImpl(this, this.sqlElasticPools
             .defineIndependentElasticPool(elasticPoolName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation));
+    }
+
+    @Override
+    public SqlDatabaseImpl fromRestorableDroppedDatabase(SqlRestorableDroppedDatabase restorableDroppedDatabase) {
+        return this.withSourceDatabase(restorableDroppedDatabase.id())
+            .withMode(CreateMode.RESTORE);
     }
 
     @Override
