@@ -18,6 +18,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
 import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
 import com.microsoft.azure.management.resources.fluentcore.model.Updatable;
 import com.microsoft.azure.management.sql.implementation.DatabaseInner;
+import com.microsoft.azure.management.storage.StorageAccount;
 import org.joda.time.DateTime;
 import rx.Completable;
 import rx.Observable;
@@ -243,13 +244,44 @@ public interface SqlDatabase
     Observable<ReplicationLink> listReplicationLinksAsync();
 
     /**
+     * Exports the current database to a specified URI path.
+     *
+     * @param storageUri the storage URI to use
+     * @return response object
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    SqlDatabaseExportRequest.DefinitionStages.WithStorageType exportTo(String storageUri);
+
+    /**
+     * Exports the current database to an existing storage account and relative path.
+     *
+     * @param storageAccount an existing storage account to be used
+     * @param containerName the container name within the storage account to use
+     * @param fileName the exported database file name
+     * @return response object
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationType exportTo(StorageAccount storageAccount, String containerName, String fileName);
+
+    /**
+     * Exports the current database to a new storage account and relative path.
+     *
+     * @param storageAccountCreatable a storage account to be created as part of this execution flow
+     * @param containerName the container name within the storage account to use
+     * @param fileName the exported database file name
+     * @return response object
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationType exportTo(Creatable<StorageAccount> storageAccountCreatable, String containerName, String fileName);
+
+    /**
      * Deletes the database from the server.
      */
     @Method
     void delete();
 
     /**
-     * Deletes the firewall rule asynchronously.
+     * Deletes the database asynchronously.
      *
      * @return a representation of the deferred computation of this call
      */

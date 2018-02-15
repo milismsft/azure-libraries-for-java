@@ -20,6 +20,7 @@ import com.microsoft.azure.management.sql.RestorePoint;
 import com.microsoft.azure.management.sql.ServiceObjectiveName;
 import com.microsoft.azure.management.sql.ServiceTierAdvisor;
 import com.microsoft.azure.management.sql.SqlDatabase;
+import com.microsoft.azure.management.sql.SqlDatabaseExportRequest;
 import com.microsoft.azure.management.sql.SqlDatabaseMetric;
 import com.microsoft.azure.management.sql.SqlDatabaseMetricDefinition;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
@@ -35,6 +36,7 @@ import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.management.sql.SqlWarehouse;
 import com.microsoft.azure.management.sql.TransparentDataEncryption;
 import com.microsoft.azure.management.sql.UpgradeHintInterface;
+import com.microsoft.azure.management.storage.StorageAccount;
 import org.joda.time.DateTime;
 import rx.Completable;
 import rx.Observable;
@@ -288,6 +290,24 @@ class SqlDatabaseImpl
                     return new ReplicationLinkImpl(self.resourceGroupName, self.sqlServerName, replicationLinkInner, self.sqlServerManager);
                 }
             });
+    }
+
+    @Override
+    public SqlDatabaseExportRequest.DefinitionStages.WithStorageType exportTo(String storageUri) {
+        return new SqlDatabaseExportRequestImpl(this, this.sqlServerManager)
+            .exportTo(storageUri);
+    }
+
+    @Override
+    public SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationType exportTo(StorageAccount storageAccount, String containerName, String fileName) {
+        return new SqlDatabaseExportRequestImpl(this, this.sqlServerManager)
+            .exportTo(storageAccount, containerName, fileName);
+    }
+
+    @Override
+    public SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationType exportTo(Creatable<StorageAccount> storageAccountCreatable, String containerName, String fileName) {
+        return new SqlDatabaseExportRequestImpl(this, this.sqlServerManager)
+            .exportTo(storageAccountCreatable, containerName, fileName);
     }
 
     @Override

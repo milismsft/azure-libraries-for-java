@@ -7,6 +7,7 @@ package com.microsoft.azure.management.sql;
 
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
+import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
 import org.joda.time.DateTime;
 
 /**
@@ -14,7 +15,7 @@ import org.joda.time.DateTime;
  */
 @Fluent
 @Beta(Beta.SinceVersion.V2_0_0)
-public interface SqlDatabaseMetricValue {
+public interface SqlDatabaseMetricValue extends HasInner<MetricValue> {
     /**
      * @return  the number of values for the metric
      */

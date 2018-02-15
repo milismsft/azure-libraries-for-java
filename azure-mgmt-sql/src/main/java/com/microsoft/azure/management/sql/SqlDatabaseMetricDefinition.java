@@ -7,6 +7,8 @@ package com.microsoft.azure.management.sql;
 
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
+import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
+import com.microsoft.azure.management.sql.implementation.MetricDefinitionInner;
 
 import java.util.List;
 
@@ -15,7 +17,7 @@ import java.util.List;
  */
 @Fluent
 @Beta(Beta.SinceVersion.V2_0_0)
-public interface SqlDatabaseMetricDefinition {
+public interface SqlDatabaseMetricDefinition extends HasInner<MetricDefinitionInner> {
     /**
      * @return the name of the metric
      */

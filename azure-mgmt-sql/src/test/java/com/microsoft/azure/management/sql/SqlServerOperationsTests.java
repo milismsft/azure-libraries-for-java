@@ -7,6 +7,8 @@
 package com.microsoft.azure.management.sql;
 
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
+import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
+import com.microsoft.azure.management.storage.StorageAccount;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,13 +65,25 @@ public class SqlServerOperationsTests extends SqlServerTest {
         List<SqlRestorableDroppedDatabase> restorableDroppedDatabases = sqlServer.listRestorableDroppedDatabases();
         SqlRestorableDroppedDatabase restorableDroppedDatabase = restorableDroppedDatabases.get(0);
 
-        SqlDatabase db = sqlServerManager.sqlServers().databases().define("test-restore")
-            .withSqlServer(sqlServer)
-            .withSourceDatabase(restorableDroppedDatabase.id())
-            .withMode(CreateMode.RESTORE)
-            .create();
+//        SqlDatabase db = sqlServerManager.sqlServers().databases().define("test-restore")
+//            .withSqlServer(sqlServer)
+//            .withSourceDatabase(restorableDroppedDatabase.id())
+//            .withMode(CreateMode.RESTORE)
+//            .create();
+//        db.delete();
+        Creatable<StorageAccount> storageAccountCreatable = storageManager.storageAccounts()
+            .define("my223344")
+            .withRegion(sqlServer.regionName())
+            .withExistingResourceGroup(sqlServer.resourceGroupName());
 
-        db.delete();
+        SqlDatabase db = sqlServerManager.sqlServers().databases()
+            .getBySqlServer(sqlServer, "db-sample");
+
+        SqlDatabaseImportExportResponse exportedDB = db.exportTo(storageAccountCreatable, "sample-test","dbbackup.bacpac")
+            .withSqlAdministratorLoginAndPassword("adminsql", "passSQL1")
+            .execute();
+
+
 //        SqlDatabase db5 = sqlServerManager.sqlServers().databases()
 //            .define("db5")
 //            .withSqlServer(sqlServer)

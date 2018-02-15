@@ -10,6 +10,7 @@ import com.microsoft.azure.management.resources.core.TestBase;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.resources.implementation.ResourceManager;
 import com.microsoft.azure.management.sql.implementation.SqlServerManager;
+import com.microsoft.azure.management.storage.implementation.StorageManager;
 import com.microsoft.rest.RestClient;
 
 import java.net.InetSocketAddress;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class SqlServerTest extends TestBase {
     protected static ResourceManager resourceManager;
     protected static SqlServerManager sqlServerManager;
+    protected static StorageManager storageManager;
     protected static String RG_NAME = "";
     protected static String SQL_SERVER_NAME = "";
 
@@ -41,6 +43,9 @@ public abstract class SqlServerTest extends TestBase {
 
         sqlServerManager = SqlServerManager
                 .authenticate(restClient, domain, defaultSubscription);
+
+        storageManager = StorageManager
+            .authenticate(restClient, defaultSubscription);
     }
 
     @Override
