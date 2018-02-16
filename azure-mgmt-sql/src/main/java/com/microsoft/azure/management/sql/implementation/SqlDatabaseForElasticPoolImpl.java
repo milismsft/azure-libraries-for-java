@@ -9,6 +9,7 @@ package com.microsoft.azure.management.sql.implementation;
 import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.sql.CreateMode;
 import com.microsoft.azure.management.sql.DatabaseEdition;
+import com.microsoft.azure.management.sql.RestorePoint;
 import com.microsoft.azure.management.sql.ServiceObjectiveName;
 import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlDatabasePremiumRSServiceObjective;
@@ -19,6 +20,7 @@ import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardStorage;
 import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
 import com.microsoft.azure.management.sql.SqlRestorableDroppedDatabase;
+import com.microsoft.azure.management.storage.StorageAccount;
 
 import java.util.Objects;
 
@@ -28,7 +30,11 @@ import java.util.Objects;
 @LangDefinition
 public class SqlDatabaseForElasticPoolImpl
     implements
-        SqlDatabase.SqlDatabaseDefinition<SqlElasticPoolOperations.DefinitionStages.WithCreate> {
+        SqlDatabase.DefinitionStages.WithoutElasticPoolOptions<SqlElasticPoolOperations.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithStorageKey<SqlElasticPoolOperations.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithAuthentication<SqlElasticPoolOperations.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithCreateMode<SqlElasticPoolOperations.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithAttachAllOptions<SqlElasticPoolOperations.DefinitionStages.WithCreate> {
 
     private SqlDatabaseImpl sqlDatabase;
     private SqlElasticPoolImpl sqlElasticPool;
@@ -108,7 +114,7 @@ public class SqlDatabaseForElasticPoolImpl
     public SqlDatabaseForElasticPoolImpl withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity) {
         this.sqlDatabase.withEdition(DatabaseEdition.STANDARD);
         this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacityInMB());
+        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacity());
         return this;
     }
 
@@ -123,7 +129,7 @@ public class SqlDatabaseForElasticPoolImpl
     public SqlDatabaseForElasticPoolImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity) {
         this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM);
         this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacityInMB());
+        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacity());
         return this;
     }
 
@@ -138,13 +144,55 @@ public class SqlDatabaseForElasticPoolImpl
     public SqlDatabaseForElasticPoolImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity) {
         this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM_RS);
         this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacityInMB());
+        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacity());
         return this;
     }
 
     @Override
     public SqlDatabaseForElasticPoolImpl withServiceObjective(ServiceObjectiveName serviceLevelObjective) {
         this.sqlDatabase.withServiceObjective(serviceLevelObjective);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl importFrom(String storageUri) {
+        this.sqlDatabase.importFrom(storageUri);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl importFrom(StorageAccount storageAccount, String containerName, String fileName) {
+        this.sqlDatabase.importFrom(storageAccount, containerName, fileName);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withStorageAccessKey(String storageAccessKey) {
+        this.sqlDatabase.withStorageAccessKey(storageAccessKey);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withSharedAccessKey(String sharedAccessKey) {
+        this.sqlDatabase.withSharedAccessKey(sharedAccessKey);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withSqlAdministratorLoginAndPassword(String administratorLogin, String administratorPassword) {
+        this.sqlDatabase.withSqlAdministratorLoginAndPassword(administratorLogin, administratorPassword);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl withActiveDirectoryLoginAndPassword(String administratorLogin, String administratorPassword) {
+        this.sqlDatabase.withActiveDirectoryLoginAndPassword(administratorLogin, administratorPassword);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseForElasticPoolImpl fromRestorePoint(RestorePoint restorePoint) {
+        this.sqlDatabase.fromRestorePoint(restorePoint);
         return this;
     }
 }

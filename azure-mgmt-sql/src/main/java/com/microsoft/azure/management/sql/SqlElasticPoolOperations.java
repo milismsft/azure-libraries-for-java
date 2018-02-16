@@ -53,10 +53,10 @@ public interface SqlElasticPoolOperations extends
             /**
              * Sets the parent SQL server for the new Elastic Pool.
              *
-             * @param sqlServer the parent SQL server ID
+             * @param sqlServer the parent SQL server
              * @return The next stage of the definition.
              */
-            SqlElasticPoolOperations.DefinitionStages.WithEdition withSqlServer(SqlServer sqlServer);
+            SqlElasticPoolOperations.DefinitionStages.WithEdition withExistingSqlServer(SqlServer sqlServer);
         }
 
         /**
@@ -306,7 +306,7 @@ public interface SqlElasticPoolOperations extends
              * @return the first stage of the new SQL Database definition
              */
             @Beta(Beta.SinceVersion.V2_0_0)
-            SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String databaseName);
+            SqlDatabase.DefinitionStages.WithoutElasticPoolOptions<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String databaseName);
         }
 
         /**

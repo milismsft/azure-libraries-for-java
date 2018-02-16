@@ -10,6 +10,7 @@ import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.Resource;
 import com.microsoft.azure.management.resources.fluentcore.collection.SupportsCreating;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
+import com.microsoft.azure.management.storage.StorageAccount;
 
 /**
  * A representation of the Azure SQL Database operations.
@@ -23,15 +24,21 @@ public interface SqlDatabaseOperations extends
     /**
      * Container interface for all the definitions that need to be implemented.
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     interface SqlDatabaseOperationsDefinition extends
         SqlDatabaseOperations.DefinitionStages.Blank,
         SqlDatabaseOperations.DefinitionStages.WithSqlServer,
         SqlDatabaseOperations.DefinitionStages.WithAllDifferentOptions,
         SqlDatabaseOperations.DefinitionStages.WithElasticPoolName,
+        SqlDatabaseOperations.DefinitionStages.WithRestorableDroppedDatabase,
+        SqlDatabaseOperations.DefinitionStages.WithImportFrom,
+        SqlDatabaseOperations.DefinitionStages.WithStorageKey,
+        SqlDatabaseOperations.DefinitionStages.WithAuthentication,
+        SqlDatabaseOperations.DefinitionStages.WithRestorePointDatabase,
         SqlDatabaseOperations.DefinitionStages.WithSourceDatabaseId,
         SqlDatabaseOperations.DefinitionStages.WithCreateMode,
-        SqlDatabaseOperations.DefinitionStages.WithCreate,
-        SqlDatabaseOperations.DefinitionStages.WithCreateWithLessOptions {
+        SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions,
+        SqlDatabaseOperations.DefinitionStages.WithCreateFinal {
     }
 
     /**
@@ -56,24 +63,29 @@ public interface SqlDatabaseOperations extends
              * @param location          the parent SQL server location
              * @return The next stage of the definition.
              */
+            @Beta(Beta.SinceVersion.V2_0_0)
             SqlDatabaseOperations.DefinitionStages.WithAllDifferentOptions withExistingSqlServer(String resourceGroupName, String sqlServerName, String location);
 
             /**
              * Sets the parent SQL server for the new SQL Database.
              *
-             * @param sqlServer the parent SQL server ID
+             * @param sqlServer the parent SQL server
              * @return The next stage of the definition.
              */
-            SqlDatabaseOperations.DefinitionStages.WithAllDifferentOptions withSqlServer(SqlServer sqlServer);
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithAllDifferentOptions withExistingSqlServer(SqlServer sqlServer);
         }
 
         /**
          * The SQL database interface with all starting options for definition.
          */
+        @Beta(Beta.SinceVersion.V2_0_0)
         interface WithAllDifferentOptions extends
             SqlDatabaseOperations.DefinitionStages.WithElasticPoolName,
+            SqlDatabaseOperations.DefinitionStages.WithRestorableDroppedDatabase,
+            SqlDatabaseOperations.DefinitionStages.WithImportFrom,
             SqlDatabaseOperations.DefinitionStages.WithSourceDatabaseId,
-            SqlDatabaseOperations.DefinitionStages.WithCreate {
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions {
         }
 
         /**
@@ -118,14 +130,80 @@ public interface SqlDatabaseOperations extends
          * The stage to decide whether using existing database or not.
          */
         interface WithExistingDatabase extends
+            SqlDatabaseOperations.DefinitionStages.WithRestorePointDatabase,
             SqlDatabaseOperations.DefinitionStages.WithSourceDatabaseId,
-            SqlDatabaseOperations.DefinitionStages.WithCreateWithElasticPoolOptions {
+            SqlDatabaseOperations.DefinitionStages.WithCreateAfterElasticPoolOptions {
         }
 
         /**
-         * The SQL Database definition to set the source database id for database.
+         * The SQL Database definition to import a BACPAC file as the source database.
          */
-        interface WithSourceDatabaseId {
+        interface WithImportFrom {
+            /**
+             * Creates a new database from a BACPAC file.
+             *
+             * @param storageUri the source URI for the database to be imported
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithStorageKey importFrom(String storageUri);
+
+            /**
+             * Creates a new database from a BACPAC file.
+             *
+             * @param storageAccount an existing storage account to be used
+             * @param containerName the container name within the storage account to use
+             * @param fileName the exported database file name
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithAuthentication importFrom(StorageAccount storageAccount, String containerName, String fileName);
+        }
+
+        /**
+         * Sets the storage key type and value to use.
+         */
+        interface WithStorageKey {
+            /**
+             * @param storageAccessKey the storage access key to use
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithAuthentication withStorageAccessKey(String storageAccessKey);
+
+            /**
+             * @param sharedAccessKey the shared access key to use; it must be preceded with a "?."
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithAuthentication withSharedAccessKey(String sharedAccessKey);
+        }
+
+        /**
+         * Sets the authentication type and SQL or Active Directory administrator login and password.
+         */
+        interface WithAuthentication {
+            /**
+             * @param administratorLogin the SQL administrator login
+             * @param administratorPassword the SQL administrator password
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withSqlAdministratorLoginAndPassword(String administratorLogin, String administratorPassword);
+
+            /**
+             * @param administratorLogin the Active Directory administrator login
+             * @param administratorPassword the Active Directory administrator password
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withActiveDirectoryLoginAndPassword(String administratorLogin, String administratorPassword);
+        }
+
+        /**
+         * The SQL Database definition to set a restorable dropped database as the source database.
+         */
+        interface WithRestorableDroppedDatabase {
             /**
              * Creates a new database from a previously deleted database (see restorable dropped database).
              * <p>
@@ -135,7 +213,28 @@ public interface SqlDatabaseOperations extends
              * @param restorableDroppedDatabase the restorable dropped database
              * @return The next stage of the definition.
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreateWithLessOptions fromRestorableDroppedDatabase(SqlRestorableDroppedDatabase restorableDroppedDatabase);
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateFinal fromRestorableDroppedDatabase(SqlRestorableDroppedDatabase restorableDroppedDatabase);
+        }
+
+        /**
+         * The SQL Database definition to set a restore point as the source database.
+         */
+        interface WithRestorePointDatabase {
+            /**
+             * Creates a new database from a restore point.
+             *
+             * @param restorePoint the restore point
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions fromRestorePoint(RestorePoint restorePoint);
+        }
+
+        /**
+         * The SQL Database definition to set the source database id for database.
+         */
+        interface WithSourceDatabaseId {
 
             /**
              * Sets the resource if of source database for the SQL Database.
@@ -170,43 +269,45 @@ public interface SqlDatabaseOperations extends
              * @param createMode create mode for the database, should not be default in this flow
              * @return The next stage of the definition.
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreateWithLessOptions withMode(CreateMode createMode);
+            SqlDatabaseOperations.DefinitionStages.WithCreateFinal withMode(CreateMode createMode);
         }
 
         /**
-         *
+         * The final stage of the SQL Database definition after the SQL Elastic Pool definition.
          */
-        interface WithCreateWithElasticPoolOptions extends
-            SqlDatabaseOperations.DefinitionStages.WithCollation,
-            SqlDatabaseOperations.DefinitionStages.WithMaxSizeBytes,
-            SqlDatabaseOperations.DefinitionStages.WithCreateWithLessOptions {
-
+        interface WithCreateAfterElasticPoolOptions extends
+            SqlDatabaseOperations.DefinitionStages.WithCollationAfterElasticPoolOptions,
+            SqlDatabaseOperations.DefinitionStages.WithMaxSizeBytesAfterElasticPoolOptions,
+            SqlDatabaseOperations.DefinitionStages.WithCreateFinal {
         }
 
         /**
          * The SQL Database definition to set the collation for database.
          */
-        interface WithCollationAllCreateOptions {
+        interface WithCollationAfterElasticPoolOptions {
             /**
              * Sets the collation for the SQL Database.
              *
              * @param collation collation to be set for database
              * @return The next stage of the definition
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreate withCollation(String collation);
+            WithCreateAfterElasticPoolOptions withCollation(String collation);
         }
 
         /**
-         * The SQL Database definition to set the collation for database.
+         * The SQL Database definition to set the Max Size in Bytes for database.
          */
-        interface WithCollation {
+        interface WithMaxSizeBytesAfterElasticPoolOptions {
             /**
-             * Sets the collation for the SQL Database.
+             * Sets the max size in bytes for SQL Database.
              *
-             * @param collation collation to be set for database
-             * @return The next stage of the definition
+             * @param maxSizeBytes max size of the Azure SQL Database expressed in bytes. Note: Only
+             * the following sizes are supported (in addition to limitations being
+             * placed on each edition): { 100 MB | 500 MB |1 GB | 5 GB | 10 GB | 20
+             * GB | 30 GB … 150 GB | 200 GB … 500 GB }
+             * @return The next stage of the definition.
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreateWithElasticPoolOptions withCollation(String collation);
+            WithCreateAfterElasticPoolOptions withMaxSizeBytes(long maxSizeBytes);
         }
 
         /**
@@ -220,14 +321,15 @@ public interface SqlDatabaseOperations extends
              * @return The next stage of the definition
              */
             @Deprecated
-            SqlDatabaseOperations.DefinitionStages.WithCreate withEdition(DatabaseEdition edition);
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withEdition(DatabaseEdition edition);
 
             /**
              * Sets a "Basic" edition for the SQL Database.
              *
              * @return The next stage of the definition
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreate withBasicEdition();
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withBasicEdition();
 
             /**
              * Sets a "Standard" edition for the SQL Database.
@@ -235,7 +337,8 @@ public interface SqlDatabaseOperations extends
              * @param serviceObjective edition to be set for database
              * @return The next stage of the definition
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreate withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective);
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective);
 
             /**
              * Sets a "Standard" edition and maximum storage capacity for the SQL Database.
@@ -244,7 +347,8 @@ public interface SqlDatabaseOperations extends
              * @param maxStorageCapacity edition to be set for database
              * @return The next stage of the definition
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreate withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity);
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity);
 
             /**
              * Sets a "Premium" edition for the SQL Database.
@@ -252,7 +356,8 @@ public interface SqlDatabaseOperations extends
              * @param serviceObjective edition to be set for database
              * @return The next stage of the definition
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreate withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective);
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective);
 
             /**
              * Sets a "Premium" edition and maximum storage capacity for the SQL Database.
@@ -261,7 +366,8 @@ public interface SqlDatabaseOperations extends
              * @param maxStorageCapacity edition to be set for database
              * @return The next stage of the definition
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreate withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity);
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity);
 
             /**
              * Sets a "PremiumRS" edition for the SQL Database.
@@ -269,7 +375,8 @@ public interface SqlDatabaseOperations extends
              * @param serviceObjective edition to be set for database
              * @return The next stage of the definition
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreate withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective);
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective);
 
             /**
              * Sets a "PremiumRS" edition and maximum storage capacity for the SQL Database.
@@ -278,24 +385,21 @@ public interface SqlDatabaseOperations extends
              * @param maxStorageCapacity edition to be set for database
              * @return The next stage of the definition
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreate withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity);
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity);
         }
 
         /**
-         * The SQL Database definition to set the Max Size in Bytes for database.
+         * The SQL Database definition to set the collation for database.
          */
-        interface WithMaxSizeBytesAllCreateOptions {
+        interface WithCollation {
             /**
-             * Sets the max size in bytes for SQL Database.
+             * Sets the collation for the SQL Database.
              *
-             * @param maxSizeBytes max size of the Azure SQL Database expressed in bytes. Note: Only
-             * the following sizes are supported (in addition to limitations being
-             * placed on each edition): { 100 MB | 500 MB |1 GB | 5 GB | 10 GB | 20
-             * GB | 30 GB … 150 GB | 200 GB … 500 GB }
-             * @return The next stage of the definition.
+             * @param collation collation to be set for database
+             * @return The next stage of the definition
              */
-            @Deprecated
-            SqlDatabaseOperations.DefinitionStages.WithCreate withMaxSizeBytes(long maxSizeBytes);
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withCollation(String collation);
         }
 
         /**
@@ -311,7 +415,8 @@ public interface SqlDatabaseOperations extends
              * GB | 30 GB … 150 GB | 200 GB … 500 GB }
              * @return The next stage of the definition.
              */
-            SqlDatabaseOperations.DefinitionStages.WithCreateWithElasticPoolOptions withMaxSizeBytes(long maxSizeBytes);
+            @Deprecated
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withMaxSizeBytes(long maxSizeBytes);
         }
 
         /**
@@ -325,7 +430,7 @@ public interface SqlDatabaseOperations extends
              * @return The next stage of the definition.
              */
             @Deprecated
-            SqlDatabaseOperations.DefinitionStages.WithCreate withServiceObjective(ServiceObjectiveName serviceLevelObjective);
+            SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions withServiceObjective(ServiceObjectiveName serviceLevelObjective);
         }
 
         /**
@@ -333,12 +438,12 @@ public interface SqlDatabaseOperations extends
          * SQL database in the cloud, but exposing additional optional settings to
          * specify.
          */
-        interface WithCreate extends
+        interface WithCreateAllOptions extends
             SqlDatabaseOperations.DefinitionStages.WithServiceObjective,
             SqlDatabaseOperations.DefinitionStages.WithEdition,
-            SqlDatabaseOperations.DefinitionStages.WithCollationAllCreateOptions,
-            SqlDatabaseOperations.DefinitionStages.WithMaxSizeBytesAllCreateOptions,
-            SqlDatabaseOperations.DefinitionStages.WithCreateWithLessOptions {
+            SqlDatabaseOperations.DefinitionStages.WithCollation,
+            SqlDatabaseOperations.DefinitionStages.WithMaxSizeBytes,
+            SqlDatabaseOperations.DefinitionStages.WithCreateFinal {
         }
 
         /**
@@ -346,7 +451,7 @@ public interface SqlDatabaseOperations extends
          * SQL Server in the cloud, but exposing additional optional inputs to
          * specify.
          */
-        interface WithCreateWithLessOptions extends
+        interface WithCreateFinal extends
             Resource.DefinitionWithTags<SqlDatabase>,
             Creatable<SqlDatabase> {
         }
@@ -355,6 +460,7 @@ public interface SqlDatabaseOperations extends
     /**
      * Grouping of the Azure SQL Database rule common actions.
      */
+    @Beta(Beta.SinceVersion.V2_0_0)
     interface SqlDatabaseActionsDefinition extends SqlChildrenActionsDefinition<SqlDatabase> {
         /**
          * Begins the definition of a new SQL Database to be added to this server.
@@ -362,6 +468,7 @@ public interface SqlDatabaseOperations extends
          * @param databaseName the name of the new SQL Database
          * @return the first stage of the new SQL Database definition
          */
+        @Beta(Beta.SinceVersion.V2_0_0)
         SqlDatabaseOperations.DefinitionStages.WithAllDifferentOptions define(String databaseName);
     }
 }

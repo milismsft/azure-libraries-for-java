@@ -34,9 +34,16 @@ public enum SqlDatabaseBasicStorage {
     }
 
     /**
-     * @return the maximum allowed storage capacity in MB for the SQL Elastic Pool
+     * @return the maximum allowed storage capacity in MB for the SQL Database
      */
-    public int capacityInMB() {
+    public long capacityInMB() {
         return this.capacityInMB;
+    }
+
+    /**
+     * @return the maximum allowed storage capacity in bytes for the SQL Database
+     */
+    public long capacity() {
+        return this.capacityInMB * 1024 * 1024;
     }
 }

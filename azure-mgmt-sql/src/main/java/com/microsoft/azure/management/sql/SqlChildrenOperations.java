@@ -48,7 +48,6 @@ public interface SqlChildrenOperations<T> {
      * @param name the name of the child resource
      * @return an immutable representation of the resource
      */
-    @Deprecated
     T getBySqlServer(SqlServer sqlServer, String name);
 
     /**

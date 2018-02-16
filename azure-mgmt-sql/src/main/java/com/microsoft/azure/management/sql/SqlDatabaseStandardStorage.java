@@ -69,7 +69,7 @@ public enum SqlDatabaseStandardStorage {
     MAX_750_GB(750 * 1024),
 
     /** 1 TB storage capacity available for the database (only with ServiceObjective "S3" or higher). */
-    MAX_1_TB(1000 * 1024);
+    MAX_1_TB(1024 * 1024);
 
     /** The maximum allowed storage capacity in MB for the SQL Database. */
     private long capacityInMB;
@@ -79,9 +79,16 @@ public enum SqlDatabaseStandardStorage {
     }
 
     /**
-     * @return the maximum allowed storage capacity in MB for the SQL Elastic Pool
+     * @return the maximum allowed storage capacity in MB for the SQL Database
      */
     public long capacityInMB() {
         return this.capacityInMB;
+    }
+
+    /**
+     * @return the maximum allowed storage capacity in bytes for the SQL Database
+     */
+    public long capacity() {
+        return this.capacityInMB * 1024 * 1024;
     }
 }

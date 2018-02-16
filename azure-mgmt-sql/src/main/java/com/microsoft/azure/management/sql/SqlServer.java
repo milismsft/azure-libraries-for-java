@@ -95,12 +95,6 @@ public interface SqlServer extends
     @Beta(Beta.SinceVersion.V2_0_0)
     Observable<SqlRestorableDroppedDatabase> listRestorableDroppedDatabasesAsync();
 
-//    /**
-//     * @return entry point to manage Failover Groups for this SQL server.
-//     */
-//    @Beta(Beta.SinceVersion.V2_0_0)
-//    FailoverGroups failoverGroups();
-
     /**
      * Sets the Azure services default access to this server to true.
      * <p>
@@ -272,7 +266,6 @@ public interface SqlServer extends
              * @param databaseNames names of the database to be included in the elastic pool
              * @return Next stage of the SQL Server definition
              */
-            @Beta(Beta.SinceVersion.V2_0_0)
             @Deprecated
             WithCreate withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition, String... databaseNames);
 
@@ -282,7 +275,6 @@ public interface SqlServer extends
              * @param elasticPoolEdition edition of the elastic pool
              * @return Next stage of the SQL Server definition
              */
-            @Beta(Beta.SinceVersion.V2_0_0)
             @Deprecated
             WithCreate withNewElasticPool(String elasticPoolName, ElasticPoolEdition elasticPoolEdition);
         }

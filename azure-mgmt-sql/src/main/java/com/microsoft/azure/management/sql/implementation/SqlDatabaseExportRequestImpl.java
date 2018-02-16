@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Implementation for SqlDatabaseMetricValue.
+ * Implementation for SqlDatabaseExportRequest.
  */
 @LangDefinition
 public class SqlDatabaseExportRequestImpl extends ExecutableImpl<SqlDatabaseImportExportResponse>
@@ -153,14 +153,13 @@ public class SqlDatabaseExportRequestImpl extends ExecutableImpl<SqlDatabaseImpo
         return this;
     }
 
-    @Override
-    public SqlDatabaseExportRequestImpl withStorageKeyType(StorageKeyType storageKeyType) {
+    SqlDatabaseExportRequestImpl withStorageKeyType(StorageKeyType storageKeyType) {
         this.inner.withStorageKeyType(storageKeyType);
         return this;
     }
 
     @Override
-    public DefinitionStages.WithAuthenticationType withStorageAccessKey(String storageAccessKey) {
+    public SqlDatabaseExportRequestImpl withStorageAccessKey(String storageAccessKey) {
         this.inner.withStorageKeyType(StorageKeyType.STORAGE_ACCESS_KEY);
         this.inner.withStorageKey(storageAccessKey);
         return this;
@@ -173,14 +172,12 @@ public class SqlDatabaseExportRequestImpl extends ExecutableImpl<SqlDatabaseImpo
         return this;
     }
 
-    @Override
-    public SqlDatabaseExportRequestImpl withStorageKey(String storageKey) {
+    SqlDatabaseExportRequestImpl withStorageKey(String storageKey) {
         this.inner.withStorageKey(storageKey);
         return this;
     }
 
-    @Override
-    public SqlDatabaseExportRequestImpl withAuthenticationType(AuthenticationType authenticationType) {
+    SqlDatabaseExportRequestImpl withAuthenticationType(AuthenticationType authenticationType) {
         this.inner.withAuthenticationType(authenticationType);
         return this;
     }
@@ -197,8 +194,7 @@ public class SqlDatabaseExportRequestImpl extends ExecutableImpl<SqlDatabaseImpo
         return this.withLoginAndPassword(administratorLogin, administratorPassword);
     }
 
-    @Override
-    public SqlDatabaseExportRequestImpl withLoginAndPassword(String administratorLogin, String administratorPassword) {
+    SqlDatabaseExportRequestImpl withLoginAndPassword(String administratorLogin, String administratorPassword) {
         this.inner.withAdministratorLogin(administratorLogin);
         this.inner.withAdministratorLoginPassword(administratorPassword);
         return this;

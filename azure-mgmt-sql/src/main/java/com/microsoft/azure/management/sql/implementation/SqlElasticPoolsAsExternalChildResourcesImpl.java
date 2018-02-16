@@ -65,13 +65,13 @@ public class SqlElasticPoolsAsExternalChildResourcesImpl
 
     SqlElasticPoolImpl defineIndependentElasticPool(String name) {
         // resource group, server name and location will be set by the next method in the Fluent flow
-        return prepareIndependentDefine(new SqlElasticPoolImpl(null, null, null, name, new ElasticPoolInner(), this.sqlServerManager));
+        return prepareIndependentDefine(new SqlElasticPoolImpl(name, new ElasticPoolInner(), this.sqlServerManager));
     }
 
     SqlElasticPoolImpl defineInlineElasticPool(String name) {
         if (this.parent() == null) {
             // resource group and server name will be set by the next method in the Fluent flow
-            return prepareInlineDefine(new SqlElasticPoolImpl(null, null, null, name, new ElasticPoolInner(), this.sqlServerManager));
+            return prepareInlineDefine(new SqlElasticPoolImpl(name, new ElasticPoolInner(), this.sqlServerManager));
         } else {
             return prepareInlineDefine(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
         }
@@ -80,7 +80,7 @@ public class SqlElasticPoolsAsExternalChildResourcesImpl
     SqlElasticPoolImpl updateInlineElasticPool(String name) {
         if (this.parent() == null) {
             // resource group and server name will be set by the next method in the Fluent flow
-            return prepareInlineUpdate(new SqlElasticPoolImpl(null, null, null, name, new ElasticPoolInner(), this.sqlServerManager));
+            return prepareInlineUpdate(new SqlElasticPoolImpl(name, new ElasticPoolInner(), this.sqlServerManager));
         } else {
             return prepareInlineUpdate(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
         }
@@ -89,7 +89,7 @@ public class SqlElasticPoolsAsExternalChildResourcesImpl
     void removeInlineElasticPool(String name) {
         if (this.parent() == null) {
             // resource group and server name will be set by the next method in the Fluent flow
-            prepareInlineRemove(new SqlElasticPoolImpl(null, null, null, name, new ElasticPoolInner(), this.sqlServerManager));
+            prepareInlineRemove(new SqlElasticPoolImpl(name, new ElasticPoolInner(), this.sqlServerManager));
         } else {
             prepareInlineRemove(new SqlElasticPoolImpl(name, this.parent(), new ElasticPoolInner(), this.parent().manager()));
         }

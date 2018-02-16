@@ -48,13 +48,13 @@ public class SqlFirewallRulesAsExternalChildResourcesImpl
 
     SqlFirewallRuleImpl defineIndependentFirewallRule(String name) {
         // resource group and server name will be set by the next method in the Fluent flow
-        return prepareIndependentDefine(new SqlFirewallRuleImpl(null, null, name, new FirewallRuleInner(), this.sqlServerManager));
+        return prepareIndependentDefine(new SqlFirewallRuleImpl(name, new FirewallRuleInner(), this.sqlServerManager));
     }
 
     SqlFirewallRuleImpl defineInlineFirewallRule(String name) {
         if (this.parent() == null) {
             // resource group and server name will be set by the next method in the Fluent flow
-            return prepareInlineDefine(new SqlFirewallRuleImpl(null, null, name, new FirewallRuleInner(), this.sqlServerManager));
+            return prepareInlineDefine(new SqlFirewallRuleImpl(name, new FirewallRuleInner(), this.sqlServerManager));
         } else {
             return prepareInlineDefine(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
         }
@@ -63,7 +63,7 @@ public class SqlFirewallRulesAsExternalChildResourcesImpl
     SqlFirewallRuleImpl updateInlineFirewallRule(String name) {
         if (this.parent() == null) {
             // resource group and server name will be set by the next method in the Fluent flow
-            return prepareInlineUpdate(new SqlFirewallRuleImpl(null, null, name, new FirewallRuleInner(), this.sqlServerManager));
+            return prepareInlineUpdate(new SqlFirewallRuleImpl(name, new FirewallRuleInner(), this.sqlServerManager));
         } else {
             return prepareInlineUpdate(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
         }
@@ -72,7 +72,7 @@ public class SqlFirewallRulesAsExternalChildResourcesImpl
     void removeInlineFirewallRule(String name) {
         if (this.parent() == null) {
             // resource group and server name will be set by the next method in the Fluent flow
-            prepareInlineRemove(new SqlFirewallRuleImpl(null, null, name, new FirewallRuleInner(), this.sqlServerManager));
+            prepareInlineRemove(new SqlFirewallRuleImpl(name, new FirewallRuleInner(), this.sqlServerManager));
         } else {
             prepareInlineRemove(new SqlFirewallRuleImpl(name, this.parent(), new FirewallRuleInner(), this.parent().manager()));
         }

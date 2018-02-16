@@ -69,7 +69,7 @@ public enum SqlDatabasePremiumStorage {
     MAX_750_GB(750 * 1024),
 
     /** 1 TB storage capacity available for the database. */
-    MAX_1_TB(1000 * 1024),
+    MAX_1_TB(1024 * 1024),
 
     /** 1280 GB storage capacity available for the database (only with ServiceObjective "P9" or higher). */
     MAX_1280_GB(1280 * 1024),
@@ -81,7 +81,7 @@ public enum SqlDatabasePremiumStorage {
     MAX_1792_GB(1792 * 1024),
 
     /** 2 TB storage capacity available for the database (only with ServiceObjective "P9" or higher). */
-    MAX_2_TB(2000 * 1024),
+    MAX_2_TB(2 * 1024 * 1024),
 
     /** 2304 GB storage capacity available for the database (only with ServiceObjective "P9" or higher). */
     MAX_2304_GB(2304 * 1024),
@@ -93,7 +93,7 @@ public enum SqlDatabasePremiumStorage {
     MAX_2816_GB(2816 * 1024),
 
     /** 3 TB storage capacity available for the database (only with ServiceObjective "P9" or higher). */
-    MAX_3_TB(3000 * 1024),
+    MAX_3_TB(3 * 1024 * 1024),
 
     /** 3328 GB storage capacity available for the database (only with ServiceObjective "P9" or higher). */
     MAX_3328_GB(3328 * 1024),
@@ -105,7 +105,7 @@ public enum SqlDatabasePremiumStorage {
     MAX_3840_GB(3840 * 1024),
 
     /** 4 TB storage capacity available for the database (only with ServiceObjective "P9" or higher). */
-    MAX_4_TB(4000 * 1024);
+    MAX_4_TB(4 * 1024 * 1024);
 
     /** The maximum allowed storage capacity in MB for the SQL Database. */
     private long capacityInMB;
@@ -115,9 +115,16 @@ public enum SqlDatabasePremiumStorage {
     }
 
     /**
-     * @return the maximum allowed storage capacity in MB for the SQL Elastic Pool
+     * @return the maximum allowed storage capacity in MB for the SQL Database
      */
     public long capacityInMB() {
         return this.capacityInMB;
+    }
+
+    /**
+     * @return the maximum allowed storage capacity in bytes for the SQL Database
+     */
+    public long capacity() {
+        return this.capacityInMB * 1024 * 1024;
     }
 }

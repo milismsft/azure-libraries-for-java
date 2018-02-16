@@ -8,60 +8,51 @@ package com.microsoft.azure.management.sql;
 import com.microsoft.azure.management.apigeneration.Beta;
 import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.HasParent;
-import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.Executable;
 import com.microsoft.azure.management.resources.fluentcore.model.HasInner;
-import com.microsoft.azure.management.sql.implementation.ExportRequestInner;
+import com.microsoft.azure.management.sql.implementation.ImportExtensionRequestInner;
 import com.microsoft.azure.management.storage.StorageAccount;
 
 /**
- * An immutable client-side representation of an Azure SQL Database export operation request.
+ * An immutable client-side representation of an Azure SQL Database import operation request.
  */
 @Fluent
 @Beta(Beta.SinceVersion.V2_0_0)
-public interface SqlDatabaseExportRequest extends
-    HasInner<ExportRequestInner>,
-    Executable<SqlDatabaseImportExportResponse>,
+public interface SqlDatabaseImportRequest extends
+    HasInner<ImportExtensionRequestInner>,
+    Executable<SqlDatabase>,
     HasParent<SqlDatabase> {
 
     /**
-     * The entirety of database export operation definition.
+     * The entirety of database import operation definition.
      */
-    interface SqlDatabaseExportRequestDefinition extends
-        SqlDatabaseExportRequest.DefinitionStages.ExportTo,
-        SqlDatabaseExportRequest.DefinitionStages.WithStorageTypeAndKey,
-        SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword,
-        DefinitionStages.WithExecute {
+    interface SqlDatabaseImportRequestDefinition extends
+        SqlDatabaseImportRequest.DefinitionStages.ImportFrom,
+        SqlDatabaseImportRequest.DefinitionStages.WithStorageTypeAndKey,
+        SqlDatabaseImportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword,
+        SqlDatabaseImportRequest.DefinitionStages.WithExecute {
     }
 
     /**
-     * Grouping of database export definition stages.
+     * Grouping of database import definition stages.
      */
     interface DefinitionStages {
         /**
          * Sets the storage URI to use.
          */
-        interface ExportTo {
+        interface ImportFrom {
             /**
              * @param storageUri the storage URI to use
              * @return next definition stage
              */
-             SqlDatabaseExportRequest.DefinitionStages.WithStorageTypeAndKey exportTo(String storageUri);
+            SqlDatabaseImportRequest.DefinitionStages.WithStorageTypeAndKey importFrom(String storageUri);
 
             /**
              * @param storageAccount an existing storage account to be used
              * @param containerName the container name within the storage account to use
              * @param fileName the exported database file name
              */
-            SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword exportTo(StorageAccount storageAccount, String containerName, String fileName);
-
-            /**
-             * @param storageAccountCreatable a storage account to be created as part of this execution flow
-             * @param containerName the container name within the storage account to use
-             * @param fileName the exported database file name
-             * @return next definition stage
-             */
-            SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword exportTo(Creatable<StorageAccount> storageAccountCreatable, String containerName, String fileName);
+            SqlDatabaseImportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword importFrom(StorageAccount storageAccount, String containerName, String fileName);
         }
 
         /**
@@ -72,13 +63,13 @@ public interface SqlDatabaseExportRequest extends
              * @param storageAccessKey the storage access key to use
              * @return next definition stage
              */
-            SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword withStorageAccessKey(String storageAccessKey);
+            SqlDatabaseImportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword withStorageAccessKey(String storageAccessKey);
 
             /**
              * @param sharedAccessKey the shared access key to use; it must be preceded with a "?."
              * @return next definition stage
              */
-            SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword withSharedAccessKey(String sharedAccessKey);
+            SqlDatabaseImportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword withSharedAccessKey(String sharedAccessKey);
         }
 
         /**
@@ -90,14 +81,14 @@ public interface SqlDatabaseExportRequest extends
              * @param administratorPassword the SQL administrator password
              * @return next definition stage
              */
-            SqlDatabaseExportRequest.DefinitionStages.WithExecute withSqlAdministratorLoginAndPassword(String administratorLogin, String administratorPassword);
+            SqlDatabaseImportRequest.DefinitionStages.WithExecute withSqlAdministratorLoginAndPassword(String administratorLogin, String administratorPassword);
 
             /**
              * @param administratorLogin the Active Directory administrator login
              * @param administratorPassword the Active Directory administrator password
              * @return next definition stage
              */
-            SqlDatabaseExportRequest.DefinitionStages.WithExecute withActiveDirectoryLoginAndPassword(String administratorLogin, String administratorPassword);
+            SqlDatabaseImportRequest.DefinitionStages.WithExecute withActiveDirectoryLoginAndPassword(String administratorLogin, String administratorPassword);
         }
 
         /**
@@ -105,8 +96,7 @@ public interface SqlDatabaseExportRequest extends
          * for any other optional settings to be specified.
          */
         interface WithExecute extends
-            Executable<SqlDatabaseImportExportResponse> {
+            Executable<SqlDatabase> {
         }
     }
-
 }

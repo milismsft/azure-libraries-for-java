@@ -105,6 +105,21 @@ public class SqlElasticPoolImpl
         this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
     }
 
+    /**
+     * Creates an instance of external child resource in-memory.
+     *
+     * @param name        the name of this external child resource
+     * @param innerObject reference to the inner object representing this external child resource
+     * @param sqlServerManager reference to the SQL server manager that accesses firewall rule operations
+     */
+    SqlElasticPoolImpl(String name, ElasticPoolInner innerObject, SqlServerManager sqlServerManager) {
+        super(name, null, innerObject);
+        Objects.requireNonNull(sqlServerManager);
+        this.sqlServerManager = sqlServerManager;
+
+        this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
+    }
+
     @Override
     public String id() {
         return this.inner().id();
@@ -430,7 +445,7 @@ public class SqlElasticPoolImpl
     }
 
     @Override
-    public SqlElasticPoolImpl withSqlServer(SqlServer sqlServer) {
+    public SqlElasticPoolImpl withExistingSqlServer(SqlServer sqlServer) {
         this.resourceGroupName = sqlServer.resourceGroupName();
         this.sqlServerName = sqlServer.name();
         this.sqlServerLocation = sqlServer.regionName();
@@ -586,7 +601,7 @@ public class SqlElasticPoolImpl
     }
 
     @Override
-    public SqlDatabase.DefinitionStages.Blank<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String databaseName) {
+    public SqlDatabaseForElasticPoolImpl defineDatabase(String databaseName) {
         if (this.sqlDatabases == null) {
             this.sqlDatabases = new SqlDatabasesAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlDatabase");
         }

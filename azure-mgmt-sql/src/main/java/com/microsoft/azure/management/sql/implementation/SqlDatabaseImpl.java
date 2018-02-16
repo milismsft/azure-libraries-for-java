@@ -10,8 +10,11 @@ import com.microsoft.azure.management.apigeneration.LangDefinition;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.ResourceUtils;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.implementation.ExternalChildResourceImpl;
+import com.microsoft.azure.management.resources.fluentcore.dag.FunctionalTaskItem;
 import com.microsoft.azure.management.resources.fluentcore.dag.TaskGroup;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
+import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
+import com.microsoft.azure.management.sql.AuthenticationType;
 import com.microsoft.azure.management.sql.CreateMode;
 import com.microsoft.azure.management.sql.DatabaseEdition;
 import com.microsoft.azure.management.sql.DatabaseMetric;
@@ -20,7 +23,6 @@ import com.microsoft.azure.management.sql.RestorePoint;
 import com.microsoft.azure.management.sql.ServiceObjectiveName;
 import com.microsoft.azure.management.sql.ServiceTierAdvisor;
 import com.microsoft.azure.management.sql.SqlDatabase;
-import com.microsoft.azure.management.sql.SqlDatabaseExportRequest;
 import com.microsoft.azure.management.sql.SqlDatabaseMetric;
 import com.microsoft.azure.management.sql.SqlDatabaseMetricDefinition;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
@@ -34,9 +36,11 @@ import com.microsoft.azure.management.sql.SqlElasticPool;
 import com.microsoft.azure.management.sql.SqlRestorableDroppedDatabase;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.management.sql.SqlWarehouse;
+import com.microsoft.azure.management.sql.StorageKeyType;
 import com.microsoft.azure.management.sql.TransparentDataEncryption;
 import com.microsoft.azure.management.sql.UpgradeHintInterface;
 import com.microsoft.azure.management.storage.StorageAccount;
+import com.microsoft.azure.management.storage.StorageAccountKey;
 import org.joda.time.DateTime;
 import rx.Completable;
 import rx.Observable;
@@ -60,9 +64,10 @@ class SqlDatabaseImpl
     implements
         SqlDatabase,
         SqlDatabase.SqlDatabaseDefinition<SqlServer.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithExistingDatabase<SqlServer.DefinitionStages.WithCreate>,
         SqlDatabase.Update,
         SqlDatabaseOperations.DefinitionStages.WithExistingDatabase,
-        SqlDatabaseOperations.DefinitionStages.WithCreateWithElasticPoolOptions,
+        SqlDatabaseOperations.DefinitionStages.WithCreateAfterElasticPoolOptions,
         SqlDatabaseOperations.SqlDatabaseOperationsDefinition {
 
     private SqlElasticPoolsAsExternalChildResourcesImpl sqlElasticPools;
@@ -73,6 +78,7 @@ class SqlDatabaseImpl
     protected String sqlServerName;
     protected String sqlServerLocation;
     private boolean isPatchUpdate;
+    private ImportRequestInner importRequestInner;
 
     /**
      * Creates an instance of external child resource in-memory.
@@ -95,6 +101,7 @@ class SqlDatabaseImpl
         this.sqlElasticPools = null;
         this.parentSqlElasticPool = null;
         this.isPatchUpdate = false;
+        this.importRequestInner = null;
     }
 
     /**
@@ -118,6 +125,7 @@ class SqlDatabaseImpl
         this.sqlElasticPools = new SqlElasticPoolsAsExternalChildResourcesImpl(this.sqlServerManager, "SqlElasticPool");
         this.parentSqlElasticPool = null;
         this.isPatchUpdate = false;
+        this.importRequestInner = null;
     }
 
     /**
@@ -137,41 +145,42 @@ class SqlDatabaseImpl
         this.sqlElasticPools = new SqlElasticPoolsAsExternalChildResourcesImpl(this.sqlServerManager, "SqlElasticPool");
         this.parentSqlElasticPool = null;
         this.isPatchUpdate = false;
+        this.importRequestInner = null;
     }
 
     @Override
     public String id() {
-        return null;
+        return this.inner().id();
     }
 
     @Override
     public String sqlServerName() {
-        return null;
+        return this.sqlServerName;
     }
 
     @Override
     public String collation() {
-        return null;
+        return this.inner().collation();
     }
 
     @Override
     public DateTime creationDate() {
-        return null;
+        return this.inner().creationDate();
     }
 
     @Override
     public UUID currentServiceObjectiveId() {
-        return null;
+        return this.inner().currentServiceObjectiveId();
     }
 
     @Override
     public String databaseId() {
-        return null;
+        return this.inner().databaseId().toString();
     }
 
     @Override
     public DateTime earliestRestoreDate() {
-        return null;
+        return this.inner().earliestRestoreDate();
     }
 
     @Override
@@ -181,37 +190,37 @@ class SqlDatabaseImpl
 
     @Override
     public UUID requestedServiceObjectiveId() {
-        return null;
+        return this.inner().requestedServiceObjectiveId();
     }
 
     @Override
     public long maxSizeBytes() {
-        return 0;
+        return Long.valueOf(this.inner().maxSizeBytes());
     }
 
     @Override
     public ServiceObjectiveName requestedServiceObjectiveName() {
-        return null;
+        return this.inner().requestedServiceObjectiveName();
     }
 
     @Override
     public ServiceObjectiveName serviceLevelObjective() {
-        return null;
+        return this.inner().serviceLevelObjective();
     }
 
     @Override
     public String status() {
-        return null;
+        return this.inner().status();
     }
 
     @Override
     public String elasticPoolName() {
-        return null;
+        return this.inner().elasticPoolName();
     }
 
     @Override
     public String defaultSecondaryLocation() {
-        return null;
+        return this.inner().defaultSecondaryLocation();
     }
 
     @Override
@@ -293,21 +302,33 @@ class SqlDatabaseImpl
     }
 
     @Override
-    public SqlDatabaseExportRequest.DefinitionStages.WithStorageType exportTo(String storageUri) {
+    public SqlDatabaseExportRequestImpl exportTo(String storageUri) {
         return new SqlDatabaseExportRequestImpl(this, this.sqlServerManager)
             .exportTo(storageUri);
     }
 
     @Override
-    public SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationType exportTo(StorageAccount storageAccount, String containerName, String fileName) {
+    public SqlDatabaseExportRequestImpl exportTo(StorageAccount storageAccount, String containerName, String fileName) {
         return new SqlDatabaseExportRequestImpl(this, this.sqlServerManager)
             .exportTo(storageAccount, containerName, fileName);
     }
 
     @Override
-    public SqlDatabaseExportRequest.DefinitionStages.WithAuthenticationType exportTo(Creatable<StorageAccount> storageAccountCreatable, String containerName, String fileName) {
+    public SqlDatabaseExportRequestImpl exportTo(Creatable<StorageAccount> storageAccountCreatable, String containerName, String fileName) {
         return new SqlDatabaseExportRequestImpl(this, this.sqlServerManager)
             .exportTo(storageAccountCreatable, containerName, fileName);
+    }
+
+    @Override
+    public SqlDatabaseImportRequestImpl importBacpac(String storageUri) {
+        return new SqlDatabaseImportRequestImpl(this, this.sqlServerManager)
+            .importFrom(storageUri);
+    }
+
+    @Override
+    public SqlDatabaseImportRequestImpl importBacpac(StorageAccount storageAccount, String containerName, String fileName) {
+        return new SqlDatabaseImportRequestImpl(this, this.sqlServerManager)
+            .importFrom(storageAccount, containerName, fileName);
     }
 
     @Override
@@ -477,15 +498,31 @@ class SqlDatabaseImpl
     public Observable<SqlDatabase> createResourceAsync() {
         final SqlDatabaseImpl self = this;
         this.inner().withLocation(this.sqlServerLocation);
-        return this.sqlServerManager.inner().databases()
-            .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(), this.inner())
-            .map(new Func1<DatabaseInner, SqlDatabase>() {
-                @Override
-                public SqlDatabase call(DatabaseInner inner) {
-                    self.setInner(inner);
-                    return self;
-                }
-            });
+        if (this.importRequestInner != null) {
+            this.importRequestInner.withDatabaseName(this.name());
+            this.importRequestInner.withEdition(this.inner().edition());
+            this.importRequestInner.withServiceObjectiveName((this.inner().serviceLevelObjective()));
+            this.importRequestInner.withMaxSizeBytes(this.inner().maxSizeBytes());
+
+            return this.sqlServerManager.inner().databases()
+                .importMethodAsync(this.resourceGroupName, this.sqlServerName, this.importRequestInner)
+                .flatMap(new Func1<ImportExportResponseInner, Observable<SqlDatabase>>() {
+                    @Override
+                    public Observable<SqlDatabase> call(ImportExportResponseInner importExportResponseInner) {
+                        return self.refreshAsync();
+                    }
+                });
+        } else {
+            return this.sqlServerManager.inner().databases()
+                .createOrUpdateAsync(this.resourceGroupName, this.sqlServerName, this.name(), this.inner())
+                .map(new Func1<DatabaseInner, SqlDatabase>() {
+                    @Override
+                    public SqlDatabase call(DatabaseInner inner) {
+                        self.setInner(inner);
+                        return self;
+                    }
+                });
+        }
     }
 
     @Override
@@ -527,6 +564,7 @@ class SqlDatabaseImpl
         if (this.sqlElasticPools != null) {
             this.sqlElasticPools.clear();
         }
+        this.importRequestInner = null;
 
         return Completable.complete();
     }
@@ -556,7 +594,7 @@ class SqlDatabaseImpl
     }
 
     @Override
-    public SqlDatabaseImpl withSqlServer(SqlServer sqlServer) {
+    public SqlDatabaseImpl withExistingSqlServer(SqlServer sqlServer) {
         this.resourceGroupName = sqlServer.resourceGroupName();
         this.sqlServerName = sqlServer.name();
         this.sqlServerLocation = sqlServer.regionName();
@@ -611,6 +649,76 @@ class SqlDatabaseImpl
     public SqlDatabaseImpl fromRestorableDroppedDatabase(SqlRestorableDroppedDatabase restorableDroppedDatabase) {
         return this.withSourceDatabase(restorableDroppedDatabase.id())
             .withMode(CreateMode.RESTORE);
+    }
+
+    @Override
+    public SqlDatabaseImpl importFrom(String storageUri) {
+        this.importRequestInner.withStorageUri(storageUri);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl importFrom(final StorageAccount storageAccount, final String containerName, final String fileName) {
+        final SqlDatabaseImpl self = this;
+        this.addDependency(new FunctionalTaskItem() {
+            @Override
+            public Observable<Indexable> call(final Context context) {
+                return storageAccount.getKeysAsync()
+                    .flatMap(new Func1<List<StorageAccountKey>, Observable<StorageAccountKey>>() {
+                        @Override
+                        public Observable<StorageAccountKey> call(List<StorageAccountKey> storageAccountKeys) {
+                            return Observable.from(storageAccountKeys).first();
+                        }
+                    })
+                    .flatMap(new Func1<StorageAccountKey, Observable<Indexable>>() {
+                        @Override
+                        public Observable<Indexable> call(StorageAccountKey storageAccountKey) {
+                            self.importRequestInner.withStorageUri(String.format("%s%s/%s", storageAccount.endPoints().primary().blob(), containerName, fileName));
+                            self.importRequestInner.withStorageKeyType(StorageKeyType.STORAGE_ACCESS_KEY);
+                            self.importRequestInner.withStorageKey(storageAccountKey.value());
+                            return context.voidObservable();
+                        }
+                    });
+            }
+        });
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withStorageAccessKey(String storageAccessKey) {
+        this.importRequestInner.withStorageKeyType(StorageKeyType.STORAGE_ACCESS_KEY);
+        this.importRequestInner.withStorageKey(storageAccessKey);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withSharedAccessKey(String sharedAccessKey) {
+        this.importRequestInner.withStorageKeyType(StorageKeyType.SHARED_ACCESS_KEY);
+        this.importRequestInner.withStorageKey(sharedAccessKey);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withSqlAdministratorLoginAndPassword(String administratorLogin, String administratorPassword) {
+        this.importRequestInner.withAuthenticationType(AuthenticationType.SQL);
+        this.importRequestInner.withAdministratorLogin(administratorLogin);
+        this.importRequestInner.withAdministratorLoginPassword(administratorPassword);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl withActiveDirectoryLoginAndPassword(String administratorLogin, String administratorPassword) {
+        this.importRequestInner.withAuthenticationType(AuthenticationType.ADPASSWORD);
+        this.importRequestInner.withAdministratorLogin(administratorLogin);
+        this.importRequestInner.withAdministratorLoginPassword(administratorPassword);
+        return this;
+    }
+
+    @Override
+    public SqlDatabaseImpl fromRestorePoint(RestorePoint restorePoint) {
+        this.inner().withRestorePointInTime(restorePoint.restorePointCreationDate());
+        return this.withSourceDatabase(restorePoint.id())
+            .withMode(CreateMode.POINT_IN_TIME_RESTORE);
     }
 
     @Override
@@ -671,7 +779,7 @@ class SqlDatabaseImpl
     public SqlDatabaseImpl withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity) {
         this.inner().withEdition(DatabaseEdition.STANDARD);
         this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacityInMB()));
+        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacity()));
         return this;
     }
 
@@ -686,7 +794,7 @@ class SqlDatabaseImpl
     public SqlDatabaseImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity) {
         this.inner().withEdition(DatabaseEdition.PREMIUM);
         this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacityInMB()));
+        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacity()));
         return this;
     }
 
@@ -701,7 +809,7 @@ class SqlDatabaseImpl
     public SqlDatabaseImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity) {
         this.inner().withEdition(DatabaseEdition.PREMIUM_RS);
         this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacityInMB()));
+        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacity()));
         return this;
     }
 
@@ -730,5 +838,4 @@ class SqlDatabaseImpl
         this.inner().getTags().remove(key);
         return this;
     }
-
 }

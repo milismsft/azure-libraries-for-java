@@ -51,7 +51,15 @@ public interface SqlFirewallRuleOperations extends
              * @param sqlServerId the parent SQL server ID
              * @return The next stage of the definition.
              */
-            WithIPAddressRange withSqlServerId(String sqlServerId);
+            WithIPAddressRange withExistingSqlServerId(String sqlServerId);
+
+            /**
+             * Sets the parent SQL server for the new Firewall rule.
+             *
+             * @param sqlServer the parent SQL server
+             * @return The next stage of the definition.
+             */
+            WithIPAddressRange withExistingSqlServer(SqlServer sqlServer);
         }
 
         /**

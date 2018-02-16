@@ -11,6 +11,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.storage.StorageAccount;
 import org.junit.Assert;
 import org.junit.Test;
+import rx.Observable;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +48,7 @@ public class SqlServerOperationsTests extends SqlServerTest {
 
 //        SqlElasticPool elasticPool = sqlServerManager.sqlServers().elasticPools()
 //            .define("ep1")
-//            .withSqlServer(sqlServer)
+//            .withExistingSqlServer(sqlServer)
 //            .withBasicPool()
 //            .withReservedDtu(SqlElasticPoolBasicEDTUs.eDTU_200)
 //            .withDatabaseDtuMax(SqlElasticPoolBasicMaxEDTUs.eDTU_5)
@@ -66,43 +67,56 @@ public class SqlServerOperationsTests extends SqlServerTest {
         SqlRestorableDroppedDatabase restorableDroppedDatabase = restorableDroppedDatabases.get(0);
 
 //        SqlDatabase db = sqlServerManager.sqlServers().databases().define("test-restore")
-//            .withSqlServer(sqlServer)
+//            .withExistingSqlServer(sqlServer)
 //            .withSourceDatabase(restorableDroppedDatabase.id())
 //            .withMode(CreateMode.RESTORE)
 //            .create();
 //        db.delete();
-        Creatable<StorageAccount> storageAccountCreatable = storageManager.storageAccounts()
-            .define("my223344")
-            .withRegion(sqlServer.regionName())
-            .withExistingResourceGroup(sqlServer.resourceGroupName());
+
 
         SqlDatabase db = sqlServerManager.sqlServers().databases()
             .getBySqlServer(sqlServer, "db-sample");
 
-        SqlDatabaseImportExportResponse exportedDB = db.exportTo(storageAccountCreatable, "sample-test","dbbackup.bacpac")
-            .withSqlAdministratorLoginAndPassword("adminsql", "passSQL1")
-            .execute();
+        StorageAccount storageAccount = storageManager.storageAccounts().getByResourceGroup(sqlServer.resourceGroupName(), sqlServer.regionName());
+        if (storageAccount == null) {
+            Creatable<StorageAccount> storageAccountCreatable = storageManager.storageAccounts()
+                .define("my223344")
+                .withRegion(sqlServer.regionName())
+                .withExistingResourceGroup(sqlServer.resourceGroupName());
+
+
+            SqlDatabaseImportExportResponse exportedDB = db.exportTo(storageAccountCreatable, "sample-test", "dbbackup.bacpac")
+                .withSqlAdministratorLoginAndPassword("adminsql", "passSQL1")
+                .execute();
+        } else {
+            SqlDatabaseImportExportResponse exportedDB = db.exportTo(storageAccount, "sample-test", "dbbackup.bacpac")
+                .withSqlAdministratorLoginAndPassword("adminsql", "passSQL1")
+                .execute();
+        }
 
 
 //        SqlDatabase db5 = sqlServerManager.sqlServers().databases()
 //            .define("db5")
-//            .withSqlServer(sqlServer)
+//            .withExistingSqlServer(sqlServer)
 //            .defineElasticPool("ep3")
 //                .withBasicPool()
 //                .attach()
 //            .create();
 
-//        SqlElasticPool elasticPool2 = sqlServerManager.sqlServers().elasticPools()
-//            .define("ep2")
-//            .withSqlServer(sqlServer)
-//            .withBasicPool()
-//            .withNewDatabase("db2")
-//            .defineDatabase("db3")
-//                .attach()
-//            .withExistingDatabase("db4")
-//            .create();
-//
-//        elasticPool2.delete();
+        SqlElasticPool elasticPool2 = sqlServerManager.sqlServers().elasticPools()
+            .define("ep2")
+            .withExistingSqlServer(sqlServer)
+            .withBasicPool()
+            .withNewDatabase("db2")
+            .defineDatabase("db3")
+                .attach()
+            .withExistingDatabase("db4")
+            .create();
+
+        elasticPool2.delete();
+
+        sqlServer.databases().define("d")
+            .create();
 
 
 //                canCRUDSqlServer();

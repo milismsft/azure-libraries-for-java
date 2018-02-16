@@ -70,6 +70,19 @@ public class SqlFirewallRuleImpl
         this.sqlServerName = sqlServerName;
     }
 
+    /**
+     * Creates an instance of external child resource in-memory.
+     *
+     * @param name        the name of this external child resource
+     * @param innerObject reference to the inner object representing this external child resource
+     * @param sqlServerManager reference to the SQL server manager that accesses firewall rule operations
+     */
+    SqlFirewallRuleImpl(String name, FirewallRuleInner innerObject, SqlServerManager sqlServerManager) {
+        super(name, null, innerObject);
+        Objects.requireNonNull(sqlServerManager);
+        this.sqlServerManager = sqlServerManager;
+    }
+
     @Override
     public String id() {
         return this.inner().id();
@@ -180,7 +193,14 @@ public class SqlFirewallRuleImpl
     }
 
     @Override
-    public SqlFirewallRuleImpl withSqlServerId(String sqlServerId) {
+    public SqlFirewallRuleImpl withExistingSqlServer(SqlServer sqlServer) {
+        this.resourceGroupName = sqlServer.resourceGroupName();
+        this.sqlServerName = sqlServer.name();
+        return this;
+    }
+
+    @Override
+    public SqlFirewallRuleImpl withExistingSqlServerId(String sqlServerId) {
         this.resourceGroupName = ResourceUtils.groupFromResourceId(sqlServerId);
         this.sqlServerName = ResourceUtils.nameFromResourceId(ResourceUtils.parentRelativePathFromResourceId(sqlServerId));
         return this;
