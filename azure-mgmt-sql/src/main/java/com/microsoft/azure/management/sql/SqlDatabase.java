@@ -10,6 +10,7 @@ import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.apigeneration.Method;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.ExternalChildResource;
+import com.microsoft.azure.management.resources.fluentcore.arm.models.HasResourceGroup;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.Resource;
 import com.microsoft.azure.management.resources.fluentcore.model.Appliable;
 import com.microsoft.azure.management.resources.fluentcore.model.Attachable;
@@ -36,6 +37,7 @@ public interface SqlDatabase
     extends
         ExternalChildResource<SqlDatabase, SqlServer>,
         HasInner<DatabaseInner>,
+        HasResourceGroup,
         Refreshable<SqlDatabase>,
         Updatable<SqlDatabase.Update> {
 

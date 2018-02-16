@@ -126,6 +126,11 @@ public class SqlElasticPoolImpl
     }
 
     @Override
+    public String resourceGroupName() {
+        return this.resourceGroupName;
+    }
+
+    @Override
     public String sqlServerName() {
         return this.sqlServerName;
     }

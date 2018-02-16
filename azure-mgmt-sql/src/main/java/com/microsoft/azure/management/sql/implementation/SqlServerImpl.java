@@ -14,7 +14,7 @@ import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.resources.fluentcore.utils.SdkContext;
 import com.microsoft.azure.management.sql.ElasticPoolEdition;
 import com.microsoft.azure.management.sql.RecommendedElasticPool;
-import com.microsoft.azure.management.sql.ServerUsage;
+import com.microsoft.azure.management.sql.ServerMetric;
 import com.microsoft.azure.management.sql.ServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
 import com.microsoft.azure.management.sql.SqlElasticPoolOperations;
@@ -146,8 +146,26 @@ public class SqlServerImpl
     }
 
     @Override
-    public List<ServerUsage> listUsageMetrics() {
-        return null;
+    public String state() {
+        return this.inner().state();
+    }
+
+    @Override
+    public List<ServerMetric> listUsages() {
+        return listUsageMetrics();
+    }
+
+    @Override
+    public List<ServerMetric> listUsageMetrics() {
+        List<ServerMetric> serverMetrics = new ArrayList<>();
+        List<ServerUsageInner> serverUsageInners = this.manager().inner().serverUsages()
+            .listByServer(this.resourceGroupName(), this.name());
+        if (serverUsageInners != null) {
+            for (ServerUsageInner serverUsageInner : serverUsageInners) {
+                serverMetrics.add(new ServerMetricImpl(serverUsageInner));
+            }
+        }
+        return Collections.unmodifiableList(serverMetrics);
     }
 
     @Override

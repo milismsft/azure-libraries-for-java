@@ -132,10 +132,10 @@ import com.microsoft.azure.management.servicebus.ServiceBusNamespace;
 import com.microsoft.azure.management.servicebus.ServiceBusSubscription;
 import com.microsoft.azure.management.servicebus.Topic;
 import com.microsoft.azure.management.servicebus.TopicAuthorizationRule;
-//import com.microsoft.azure.management.sql.ElasticPoolActivity;
-//import com.microsoft.azure.management.sql.ElasticPoolDatabaseActivity;
-//import com.microsoft.azure.management.sql.SqlDatabase;
-//import com.microsoft.azure.management.sql.SqlElasticPool;
+import com.microsoft.azure.management.sql.ElasticPoolActivity;
+import com.microsoft.azure.management.sql.ElasticPoolDatabaseActivity;
+import com.microsoft.azure.management.sql.SqlDatabase;
+import com.microsoft.azure.management.sql.SqlElasticPool;
 import com.microsoft.azure.management.sql.SqlFirewallRule;
 import com.microsoft.azure.management.sql.SqlServer;
 import com.microsoft.azure.management.storage.StorageAccount;
@@ -1447,125 +1447,125 @@ public final class Utils {
     }
 
 
-//    /**
-//     * Prints information for passed SQL Server.
-//     * @param sqlServer sqlServer to be printed
-//     */
-//    public static void print(SqlServer sqlServer) {
-//        StringBuilder builder = new StringBuilder().append("Sql Server: ").append(sqlServer.id())
-//                .append("Name: ").append(sqlServer.name())
-//                .append("\n\tResource group: ").append(sqlServer.resourceGroupName())
-//                .append("\n\tRegion: ").append(sqlServer.region())
-//                .append("\n\tSqlServer version: ").append(sqlServer.version())
-//                .append("\n\tFully qualified name for Sql Server: ").append(sqlServer.fullyQualifiedDomainName());
-//        System.out.println(builder.toString());
-//    }
-//
-//    /**
-//     * Prints information for the passed SQL Database.
-//     * @param database database to be printed
-//     */
-//    public static void print(SqlDatabase database) {
-//        StringBuilder builder = new StringBuilder().append("Sql Database: ").append(database.id())
-//                .append("Name: ").append(database.name())
-//                .append("\n\tResource group: ").append(database.resourceGroupName())
-//                .append("\n\tRegion: ").append(database.region())
-//                .append("\n\tSqlServer Name: ").append(database.sqlServerName())
-//                .append("\n\tEdition of SQL database: ").append(database.edition())
-//                .append("\n\tCollation of SQL database: ").append(database.collation())
-//                .append("\n\tCreation date of SQL database: ").append(database.creationDate())
-//                .append("\n\tIs data warehouse: ").append(database.isDataWarehouse())
-//                .append("\n\tCurrent service objective of SQL database: ").append(database.serviceLevelObjective())
-//                .append("\n\tId of current service objective of SQL database: ").append(database.currentServiceObjectiveId())
-//                .append("\n\tMax size bytes of SQL database: ").append(database.maxSizeBytes())
-//                .append("\n\tDefault secondary location of SQL database: ").append(database.defaultSecondaryLocation());
-//
-//        System.out.println(builder.toString());
-//    }
-//
-//    /**
-//     * Prints information for the passed firewall rule.
-//     * @param firewallRule firewall rule to be printed.
-//     */
-//    public static void print(SqlFirewallRule firewallRule) {
-//        StringBuilder builder = new StringBuilder().append("Sql firewall rule: ").append(firewallRule.id())
-//                .append("Name: ").append(firewallRule.name())
-//                .append("\n\tResource group: ").append(firewallRule.resourceGroupName())
-//                .append("\n\tRegion: ").append(firewallRule.region())
-//                .append("\n\tSqlServer Name: ").append(firewallRule.sqlServerName())
-//                .append("\n\tStart IP Address of the firewall rule: ").append(firewallRule.startIPAddress())
-//                .append("\n\tEnd IP Address of the firewall rule: ").append(firewallRule.endIPAddress());
-//
-//        System.out.println(builder.toString());
-//    }
-//
-//    /**
-//     * Prints information of the elastic pool passed in.
-//     * @param elasticPool elastic pool to be printed
-//     */
-//    public static void print(SqlElasticPool elasticPool) {
-//        StringBuilder builder = new StringBuilder().append("Sql elastic pool: ").append(elasticPool.id())
-//                .append("Name: ").append(elasticPool.name())
-//                .append("\n\tResource group: ").append(elasticPool.resourceGroupName())
-//                .append("\n\tRegion: ").append(elasticPool.region())
-//                .append("\n\tSqlServer Name: ").append(elasticPool.sqlServerName())
-//                .append("\n\tEdition of elastic pool: ").append(elasticPool.edition())
-//                .append("\n\tTotal number of DTUs in the elastic pool: ").append(elasticPool.dtu())
-//                .append("\n\tMaximum DTUs a database can get in elastic pool: ").append(elasticPool.databaseDtuMax())
-//                .append("\n\tMinimum DTUs a database is guaranteed in elastic pool: ").append(elasticPool.databaseDtuMin())
-//                .append("\n\tCreation date for the elastic pool: ").append(elasticPool.creationDate())
-//                .append("\n\tState of the elastic pool: ").append(elasticPool.state())
-//                .append("\n\tStorage capacity in MBs for the elastic pool: ").append(elasticPool.storageMB());
-//
-//        System.out.println(builder.toString());
-//    }
-//
-//    /**
-//     * Prints information of the elastic pool activity.
-//     * @param elasticPoolActivity elastic pool activity to be printed
-//     */
-//    public static void print(ElasticPoolActivity elasticPoolActivity) {
-//        StringBuilder builder = new StringBuilder().append("Sql elastic pool activity: ").append(elasticPoolActivity.id())
-//                .append("Name: ").append(elasticPoolActivity.name())
-//                .append("\n\tResource group: ").append(elasticPoolActivity.resourceGroupName())
-//                .append("\n\tState: ").append(elasticPoolActivity.state())
-//                .append("\n\tElastic pool name: ").append(elasticPoolActivity.elasticPoolName())
-//                .append("\n\tStart time of activity: ").append(elasticPoolActivity.startTime())
-//                .append("\n\tEnd time of activity: ").append(elasticPoolActivity.endTime())
-//                .append("\n\tError code of activity: ").append(elasticPoolActivity.errorCode())
-//                .append("\n\tError message of activity: ").append(elasticPoolActivity.errorMessage())
-//                .append("\n\tError severity of activity: ").append(elasticPoolActivity.errorSeverity())
-//                .append("\n\tOperation: ").append(elasticPoolActivity.operation())
-//                .append("\n\tCompleted percentage of activity: ").append(elasticPoolActivity.percentComplete())
-//                .append("\n\tRequested DTU max limit in activity: ").append(elasticPoolActivity.requestedDatabaseDtuMax())
-//                .append("\n\tRequested DTU min limit in activity: ").append(elasticPoolActivity.requestedDatabaseDtuMin())
-//                .append("\n\tRequested DTU limit in activity: ").append(elasticPoolActivity.requestedDtu());
-//
-//        System.out.println(builder.toString());
-//
-//    }
-//
-//    /**
-//     * Prints information of the database activity.
-//     * @param databaseActivity database activity to be printed
-//     */
-//    public static void print(ElasticPoolDatabaseActivity databaseActivity) {
-//        StringBuilder builder = new StringBuilder().append("Sql elastic pool database activity: ").append(databaseActivity.id())
-//                .append("Name: ").append(databaseActivity.name())
-//                .append("\n\tResource group: ").append(databaseActivity.resourceGroupName())
-//                .append("\n\tSQL Server Name: ").append(databaseActivity.serverName())
-//                .append("\n\tDatabase name name: ").append(databaseActivity.databaseName())
-//                .append("\n\tCurrent elastic pool name of the database: ").append(databaseActivity.currentElasticPoolName())
-//                .append("\n\tState: ").append(databaseActivity.state())
-//                .append("\n\tStart time of activity: ").append(databaseActivity.startTime())
-//                .append("\n\tEnd time of activity: ").append(databaseActivity.endTime())
-//                .append("\n\tCompleted percentage: ").append(databaseActivity.percentComplete())
-//                .append("\n\tError code of activity: ").append(databaseActivity.errorCode())
-//                .append("\n\tError message of activity: ").append(databaseActivity.errorMessage())
-//                .append("\n\tError severity of activity: ").append(databaseActivity.errorSeverity());
-//
-//        System.out.println(builder.toString());
-//    }
+    /**
+     * Prints information for passed SQL Server.
+     * @param sqlServer sqlServer to be printed
+     */
+    public static void print(SqlServer sqlServer) {
+        StringBuilder builder = new StringBuilder().append("Sql Server: ").append(sqlServer.id())
+                .append("Name: ").append(sqlServer.name())
+                .append("\n\tResource group: ").append(sqlServer.resourceGroupName())
+                .append("\n\tRegion: ").append(sqlServer.region())
+                .append("\n\tSqlServer version: ").append(sqlServer.version())
+                .append("\n\tFully qualified name for Sql Server: ").append(sqlServer.fullyQualifiedDomainName());
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information for the passed SQL Database.
+     * @param database database to be printed
+     */
+    public static void print(SqlDatabase database) {
+        StringBuilder builder = new StringBuilder().append("Sql Database: ").append(database.id())
+                .append("Name: ").append(database.name())
+                .append("\n\tResource group: ").append(database.resourceGroupName())
+                .append("\n\tRegion: ").append(database.region())
+                .append("\n\tSqlServer Name: ").append(database.sqlServerName())
+                .append("\n\tEdition of SQL database: ").append(database.edition())
+                .append("\n\tCollation of SQL database: ").append(database.collation())
+                .append("\n\tCreation date of SQL database: ").append(database.creationDate())
+                .append("\n\tIs data warehouse: ").append(database.isDataWarehouse())
+                .append("\n\tCurrent service objective of SQL database: ").append(database.serviceLevelObjective())
+                .append("\n\tId of current service objective of SQL database: ").append(database.currentServiceObjectiveId())
+                .append("\n\tMax size bytes of SQL database: ").append(database.maxSizeBytes())
+                .append("\n\tDefault secondary location of SQL database: ").append(database.defaultSecondaryLocation());
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information for the passed firewall rule.
+     * @param firewallRule firewall rule to be printed.
+     */
+    public static void print(SqlFirewallRule firewallRule) {
+        StringBuilder builder = new StringBuilder().append("Sql firewall rule: ").append(firewallRule.id())
+                .append("Name: ").append(firewallRule.name())
+                .append("\n\tResource group: ").append(firewallRule.resourceGroupName())
+                .append("\n\tRegion: ").append(firewallRule.region())
+                .append("\n\tSqlServer Name: ").append(firewallRule.sqlServerName())
+                .append("\n\tStart IP Address of the firewall rule: ").append(firewallRule.startIPAddress())
+                .append("\n\tEnd IP Address of the firewall rule: ").append(firewallRule.endIPAddress());
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information of the elastic pool passed in.
+     * @param elasticPool elastic pool to be printed
+     */
+    public static void print(SqlElasticPool elasticPool) {
+        StringBuilder builder = new StringBuilder().append("Sql elastic pool: ").append(elasticPool.id())
+                .append("Name: ").append(elasticPool.name())
+                .append("\n\tResource group: ").append(elasticPool.resourceGroupName())
+                .append("\n\tRegion: ").append(elasticPool.region())
+                .append("\n\tSqlServer Name: ").append(elasticPool.sqlServerName())
+                .append("\n\tEdition of elastic pool: ").append(elasticPool.edition())
+                .append("\n\tTotal number of DTUs in the elastic pool: ").append(elasticPool.dtu())
+                .append("\n\tMaximum DTUs a database can get in elastic pool: ").append(elasticPool.databaseDtuMax())
+                .append("\n\tMinimum DTUs a database is guaranteed in elastic pool: ").append(elasticPool.databaseDtuMin())
+                .append("\n\tCreation date for the elastic pool: ").append(elasticPool.creationDate())
+                .append("\n\tState of the elastic pool: ").append(elasticPool.state())
+                .append("\n\tStorage capacity in MBs for the elastic pool: ").append(elasticPool.storageMB());
+
+        System.out.println(builder.toString());
+    }
+
+    /**
+     * Prints information of the elastic pool activity.
+     * @param elasticPoolActivity elastic pool activity to be printed
+     */
+    public static void print(ElasticPoolActivity elasticPoolActivity) {
+        StringBuilder builder = new StringBuilder().append("Sql elastic pool activity: ").append(elasticPoolActivity.id())
+                .append("Name: ").append(elasticPoolActivity.name())
+                .append("\n\tResource group: ").append(elasticPoolActivity.resourceGroupName())
+                .append("\n\tState: ").append(elasticPoolActivity.state())
+                .append("\n\tElastic pool name: ").append(elasticPoolActivity.elasticPoolName())
+                .append("\n\tStart time of activity: ").append(elasticPoolActivity.startTime())
+                .append("\n\tEnd time of activity: ").append(elasticPoolActivity.endTime())
+                .append("\n\tError code of activity: ").append(elasticPoolActivity.errorCode())
+                .append("\n\tError message of activity: ").append(elasticPoolActivity.errorMessage())
+                .append("\n\tError severity of activity: ").append(elasticPoolActivity.errorSeverity())
+                .append("\n\tOperation: ").append(elasticPoolActivity.operation())
+                .append("\n\tCompleted percentage of activity: ").append(elasticPoolActivity.percentComplete())
+                .append("\n\tRequested DTU max limit in activity: ").append(elasticPoolActivity.requestedDatabaseDtuMax())
+                .append("\n\tRequested DTU min limit in activity: ").append(elasticPoolActivity.requestedDatabaseDtuMin())
+                .append("\n\tRequested DTU limit in activity: ").append(elasticPoolActivity.requestedDtu());
+
+        System.out.println(builder.toString());
+
+    }
+
+    /**
+     * Prints information of the database activity.
+     * @param databaseActivity database activity to be printed
+     */
+    public static void print(ElasticPoolDatabaseActivity databaseActivity) {
+        StringBuilder builder = new StringBuilder().append("Sql elastic pool database activity: ").append(databaseActivity.id())
+                .append("Name: ").append(databaseActivity.name())
+                .append("\n\tResource group: ").append(databaseActivity.resourceGroupName())
+                .append("\n\tSQL Server Name: ").append(databaseActivity.serverName())
+                .append("\n\tDatabase name name: ").append(databaseActivity.databaseName())
+                .append("\n\tCurrent elastic pool name of the database: ").append(databaseActivity.currentElasticPoolName())
+                .append("\n\tState: ").append(databaseActivity.state())
+                .append("\n\tStart time of activity: ").append(databaseActivity.startTime())
+                .append("\n\tEnd time of activity: ").append(databaseActivity.endTime())
+                .append("\n\tCompleted percentage: ").append(databaseActivity.percentComplete())
+                .append("\n\tError code of activity: ").append(databaseActivity.errorCode())
+                .append("\n\tError message of activity: ").append(databaseActivity.errorMessage())
+                .append("\n\tError severity of activity: ").append(databaseActivity.errorSeverity());
+
+        System.out.println(builder.toString());
+    }
 
     /**
      * Print an application gateway.

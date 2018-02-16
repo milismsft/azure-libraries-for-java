@@ -59,60 +59,59 @@ public final class ManageSqlFirewallRules {
             // Create a SQL Server, with 2 firewall rules.
             System.out.println("Create a SQL server with 2 firewall rules adding a single IP Address and a range of IP Addresses");
 
-//            SqlServer sqlServer = azure.sqlServers().define(sqlServerName)
-//                    .withRegion(Region.US_EAST)
-//                    .withNewResourceGroup(rgName)
-//                    .withAdministratorLogin(administratorLogin)
-//                    .withAdministratorPassword(administratorPassword)
-//                    .withNewFirewallRule(firewallRuleIPAddress)
-//                    .withNewFirewallRule(firewallRuleStartIPAddress, firewallRuleEndIPAddress)
-//                    .create();
+            SqlServer sqlServer = azure.sqlServers().define(sqlServerName)
+                    .withRegion(Region.US_EAST)
+                    .withNewResourceGroup(rgName)
+                    .withAdministratorLogin(administratorLogin)
+                    .withAdministratorPassword(administratorPassword)
+                    .withNewFirewallRule(firewallRuleIPAddress)
+                    .withNewFirewallRule(firewallRuleStartIPAddress, firewallRuleEndIPAddress)
+                    .create();
 
-            // TODO: add implementation for THIS
-//            Utils.print(sqlServer);
-//
-//            // ============================================================
-//            // List and delete all firewall rules.
-//            System.out.println("Listing all firewall rules in SQL Server.");
-//
-//            List<SqlFirewallRule> firewallRules = sqlServer.firewallRules().list();
-//            for (SqlFirewallRule firewallRule: firewallRules) {
-//                // Print information of the firewall rule.
-//                Utils.print(firewallRule);
-//
-//                // Delete the firewall rule.
-//                System.out.println("Deleting a firewall rule");
-//                firewallRule.delete();
-//            }
-//
-//            // ============================================================
-//            // Add new firewall rules.
-//            System.out.println("Creating a firewall rule in existing SQL Server");
-//            SqlFirewallRule firewallRule = sqlServer.firewallRules().define(myFirewallName)
-//                    .withIPAddress(myFirewallRuleIPAddress)
-//                    .create();
-//
-//            Utils.print(firewallRule);
-//
-//            System.out.println("Get a particular firewall rule in SQL Server");
-//
-//            firewallRule = sqlServer.firewallRules().get(myFirewallName);
-//            Utils.print(firewallRule);
-//
-//            System.out.println("Deleting and adding new firewall rules as part of SQL Server update.");
-//            sqlServer.update()
-//                    .withoutFirewallRule(myFirewallName)
-//                    .withNewFirewallRule(otherFirewallRuleStartIPAddress, otherFirewallRuleEndIPAddress)
-//                    .apply();
-//
-//            for (SqlFirewallRule sqlFirewallRule: sqlServer.firewallRules().list()) {
-//                // Print information of the firewall rule.
-//                Utils.print(sqlFirewallRule);
-//            }
-//
-//            // Delete the SQL Server.
-//            System.out.println("Deleting a Sql Server");
-//            azure.sqlServers().deleteById(sqlServer.id());
+            Utils.print(sqlServer);
+
+            // ============================================================
+            // List and delete all firewall rules.
+            System.out.println("Listing all firewall rules in SQL Server.");
+
+            List<SqlFirewallRule> firewallRules = sqlServer.firewallRules().list();
+            for (SqlFirewallRule firewallRule: firewallRules) {
+                // Print information of the firewall rule.
+                Utils.print(firewallRule);
+
+                // Delete the firewall rule.
+                System.out.println("Deleting a firewall rule");
+                firewallRule.delete();
+            }
+
+            // ============================================================
+            // Add new firewall rules.
+            System.out.println("Creating a firewall rule in existing SQL Server");
+            SqlFirewallRule firewallRule = sqlServer.firewallRules().define(myFirewallName)
+                    .withIPAddress(myFirewallRuleIPAddress)
+                    .create();
+
+            Utils.print(firewallRule);
+
+            System.out.println("Get a particular firewall rule in SQL Server");
+
+            firewallRule = sqlServer.firewallRules().get(myFirewallName);
+            Utils.print(firewallRule);
+
+            System.out.println("Deleting and adding new firewall rules as part of SQL Server update.");
+            sqlServer.update()
+                    .withoutFirewallRule(myFirewallName)
+                    .withNewFirewallRule(otherFirewallRuleStartIPAddress, otherFirewallRuleEndIPAddress)
+                    .apply();
+
+            for (SqlFirewallRule sqlFirewallRule: sqlServer.firewallRules().list()) {
+                // Print information of the firewall rule.
+                Utils.print(sqlFirewallRule);
+            }
+
+            // Delete the SQL Server.
+            System.out.println("Deleting a Sql Server");
+            azure.sqlServers().deleteById(sqlServer.id());
             return true;
         } catch (Exception f) {
             System.out.println(f.getMessage());

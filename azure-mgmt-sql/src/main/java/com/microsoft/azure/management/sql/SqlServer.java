@@ -53,14 +53,25 @@ public interface SqlServer extends
     @Beta(Beta.SinceVersion.V2_0_0)
     String kind();
 
+    /**
+     * @return the state of the server.
+     */
+    @Beta(Beta.SinceVersion.V2_0_0)
+    String state();
 
     // Actions
+
+    /**
+     * @return returns the list of usages (ServerMetric) of Azure SQL Server
+     */
+    @Deprecated
+    List<ServerMetric> listUsages();
 
     /**
      * @return returns the list of usage metrics for an Azure SQL Server
      */
     @Beta(Beta.SinceVersion.V2_0_0)
-    List<ServerUsage> listUsageMetrics();
+    List<ServerMetric> listUsageMetrics();
 
     /**
      * @return the list of information on all service objectives

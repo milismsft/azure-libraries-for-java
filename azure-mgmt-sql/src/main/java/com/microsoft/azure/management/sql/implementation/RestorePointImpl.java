@@ -57,6 +57,11 @@ class RestorePointImpl
     }
 
     @Override
+    public String databaseId() {
+        return resourceId.parent().id();
+    }
+
+    @Override
     public RestorePointType restorePointType() {
         return this.inner().restorePointType();
     }

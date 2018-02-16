@@ -154,6 +154,11 @@ class SqlDatabaseImpl
     }
 
     @Override
+    public String resourceGroupName() {
+        return this.resourceGroupName;
+    }
+
+    @Override
     public String sqlServerName() {
         return this.sqlServerName;
     }
@@ -716,8 +721,8 @@ class SqlDatabaseImpl
 
     @Override
     public SqlDatabaseImpl fromRestorePoint(RestorePoint restorePoint) {
-        this.inner().withRestorePointInTime(restorePoint.restorePointCreationDate());
-        return this.withSourceDatabase(restorePoint.id())
+        this.inner().withRestorePointInTime(restorePoint.earliestRestoreDate());
+        return this.withSourceDatabase(restorePoint.databaseId())
             .withMode(CreateMode.POINT_IN_TIME_RESTORE);
     }
 

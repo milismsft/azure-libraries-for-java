@@ -84,6 +84,7 @@ public interface SqlDatabaseOperations extends
             SqlDatabaseOperations.DefinitionStages.WithElasticPoolName,
             SqlDatabaseOperations.DefinitionStages.WithRestorableDroppedDatabase,
             SqlDatabaseOperations.DefinitionStages.WithImportFrom,
+            SqlDatabaseOperations.DefinitionStages.WithRestorePointDatabase,
             SqlDatabaseOperations.DefinitionStages.WithSourceDatabaseId,
             SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions {
         }

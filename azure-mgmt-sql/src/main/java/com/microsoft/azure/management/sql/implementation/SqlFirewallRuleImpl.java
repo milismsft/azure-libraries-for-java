@@ -84,11 +84,6 @@ public class SqlFirewallRuleImpl
     }
 
     @Override
-    public String id() {
-        return this.inner().id();
-    }
-
-    @Override
     protected Observable<FirewallRuleInner> getInnerAsync() {
         return this.sqlServerManager.inner().firewallRules().getAsync(this.resourceGroupName, this.sqlServerName, this.name());
     }
@@ -98,6 +93,16 @@ public class SqlFirewallRuleImpl
         super.prepareUpdate();
 
         return this;
+    }
+
+    @Override
+    public String id() {
+        return this.inner().id();
+    }
+
+    @Override
+    public String resourceGroupName() {
+        return this.resourceGroupName;
     }
 
     @Override

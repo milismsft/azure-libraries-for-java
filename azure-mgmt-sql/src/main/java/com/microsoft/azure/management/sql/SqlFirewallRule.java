@@ -10,6 +10,7 @@ import com.microsoft.azure.management.apigeneration.Fluent;
 import com.microsoft.azure.management.apigeneration.Method;
 import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.arm.models.ExternalChildResource;
+import com.microsoft.azure.management.resources.fluentcore.arm.models.HasResourceGroup;
 import com.microsoft.azure.management.resources.fluentcore.model.Appliable;
 import com.microsoft.azure.management.resources.fluentcore.model.Attachable;
 import com.microsoft.azure.management.resources.fluentcore.model.Refreshable;
@@ -27,6 +28,7 @@ public interface SqlFirewallRule
     extends
         ExternalChildResource<SqlFirewallRule, SqlServer>,
         HasInner<FirewallRuleInner>,
+        HasResourceGroup,
         Refreshable<SqlFirewallRule>,
         Updatable<SqlFirewallRule.Update> {
 
