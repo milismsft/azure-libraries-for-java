@@ -20,7 +20,7 @@ import com.microsoft.azure.management.storage.StorageAccount;
 @Beta(Beta.SinceVersion.V2_0_0)
 public interface SqlDatabaseImportRequest extends
     HasInner<ImportExtensionRequestInner>,
-    Executable<SqlDatabase>,
+    Executable<SqlDatabaseImportExportResponse>,
     HasParent<SqlDatabase> {
 
     /**
@@ -96,7 +96,7 @@ public interface SqlDatabaseImportRequest extends
          * for any other optional settings to be specified.
          */
         interface WithExecute extends
-            Executable<SqlDatabase> {
+            Executable<SqlDatabaseImportExportResponse> {
         }
     }
 }

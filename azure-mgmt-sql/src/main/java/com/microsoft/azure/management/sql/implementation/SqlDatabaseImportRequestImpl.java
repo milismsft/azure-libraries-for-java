@@ -10,6 +10,7 @@ import com.microsoft.azure.management.resources.fluentcore.dag.FunctionalTaskIte
 import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.resources.fluentcore.model.implementation.ExecutableImpl;
 import com.microsoft.azure.management.sql.AuthenticationType;
+import com.microsoft.azure.management.sql.SqlDatabaseImportExportResponse;
 import com.microsoft.azure.management.sql.SqlDatabaseImportRequest;
 import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.StorageKeyType;
@@ -25,7 +26,7 @@ import java.util.Objects;
  * Implementation for SqlDatabaseImportRequest.
  */
 @LangDefinition
-public class SqlDatabaseImportRequestImpl extends ExecutableImpl<SqlDatabase>
+public class SqlDatabaseImportRequestImpl extends ExecutableImpl<SqlDatabaseImportExportResponse>
     implements
     SqlDatabaseImportRequest,
     SqlDatabaseImportRequest.SqlDatabaseImportRequestDefinition {
@@ -51,14 +52,21 @@ public class SqlDatabaseImportRequestImpl extends ExecutableImpl<SqlDatabase>
     }
 
     @Override
-    public Observable<SqlDatabase> executeWorkAsync() {
+    public Observable<SqlDatabaseImportExportResponse> executeWorkAsync() {
         final SqlDatabaseImportRequestImpl self = this;
         return this.sqlServerManager.inner().databases()
             .createImportOperationAsync(this.sqlDatabase.resourceGroupName, this.sqlDatabase.sqlServerName, this.sqlDatabase.name(), this.inner())
-            .flatMap(new Func1<ImportExportResponseInner, Observable<SqlDatabase>>() {
+            .flatMap(new Func1<ImportExportResponseInner, Observable<SqlDatabaseImportExportResponse>>() {
                 @Override
-                public Observable<SqlDatabase> call(ImportExportResponseInner importExportResponseInner) {
-                    return self.sqlDatabase.refreshAsync();
+                public Observable<SqlDatabaseImportExportResponse> call(final ImportExportResponseInner importExportResponseInner) {
+                    return self.sqlDatabase
+                        .refreshAsync()
+                        .map(new Func1<SqlDatabase, SqlDatabaseImportExportResponse>() {
+                            @Override
+                            public SqlDatabaseImportExportResponse call(SqlDatabase sqlDatabase) {
+                                return new SqlDatabaseImportExportResponseImpl(importExportResponseInner);
+                            }
+                        });
                 }
             });
     }
