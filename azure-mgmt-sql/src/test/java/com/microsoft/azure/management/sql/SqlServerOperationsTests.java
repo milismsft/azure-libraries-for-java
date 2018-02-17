@@ -92,7 +92,11 @@ public class SqlServerOperationsTests extends SqlServerTest {
             .withBasicEdition()
             .create();
 
-        restoredDB.delete();
+        db.importBacpac("http://asd")
+            .withStorageAccessKey("key")
+            .withSqlAdministratorLoginAndPassword("asd","blah")
+            .execute();
+
 
         StorageAccount storageAccount = storageManager.storageAccounts().getByResourceGroup(sqlServer.resourceGroupName(), sqlServer.regionName());
         if (storageAccount == null) {

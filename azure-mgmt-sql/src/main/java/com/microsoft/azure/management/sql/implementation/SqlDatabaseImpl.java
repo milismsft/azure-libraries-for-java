@@ -26,8 +26,6 @@ import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlDatabaseMetric;
 import com.microsoft.azure.management.sql.SqlDatabaseMetricDefinition;
 import com.microsoft.azure.management.sql.SqlDatabaseOperations;
-import com.microsoft.azure.management.sql.SqlDatabasePremiumRSServiceObjective;
-import com.microsoft.azure.management.sql.SqlDatabasePremiumRSStorage;
 import com.microsoft.azure.management.sql.SqlDatabasePremiumServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabasePremiumStorage;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
@@ -798,21 +796,6 @@ class SqlDatabaseImpl
     @Override
     public SqlDatabaseImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity) {
         this.inner().withEdition(DatabaseEdition.PREMIUM);
-        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacity()));
-        return this;
-    }
-
-    @Override
-    public SqlDatabaseImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective) {
-        this.inner().withEdition(DatabaseEdition.PREMIUM_RS);
-        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        return this;
-    }
-
-    @Override
-    public SqlDatabaseImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity) {
-        this.inner().withEdition(DatabaseEdition.PREMIUM_RS);
         this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
         this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacity()));
         return this;

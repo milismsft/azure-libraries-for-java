@@ -12,8 +12,6 @@ import com.microsoft.azure.management.sql.DatabaseEdition;
 import com.microsoft.azure.management.sql.RestorePoint;
 import com.microsoft.azure.management.sql.ServiceObjectiveName;
 import com.microsoft.azure.management.sql.SqlDatabase;
-import com.microsoft.azure.management.sql.SqlDatabasePremiumRSServiceObjective;
-import com.microsoft.azure.management.sql.SqlDatabasePremiumRSStorage;
 import com.microsoft.azure.management.sql.SqlDatabasePremiumServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabasePremiumStorage;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
@@ -128,21 +126,6 @@ public class SqlDatabaseForElasticPoolImpl
     @Override
     public SqlDatabaseForElasticPoolImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity) {
         this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM);
-        this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacity());
-        return this;
-    }
-
-    @Override
-    public SqlDatabaseForElasticPoolImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective) {
-        this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM_RS);
-        this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
-        return this;
-    }
-
-    @Override
-    public SqlDatabaseForElasticPoolImpl withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity) {
-        this.sqlDatabase.withEdition(DatabaseEdition.PREMIUM_RS);
         this.sqlDatabase.withServiceObjective(ServiceObjectiveName.fromString(serviceObjective.toString()));
         this.sqlDatabase.withMaxSizeBytes(maxStorageCapacity.capacity());
         return this;

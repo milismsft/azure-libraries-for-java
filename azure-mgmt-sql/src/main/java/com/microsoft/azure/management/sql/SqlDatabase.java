@@ -675,25 +675,6 @@ public interface SqlDatabase
              */
             @Beta(Beta.SinceVersion.V2_0_0)
             SqlDatabase.DefinitionStages.WithAttachAllOptions<ParentT> withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity);
-
-            /**
-             * Sets a "PremiumRS" edition for the SQL Database.
-             *
-             * @param serviceObjective edition to be set for database
-             * @return The next stage of the definition
-             */
-            @Beta(Beta.SinceVersion.V2_0_0)
-            SqlDatabase.DefinitionStages.WithAttachAllOptions<ParentT> withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective);
-
-            /**
-             * Sets a "PremiumRS" edition and maximum storage capacity for the SQL Database.
-             *
-             * @param serviceObjective edition to be set for database
-             * @param maxStorageCapacity edition to be set for database
-             * @return The next stage of the definition
-             */
-            @Beta(Beta.SinceVersion.V2_0_0)
-            SqlDatabase.DefinitionStages.WithAttachAllOptions<ParentT> withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity);
         }
 
         /**
@@ -846,25 +827,6 @@ public interface SqlDatabase
              */
             @Beta(Beta.SinceVersion.V2_0_0)
             Update withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity);
-
-            /**
-             * Sets a "PremiumRS" edition for the SQL Database.
-             *
-             * @param serviceObjective edition to be set for database
-             * @return The next stage of the definition
-             */
-            @Beta(Beta.SinceVersion.V2_0_0)
-            Update withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective);
-
-            /**
-             * Sets a "PremiumRS" edition and maximum storage capacity for the SQL Database.
-             *
-             * @param serviceObjective edition to be set for database
-             * @param maxStorageCapacity edition to be set for database
-             * @return The next stage of the definition
-             */
-            @Beta(Beta.SinceVersion.V2_0_0)
-            Update withPremiumRSEdition(SqlDatabasePremiumRSServiceObjective serviceObjective, SqlDatabasePremiumRSStorage maxStorageCapacity);
         }
 
         /**
