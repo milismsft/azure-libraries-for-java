@@ -8,6 +8,7 @@
 package com.microsoft.azure.management.sql.implementation;
 
 import com.microsoft.azure.management.apigeneration.LangDefinition;
+import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.model.implementation.RefreshableWrapperImpl;
 import com.microsoft.azure.management.sql.SqlRestorableDroppedDatabase;
 import org.joda.time.DateTime;
@@ -32,8 +33,8 @@ public class SqlRestorableDroppedDatabaseImpl extends RefreshableWrapperImpl<Res
     }
 
     @Override
-    public String location() {
-        return this.inner().location();
+    public Region region() {
+        return Region.fromName(this.inner().location());
     }
 
     @Override

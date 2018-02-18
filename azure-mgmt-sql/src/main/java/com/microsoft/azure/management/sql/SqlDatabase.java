@@ -297,6 +297,21 @@ public interface SqlDatabase
     SqlDatabaseImportRequest.DefinitionStages.WithAuthenticationTypeAndLoginPassword importBacpac(StorageAccount storageAccount, String containerName, String fileName);
 
     /**
+     * Begins a definition for a security alert policy.
+     *
+     * @param policyName the name of the security alert policy
+     * @return the first stage of the SqlDatabaseThreatDetectionPolicy definition
+     */
+    SqlDatabaseThreatDetectionPolicy.DefinitionStages.Blank defineThreatDetectionPolicy(String policyName);
+
+    /**
+     * Gets a SQL database threat detection policy.
+     *
+     * @return the SQL database threat detection policy for the current database
+     */
+    SqlDatabaseThreatDetectionPolicy getThreatDetectionPolicy();
+
+    /**
      * Deletes the database from the server.
      */
     @Method

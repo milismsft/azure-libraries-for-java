@@ -30,6 +30,7 @@ import com.microsoft.azure.management.sql.SqlDatabasePremiumServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabasePremiumStorage;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
 import com.microsoft.azure.management.sql.SqlDatabaseStandardStorage;
+import com.microsoft.azure.management.sql.SqlDatabaseThreatDetectionPolicy;
 import com.microsoft.azure.management.sql.SqlElasticPool;
 import com.microsoft.azure.management.sql.SqlRestorableDroppedDatabase;
 import com.microsoft.azure.management.sql.SqlServer;
@@ -332,6 +333,18 @@ class SqlDatabaseImpl
     public SqlDatabaseImportRequestImpl importBacpac(StorageAccount storageAccount, String containerName, String fileName) {
         return new SqlDatabaseImportRequestImpl(this, this.sqlServerManager)
             .importFrom(storageAccount, containerName, fileName);
+    }
+
+    @Override
+    public SqlDatabaseThreatDetectionPolicy.DefinitionStages.Blank defineThreatDetectionPolicy(String policyName) {
+        return new SqlDatabaseThreatDetectionPolicyImpl(policyName, this, new DatabaseSecurityAlertPolicyInner(), this.sqlServerManager);
+    }
+
+    @Override
+    public SqlDatabaseThreatDetectionPolicy getThreatDetectionPolicy() {
+        DatabaseSecurityAlertPolicyInner policyInner = this.sqlServerManager.inner().databaseThreatDetectionPolicies()
+            .get(this.resourceGroupName, this.sqlServerName, this.name());
+        return policyInner != null ? new SqlDatabaseThreatDetectionPolicyImpl(policyInner.name(), this, policyInner, this.sqlServerManager) : null;
     }
 
     @Override
