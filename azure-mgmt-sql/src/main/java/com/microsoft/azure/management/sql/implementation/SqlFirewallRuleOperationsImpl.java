@@ -199,6 +199,7 @@ public class SqlFirewallRuleOperationsImpl
 
     @Override
     public SqlFirewallRuleImpl define(String name) {
-        return sqlFirewallRules.defineIndependentFirewallRule(name);
+        SqlFirewallRuleImpl result = sqlFirewallRules.defineIndependentFirewallRule(name);
+        return (this.sqlServer != null) ? result.withExistingSqlServer(this.sqlServer) : result;
     }
 }

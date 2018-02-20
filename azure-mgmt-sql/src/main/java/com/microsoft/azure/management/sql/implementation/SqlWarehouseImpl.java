@@ -20,7 +20,11 @@ class SqlWarehouseImpl
         extends SqlDatabaseImpl
         implements SqlWarehouse {
 
-    protected SqlWarehouseImpl(String resourceGroupName, String sqlServerName, String sqlServerLocation, String name, DatabaseInner innerObject, SqlServerManager sqlServerManager) {
+    SqlWarehouseImpl(String name, SqlServerImpl parent, DatabaseInner innerObject, SqlServerManager sqlServerManager) {
+        super(name, parent, innerObject, sqlServerManager);
+    }
+
+    SqlWarehouseImpl(String resourceGroupName, String sqlServerName, String sqlServerLocation, String name, DatabaseInner innerObject, SqlServerManager sqlServerManager) {
         super(resourceGroupName, sqlServerName, sqlServerLocation, name, innerObject, sqlServerManager);
     }
 

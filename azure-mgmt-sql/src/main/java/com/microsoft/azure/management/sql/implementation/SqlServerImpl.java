@@ -110,8 +110,8 @@ public class SqlServerImpl
             // Databases in a new Elastic Pool should be created after the Elastic Pool
             List<SqlDatabaseImpl> dbToBeCreated = this.sqlDatabases.getChildren(ExternalChildResourceImpl.PendingOperation.ToBeCreated);
             List<SqlElasticPoolImpl> epToBeCreated = this.sqlElasticPools.getChildren(ExternalChildResourceImpl.PendingOperation.ToBeCreated);
-            for (SqlElasticPoolImpl epItem : epToBeRemoved) {
-                for (SqlDatabaseImpl dbItem : dbToBeRemoved) {
+            for (SqlElasticPoolImpl epItem : epToBeCreated) {
+                for (SqlDatabaseImpl dbItem : dbToBeCreated) {
                     if (dbItem.elasticPoolName() != null && dbItem.elasticPoolName().equals(epItem.name())) {
                         dbItem.addParentDependency(epItem);
                     }

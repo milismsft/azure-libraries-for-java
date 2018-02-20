@@ -17,6 +17,7 @@ import com.microsoft.azure.management.sql.ElasticPoolState;
 import com.microsoft.azure.management.sql.SqlDatabase;
 import com.microsoft.azure.management.sql.SqlDatabaseMetric;
 import com.microsoft.azure.management.sql.SqlDatabaseMetricDefinition;
+import com.microsoft.azure.management.sql.SqlDatabaseStandardServiceObjective;
 import com.microsoft.azure.management.sql.SqlElasticPool;
 import com.microsoft.azure.management.sql.SqlElasticPoolBasicEDTUs;
 import com.microsoft.azure.management.sql.SqlElasticPoolBasicMaxEDTUs;
@@ -343,29 +344,43 @@ public class SqlElasticPoolImpl
     @Override
     public SqlDatabase getDatabase(String databaseName) {
         DatabaseInner databaseInner = this.sqlServerManager.inner().databases()
-            .get(this.resourceGroupName, this.sqlServerName, this.name());
+            .get(this.resourceGroupName, this.sqlServerName, databaseName);
 
-        return databaseInner != null ? new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation, databaseInner.name(), databaseInner, this.sqlServerManager) : null;
+        return databaseInner != null ? new SqlDatabaseImpl(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation, databaseName, databaseInner, this.sqlServerManager) : null;
     }
 
     @Override
     public SqlDatabase addNewDatabase(String databaseName) {
-        return null;
+        return this.sqlServerManager.sqlServers().databases()
+            .define(databaseName)
+            .withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation)
+            .withExistingElasticPool(this)
+            .create();
     }
 
     @Override
     public SqlDatabase addExistingDatabase(String databaseName) {
-        return null;
+        return this.getDatabase(databaseName)
+            .update()
+            .withExistingElasticPool(this)
+            .apply();
     }
 
     @Override
     public SqlDatabase addExistingDatabase(SqlDatabase database) {
-        return null;
+        return database
+            .update()
+            .withExistingElasticPool(this)
+            .apply();
     }
 
     @Override
     public SqlDatabase removeDatabase(String databaseName) {
-        return null;
+        return this.getDatabase(databaseName)
+            .update()
+            .withoutElasticPool()
+            .withStandardEdition(SqlDatabaseStandardServiceObjective.S0)
+            .apply();
     }
 
     @Override

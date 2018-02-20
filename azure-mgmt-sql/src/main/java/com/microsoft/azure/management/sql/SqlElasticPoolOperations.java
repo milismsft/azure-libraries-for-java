@@ -306,7 +306,7 @@ public interface SqlElasticPoolOperations extends
              * @return the first stage of the new SQL Database definition
              */
             @Beta(Beta.SinceVersion.V2_0_0)
-            SqlDatabase.DefinitionStages.WithoutElasticPoolOptions<SqlElasticPoolOperations.DefinitionStages.WithCreate> defineDatabase(String databaseName);
+            SqlDatabase.DefinitionStages.WithExistingDatabaseAfterElasticPool<WithCreate> defineDatabase(String databaseName);
         }
 
         /**

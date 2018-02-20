@@ -11,7 +11,6 @@ import com.microsoft.azure.management.resources.fluentcore.arm.Region;
 import com.microsoft.azure.management.resources.fluentcore.model.Creatable;
 import com.microsoft.azure.management.resources.fluentcore.model.Indexable;
 import com.microsoft.azure.management.resources.fluentcore.utils.Utils;
-import com.microsoft.azure.management.sql.implementation.DatabaseInner;
 import com.microsoft.azure.management.storage.StorageAccount;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -70,9 +69,9 @@ public class SqlServerOperationsTests extends SqlServerTest {
 //
 //        elasticPool.delete();
 
-        List<SqlRestorableDroppedDatabase> restorableDroppedDatabases = sqlServer.listRestorableDroppedDatabases();
-        SqlRestorableDroppedDatabase restorableDroppedDatabase = restorableDroppedDatabases.get(0);
-
+//        List<SqlRestorableDroppedDatabase> restorableDroppedDatabases = sqlServer.listRestorableDroppedDatabases();
+//        SqlRestorableDroppedDatabase restorableDroppedDatabase = restorableDroppedDatabases.get(0);
+//
 //        SqlDatabase db = sqlServerManager.sqlServers().databases().define("test-restore")
 //            .withExistingSqlServer(sqlServer)
 //            .withSourceDatabase(restorableDroppedDatabase.id())
@@ -83,22 +82,22 @@ public class SqlServerOperationsTests extends SqlServerTest {
         SqlDatabase db = sqlServer.databases()
             .get("db-sample");
 
-        List<RestorePoint> restorePointList = db.listRestorePoints();
-        RestorePoint restorePoint = restorePointList.get(0);
+//        List<RestorePoint> restorePointList = db.listRestorePoints();
+//        RestorePoint restorePoint = restorePointList.get(0);
+//
+//        SqlDatabase restoredDB = sqlServer.databases()
+//            .define("restored-db")
+//            .fromRestorePoint(restorePoint)
+//            .withBasicEdition()
+//            .create();
+//
+//        db.importBacpac("http://asd")
+//            .withStorageAccessKey("key")
+//            .withSqlAdministratorLoginAndPassword("asd","blah")
+//            .execute();
 
-        SqlDatabase restoredDB = sqlServer.databases()
-            .define("restored-db")
-            .fromRestorePoint(restorePoint)
-            .withBasicEdition()
-            .create();
 
-        db.importBacpac("http://asd")
-            .withStorageAccessKey("key")
-            .withSqlAdministratorLoginAndPassword("asd","blah")
-            .execute();
-
-
-        StorageAccount storageAccount = storageManager.storageAccounts().getByResourceGroup(sqlServer.resourceGroupName(), sqlServer.regionName());
+        StorageAccount storageAccount = storageManager.storageAccounts().getByResourceGroup(sqlServer.resourceGroupName(), "my223344");
         if (storageAccount == null) {
             Creatable<StorageAccount> storageAccountCreatable = storageManager.storageAccounts()
                 .define("my223344")
@@ -132,19 +131,24 @@ public class SqlServerOperationsTests extends SqlServerTest {
             .withNewDatabase("db2")
             .defineDatabase("db3")
                 .attach()
-            .withExistingDatabase("db4")
             .create();
 
-        elasticPool2.delete();
+        sqlServer.update()
+            .withoutElasticPool("ep2")
+            .withoutDatabase("db2")
+            .withoutDatabase("db3")
+            .apply();
 
-        sqlServer.databases().define("d")
-            .create();
+//        elasticPool2.delete();
+//
+//        sqlServer.databases().define("d")
+//            .create();
 
 
 //                canCRUDSqlServer2();
     }
 
-//    @Test
+    @Test
     public void canCRUDSqlServerWithFirewallRule() throws Exception {
         // Create
 
@@ -291,6 +295,7 @@ public class SqlServerOperationsTests extends SqlServerTest {
                 .withNewResourceGroup(RG_NAME)
                 .withAdministratorLogin("userName")
                 .withAdministratorPassword("Password~1")
+                .withoutAccessFromAzureServices()
                 .withNewDatabase(SQL_DATABASE_NAME)
                 .withNewDatabase(database2Name)
                 .withNewElasticPool(elasticPool1Name, ElasticPoolEdition.STANDARD)
@@ -640,12 +645,8 @@ public class SqlServerOperationsTests extends SqlServerTest {
         databaseInElasticPool.refresh();
 
         // Validate that trying to get an invalid database from elastic pool returns null.
-        try {
-            elasticPool.getDatabase("does_not_exist");
-            Assert.assertNotNull(null);
-        }
-        catch(Exception ex) {
-        }
+        SqlDatabase db_which_does_not_exist = elasticPool.getDatabase("does_not_exist");
+        Assert.assertNull(db_which_does_not_exist);
 
         // Delete
         sqlServer.databases().delete(SQL_DATABASE_NAME);
@@ -868,7 +869,6 @@ public class SqlServerOperationsTests extends SqlServerTest {
                     .withoutElasticPool(elasticPool1Name)
                     .withoutElasticPool(elasticPool2Name)
                     .withoutElasticPool(elasticPool3Name)
-                    .withoutElasticPool(elasticPool1Name)
                     .withoutDatabase(database1InEPName)
                     .withoutDatabase(SQL_DATABASE_NAME)
                     .withoutDatabase(database2InEPName)

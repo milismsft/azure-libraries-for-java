@@ -199,6 +199,7 @@ public class SqlDatabaseOperationsImpl
 
     @Override
     public SqlDatabaseImpl define(String name) {
-        return this.sqlDatabases.defineIndependentDatabase(name);
+        SqlDatabaseImpl result = this.sqlDatabases.defineIndependentDatabase(name);
+        return (this.sqlServer != null) ? result.withExistingSqlServer(this.sqlServer) : result;
     }
 }

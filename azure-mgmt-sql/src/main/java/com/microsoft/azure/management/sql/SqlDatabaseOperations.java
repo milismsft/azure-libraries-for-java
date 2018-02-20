@@ -99,7 +99,7 @@ public interface SqlDatabaseOperations extends
              * @param elasticPoolName for the SQL Database
              * @return The next stage of the definition.
              */
-            SqlDatabaseOperations.DefinitionStages.WithExistingDatabase withExistingElasticPool(String elasticPoolName);
+            WithExistingDatabaseAfterElasticPool withExistingElasticPool(String elasticPoolName);
 
             /**
              * Sets the existing elastic pool for the SQLDatabase.
@@ -107,7 +107,7 @@ public interface SqlDatabaseOperations extends
              * @param sqlElasticPool for the SQL Database
              * @return The next stage of the definition.
              */
-            SqlDatabaseOperations.DefinitionStages.WithExistingDatabase withExistingElasticPool(SqlElasticPool sqlElasticPool);
+            WithExistingDatabaseAfterElasticPool withExistingElasticPool(SqlElasticPool sqlElasticPool);
 
             /**
              * Sets the new elastic pool for the SQLDatabase, this will create a new elastic pool while creating database.
@@ -115,7 +115,7 @@ public interface SqlDatabaseOperations extends
              * @param sqlElasticPool creatable definition for new elastic pool to be created for the SQL Database
              * @return The next stage of the definition.
              */
-            SqlDatabaseOperations.DefinitionStages.WithExistingDatabase withNewElasticPool(Creatable<SqlElasticPool> sqlElasticPool);
+            WithExistingDatabaseAfterElasticPool withNewElasticPool(Creatable<SqlElasticPool> sqlElasticPool);
 
             /**
              * Begins the definition of a new SQL Elastic Pool to be added to this database parent SQL server.
@@ -124,14 +124,15 @@ public interface SqlDatabaseOperations extends
              * @return the first stage of the new SQL Elastic Pool definition
              */
             @Beta(Beta.SinceVersion.V2_0_0)
-            SqlElasticPool.DefinitionStages.Blank<SqlDatabaseOperations.DefinitionStages.WithExistingDatabase> defineElasticPool(String elasticPoolName);
+            SqlElasticPool.DefinitionStages.Blank<WithExistingDatabaseAfterElasticPool> defineElasticPool(String elasticPoolName);
         }
 
         /**
          * The stage to decide whether using existing database or not.
          */
-        interface WithExistingDatabase extends
-            SqlDatabaseOperations.DefinitionStages.WithRestorePointDatabase,
+        interface WithExistingDatabaseAfterElasticPool extends
+            SqlDatabaseOperations.DefinitionStages.WithImportFromAfterElasticPool,
+            SqlDatabaseOperations.DefinitionStages.WithRestorePointDatabaseAfterElasticPool,
             SqlDatabaseOperations.DefinitionStages.WithSourceDatabaseId,
             SqlDatabaseOperations.DefinitionStages.WithCreateAfterElasticPoolOptions {
         }
@@ -202,6 +203,71 @@ public interface SqlDatabaseOperations extends
         }
 
         /**
+         * The SQL Database definition to import a BACPAC file as the source database.
+         */
+        interface WithImportFromAfterElasticPool {
+            /**
+             * Creates a new database from a BACPAC file.
+             *
+             * @param storageUri the source URI for the database to be imported
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithStorageKeyAfterElasticPool importFrom(String storageUri);
+
+            /**
+             * Creates a new database from a BACPAC file.
+             *
+             * @param storageAccount an existing storage account to be used
+             * @param containerName the container name within the storage account to use
+             * @param fileName the exported database file name
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithAuthenticationAfterElasticPool importFrom(StorageAccount storageAccount, String containerName, String fileName);
+        }
+
+        /**
+         * Sets the storage key type and value to use.
+         */
+        interface WithStorageKeyAfterElasticPool {
+            /**
+             * @param storageAccessKey the storage access key to use
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithAuthenticationAfterElasticPool withStorageAccessKey(String storageAccessKey);
+
+            /**
+             * @param sharedAccessKey the shared access key to use; it must be preceded with a "?."
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithAuthenticationAfterElasticPool withSharedAccessKey(String sharedAccessKey);
+        }
+
+        /**
+         * Sets the authentication type and SQL or Active Directory administrator login and password.
+         */
+        interface WithAuthenticationAfterElasticPool {
+            /**
+             * @param administratorLogin the SQL administrator login
+             * @param administratorPassword the SQL administrator password
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAfterElasticPoolOptions withSqlAdministratorLoginAndPassword(String administratorLogin, String administratorPassword);
+
+            /**
+             * @param administratorLogin the Active Directory administrator login
+             * @param administratorPassword the Active Directory administrator password
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAfterElasticPoolOptions withActiveDirectoryLoginAndPassword(String administratorLogin, String administratorPassword);
+        }
+
+        /**
          * The SQL Database definition to set a restorable dropped database as the source database.
          */
         interface WithRestorableDroppedDatabase {
@@ -230,6 +296,20 @@ public interface SqlDatabaseOperations extends
              */
             @Beta(Beta.SinceVersion.V2_0_0)
             SqlDatabaseOperations.DefinitionStages.WithCreateAllOptions fromRestorePoint(RestorePoint restorePoint);
+        }
+
+        /**
+         * The SQL Database definition to set a restore point as the source database within an elastic pool.
+         */
+        interface WithRestorePointDatabaseAfterElasticPool {
+            /**
+             * Creates a new database from a restore point.
+             *
+             * @param restorePoint the restore point
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabaseOperations.DefinitionStages.WithCreateAfterElasticPoolOptions fromRestorePoint(RestorePoint restorePoint);
         }
 
         /**

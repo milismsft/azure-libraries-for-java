@@ -28,7 +28,7 @@ import com.microsoft.azure.management.sql.SqlElasticPoolStandardStorage;
 @LangDefinition
 public class SqlElasticPoolForDatabaseImpl
     implements
-    SqlElasticPool.SqlElasticPoolDefinition<SqlDatabaseOperations.DefinitionStages.WithExistingDatabase> {
+    SqlElasticPool.SqlElasticPoolDefinition<SqlDatabaseOperations.DefinitionStages.WithExistingDatabaseAfterElasticPool> {
 
     private SqlElasticPoolImpl sqlElasticPool;
     private SqlDatabaseImpl sqlDatabase;

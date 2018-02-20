@@ -199,6 +199,7 @@ public class SqlElasticPoolOperationsImpl
 
     @Override
     public SqlElasticPoolImpl define(String name) {
-        return sqlElasticPools.defineIndependentElasticPool(name);
+        SqlElasticPoolImpl result = sqlElasticPools.defineIndependentElasticPool(name);
+        return (this.sqlServer != null) ? result.withExistingSqlServer(this.sqlServer) : result;
     }
 }

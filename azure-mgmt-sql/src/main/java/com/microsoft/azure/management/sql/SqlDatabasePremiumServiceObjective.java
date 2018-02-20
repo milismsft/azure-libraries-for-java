@@ -16,41 +16,41 @@ import java.util.Collection;
  */
 @Fluent
 @Beta(Beta.SinceVersion.V2_0_0)
-public class SqlDatabasePremiumServiceObjective extends ExpandableStringEnum<ServiceObjectiveName> {
+public class SqlDatabasePremiumServiceObjective extends ExpandableStringEnum<SqlDatabasePremiumServiceObjective> {
     /** Static value P1 for ServiceObjectiveName. */
-    public static final ServiceObjectiveName P1 = fromString("P1");
+    public static final SqlDatabasePremiumServiceObjective P1 = fromString("P1");
 
     /** Static value P2 for ServiceObjectiveName. */
-    public static final ServiceObjectiveName P2 = fromString("P2");
+    public static final SqlDatabasePremiumServiceObjective P2 = fromString("P2");
 
     /** Static value P3 for ServiceObjectiveName. */
-    public static final ServiceObjectiveName P3 = fromString("P3");
+    public static final SqlDatabasePremiumServiceObjective P3 = fromString("P3");
 
     /** Static value P4 for ServiceObjectiveName. */
-    public static final ServiceObjectiveName P4 = fromString("P4");
+    public static final SqlDatabasePremiumServiceObjective P4 = fromString("P4");
 
     /** Static value P6 for ServiceObjectiveName. */
-    public static final ServiceObjectiveName P6 = fromString("P6");
+    public static final SqlDatabasePremiumServiceObjective P6 = fromString("P6");
 
     /** Static value P11 for ServiceObjectiveName. */
-    public static final ServiceObjectiveName P11 = fromString("P11");
+    public static final SqlDatabasePremiumServiceObjective P11 = fromString("P11");
 
     /** Static value P15 for ServiceObjectiveName. */
-    public static final ServiceObjectiveName P15 = fromString("P15");
+    public static final SqlDatabasePremiumServiceObjective P15 = fromString("P15");
 
     /**
      * Creates or finds a ServiceObjectiveName from its string representation.
      * @param name a name to look for
      * @return the corresponding ServiceObjectiveName
      */
-    public static ServiceObjectiveName fromString(String name) {
-        return fromString(name, ServiceObjectiveName.class);
+    public static SqlDatabasePremiumServiceObjective fromString(String name) {
+        return fromString(name, SqlDatabasePremiumServiceObjective.class);
     }
 
     /**
      * @return known ServiceObjectiveName values
      */
-    public static Collection<ServiceObjectiveName> values() {
-        return values(ServiceObjectiveName.class);
+    public static Collection<SqlDatabasePremiumServiceObjective> values() {
+        return values(SqlDatabasePremiumServiceObjective.class);
     }
 }

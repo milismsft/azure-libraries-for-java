@@ -20,13 +20,18 @@ import com.microsoft.azure.management.sql.ReadScale;
 import com.microsoft.azure.management.sql.SampleName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.rest.serializer.JsonFlatten;
-import com.microsoft.azure.Resource;
 
 /**
  * Represents a database update.
  */
 @JsonFlatten
-public class DatabaseUpdateInner extends Resource {
+public class DatabaseUpdateInner extends ProxyResourceInner {
+    /**
+     * Location of the server that contains this database.
+     */
+    @JsonProperty(value = "location", access = JsonProperty.Access.WRITE_ONLY)
+    private String location;
+
     /**
      * Resource tags.
      */
@@ -282,6 +287,15 @@ public class DatabaseUpdateInner extends Resource {
      */
     @JsonProperty(value = "properties.zoneRedundant")
     private Boolean zoneRedundant;
+
+    /**
+     * Get the location value.
+     *
+     * @return the location value
+     */
+    public String location() {
+        return this.location;
+    }
 
     /**
      * Get the tags value.
@@ -691,4 +705,14 @@ public class DatabaseUpdateInner extends Resource {
         return this;
     }
 
+    /**
+     * Set the location value.
+     *
+     * @param location the location value to set
+     * @return the resource itself
+     */
+    public DatabaseUpdateInner withLocation(String location) {
+        this.location = location;
+        return this;
+    }
 }

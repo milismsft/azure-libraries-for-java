@@ -404,7 +404,7 @@ public interface SqlDatabase
              * @param elasticPoolName for the SQL Database
              * @return The next stage of the definition.
              */
-            SqlDatabase.DefinitionStages.WithExistingDatabase<ParentT> withExistingElasticPool(String elasticPoolName);
+            WithExistingDatabaseAfterElasticPool<ParentT> withExistingElasticPool(String elasticPoolName);
 
             /**
              * Sets the existing elastic pool for the SQLDatabase.
@@ -412,7 +412,7 @@ public interface SqlDatabase
              * @param sqlElasticPool for the SQL Database
              * @return The next stage of the definition.
              */
-            SqlDatabase.DefinitionStages.WithExistingDatabase<ParentT> withExistingElasticPool(SqlElasticPool sqlElasticPool);
+            WithExistingDatabaseAfterElasticPool<ParentT> withExistingElasticPool(SqlElasticPool sqlElasticPool);
 
             /**
              * Sets the new elastic pool for the SQLDatabase, this will create a new elastic pool while creating database.
@@ -420,7 +420,7 @@ public interface SqlDatabase
              * @param sqlElasticPool creatable definition for new elastic pool to be created for the SQL Database
              * @return The next stage of the definition.
              */
-            SqlDatabase.DefinitionStages.WithExistingDatabase<ParentT> withNewElasticPool(Creatable<SqlElasticPool> sqlElasticPool);
+            WithExistingDatabaseAfterElasticPool<ParentT> withNewElasticPool(Creatable<SqlElasticPool> sqlElasticPool);
         }
 
         /**
@@ -428,8 +428,9 @@ public interface SqlDatabase
          *
          * @param <ParentT> the stage of the parent definition to return to after attaching this definition
          */
-        interface WithExistingDatabase<ParentT> extends
-            SqlDatabase.DefinitionStages.WithRestorePointDatabase<ParentT>,
+        interface WithExistingDatabaseAfterElasticPool<ParentT> extends
+            SqlDatabase.DefinitionStages.WithImportFromAfterElasticPool<ParentT>,
+            SqlDatabase.DefinitionStages.WithRestorePointDatabaseAfterElasticPool<ParentT>,
             SqlDatabase.DefinitionStages.WithSourceDatabaseId<ParentT>,
             SqlDatabase.DefinitionStages.WithAttachAfterElasticPoolOptions<ParentT> {
         }
@@ -506,6 +507,77 @@ public interface SqlDatabase
         }
 
         /**
+         * The SQL Database definition to import a BACPAC file as the source database within an elastic pool.
+         *
+         * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+         */
+        interface WithImportFromAfterElasticPool<ParentT>  {
+            /**
+             * Creates a new database from a BACPAC file.
+             *
+             * @param storageUri the source URI for the database to be imported
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.WithStorageKeyAfterElasticPool<ParentT> importFrom(String storageUri);
+
+            /**
+             * Creates a new database from a BACPAC file.
+             *
+             * @param storageAccount an existing storage account to be used
+             * @param containerName the container name within the storage account to use
+             * @param fileName the exported database file name
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.WithAuthenticationAfterElasticPool<ParentT> importFrom(StorageAccount storageAccount, String containerName, String fileName);
+        }
+
+        /**
+         * Sets the storage key type and value to use.
+         *
+         * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+         */
+        interface WithStorageKeyAfterElasticPool<ParentT>  {
+            /**
+             * @param storageAccessKey the storage access key to use
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.WithAuthenticationAfterElasticPool<ParentT> withStorageAccessKey(String storageAccessKey);
+
+            /**
+             * @param sharedAccessKey the shared access key to use; it must be preceded with a "?."
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.WithAuthenticationAfterElasticPool<ParentT> withSharedAccessKey(String sharedAccessKey);
+        }
+
+        /**
+         * Sets the authentication type and SQL or Active Directory administrator login and password.
+         *
+         * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+         */
+        interface WithAuthenticationAfterElasticPool<ParentT>  {
+            /**
+             * @param administratorLogin the SQL administrator login
+             * @param administratorPassword the SQL administrator password
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.WithAttachAfterElasticPoolOptions<ParentT> withSqlAdministratorLoginAndPassword(String administratorLogin, String administratorPassword);
+
+            /**
+             * @param administratorLogin the Active Directory administrator login
+             * @param administratorPassword the Active Directory administrator password
+             * @return next definition stage
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.WithAttachAfterElasticPoolOptions<ParentT> withActiveDirectoryLoginAndPassword(String administratorLogin, String administratorPassword);
+        }
+
+        /**
          * The SQL Database definition to set a restorable dropped database as the source database.
          *
          * @param <ParentT> the stage of the parent definition to return to after attaching this definition
@@ -522,6 +594,22 @@ public interface SqlDatabase
              */
             @Beta(Beta.SinceVersion.V2_0_0)
             SqlDatabase.DefinitionStages.WithAttachFinal<ParentT> fromRestorableDroppedDatabase(SqlRestorableDroppedDatabase restorableDroppedDatabase);
+        }
+
+        /**
+         * The SQL Database definition to set a restore point as the source database within an elastic pool.
+         *
+         * @param <ParentT> the stage of the parent definition to return to after attaching this definition
+         */
+        interface WithRestorePointDatabaseAfterElasticPool<ParentT>  {
+            /**
+             * Creates a new database from a restore point.
+             *
+             * @param restorePoint the restore point
+             * @return The next stage of the definition.
+             */
+            @Beta(Beta.SinceVersion.V2_0_0)
+            SqlDatabase.DefinitionStages.WithAttachAfterElasticPoolOptions<ParentT> fromRestorePoint(RestorePoint restorePoint);
         }
 
         /**

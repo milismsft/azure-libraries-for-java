@@ -177,7 +177,10 @@ public final class ManageSqlDatabaseInElasticPool {
             System.out.println("List and delete all databases from SQL Server");
             for (SqlDatabase databaseInServer: sqlServer.databases().list()) {
                 Utils.print(databaseInServer);
-                databaseInServer.delete();
+                // Can not delete reserved database "master"
+                if (!databaseInServer.name().equals("master")) {
+                    databaseInServer.delete();
+                }
             }
 
             // ============================================================

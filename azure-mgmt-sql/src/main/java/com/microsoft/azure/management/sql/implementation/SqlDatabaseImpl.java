@@ -63,9 +63,15 @@ class SqlDatabaseImpl
     implements
         SqlDatabase,
         SqlDatabase.SqlDatabaseDefinition<SqlServer.DefinitionStages.WithCreate>,
-        SqlDatabase.DefinitionStages.WithExistingDatabase<SqlServer.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithExistingDatabaseAfterElasticPool<SqlServer.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithStorageKeyAfterElasticPool<SqlServer.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithAuthenticationAfterElasticPool<SqlServer.DefinitionStages.WithCreate>,
+        SqlDatabase.DefinitionStages.WithRestorePointDatabaseAfterElasticPool<SqlServer.DefinitionStages.WithCreate>,
         SqlDatabase.Update,
-        SqlDatabaseOperations.DefinitionStages.WithExistingDatabase,
+        SqlDatabaseOperations.DefinitionStages.WithExistingDatabaseAfterElasticPool,
+        SqlDatabaseOperations.DefinitionStages.WithStorageKeyAfterElasticPool,
+        SqlDatabaseOperations.DefinitionStages.WithAuthenticationAfterElasticPool,
+        SqlDatabaseOperations.DefinitionStages.WithRestorePointDatabaseAfterElasticPool,
         SqlDatabaseOperations.DefinitionStages.WithCreateAfterElasticPoolOptions,
         SqlDatabaseOperations.SqlDatabaseOperationsDefinition {
 
@@ -235,7 +241,11 @@ class SqlDatabaseImpl
     @Override
     public SqlWarehouse asWarehouse() {
         if (this.isDataWarehouse()) {
-            return (SqlWarehouse) this;
+            if (this.parent() != null) {
+                return new SqlWarehouseImpl(this.name(), this.parent(), this.inner(), this.sqlServerManager);
+            } else {
+                return new SqlWarehouseImpl(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation, this.name(), this.inner(), this.sqlServerManager);
+            }
         }
 
         return null;
@@ -554,6 +564,7 @@ class SqlDatabaseImpl
                 .withRequestedServiceObjectiveName(this.inner().requestedServiceObjectiveName())
                 .withMaxSizeBytes(this.inner().maxSizeBytes())
                 .withElasticPoolName(this.inner().elasticPoolName());
+            databaseUpdateInner.withLocation(self.inner().location());
             return this.sqlServerManager.inner().databases()
                 .updateAsync(this.resourceGroupName, this.sqlServerName, this.name(), databaseUpdateInner)
                 .map(new Func1<DatabaseInner, SqlDatabase>() {
@@ -626,12 +637,17 @@ class SqlDatabaseImpl
     @Override
     public SqlDatabaseImpl withoutElasticPool() {
         this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveId(null);
+        this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.S0);
 
         return this;
     }
 
     @Override
     public SqlDatabaseImpl withExistingElasticPool(String elasticPoolName) {
+        this.inner().withEdition(null);
+        this.inner().withRequestedServiceObjectiveId(null);
+        this.inner().withRequestedServiceObjectiveName(null);
         this.inner().withElasticPoolName(elasticPoolName);
 
         return this;
@@ -639,6 +655,9 @@ class SqlDatabaseImpl
 
     @Override
     public SqlDatabaseImpl withExistingElasticPool(SqlElasticPool sqlElasticPool) {
+        this.inner().withEdition(null);
+        this.inner().withRequestedServiceObjectiveId(null);
+        this.inner().withRequestedServiceObjectiveName(null);
         this.inner().withElasticPoolName(sqlElasticPool.name());
 
         return this;
@@ -646,6 +665,10 @@ class SqlDatabaseImpl
 
     @Override
     public SqlDatabaseImpl withNewElasticPool(final Creatable<SqlElasticPool> sqlElasticPool) {
+        this.inner().withEdition(null);
+        this.inner().withRequestedServiceObjectiveId(null);
+        this.inner().withRequestedServiceObjectiveName(null);
+        this.inner().withElasticPoolName(sqlElasticPool.name());
         this.addDependency(sqlElasticPool);
 
         return this;
@@ -656,6 +679,10 @@ class SqlDatabaseImpl
         if (this.sqlElasticPools == null) {
             this.sqlElasticPools = new SqlElasticPoolsAsExternalChildResourcesImpl(this.taskGroup(), this.sqlServerManager, "SqlElasticPool");
         }
+        this.inner().withEdition(null);
+        this.inner().withRequestedServiceObjectiveId(null);
+        this.inner().withRequestedServiceObjectiveName(null);
+        this.inner().withElasticPoolName(elasticPoolName);
 
         return new SqlElasticPoolForDatabaseImpl(this, this.sqlElasticPools
             .defineIndependentElasticPool(elasticPoolName).withExistingSqlServer(this.resourceGroupName, this.sqlServerName, this.sqlServerLocation));
@@ -773,6 +800,7 @@ class SqlDatabaseImpl
     @Override
     public SqlDatabaseImpl withEdition(DatabaseEdition edition) {
         this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveId(null);
         this.inner().withEdition(edition);
 
         return this;
@@ -781,12 +809,16 @@ class SqlDatabaseImpl
     @Override
     public SqlDatabaseImpl withBasicEdition() {
         this.inner().withEdition(DatabaseEdition.BASIC);
+        this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveId(null);
         return this;
     }
 
     @Override
     public SqlDatabaseImpl withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective) {
         this.inner().withEdition(DatabaseEdition.STANDARD);
+        this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveId(null);
         this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
         return this;
     }
@@ -794,6 +826,8 @@ class SqlDatabaseImpl
     @Override
     public SqlDatabaseImpl withStandardEdition(SqlDatabaseStandardServiceObjective serviceObjective, SqlDatabaseStandardStorage maxStorageCapacity) {
         this.inner().withEdition(DatabaseEdition.STANDARD);
+        this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveId(null);
         this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
         this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacity()));
         return this;
@@ -802,6 +836,8 @@ class SqlDatabaseImpl
     @Override
     public SqlDatabaseImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective) {
         this.inner().withEdition(DatabaseEdition.PREMIUM);
+        this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveId(null);
         this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
         return this;
     }
@@ -809,6 +845,8 @@ class SqlDatabaseImpl
     @Override
     public SqlDatabaseImpl withPremiumEdition(SqlDatabasePremiumServiceObjective serviceObjective, SqlDatabasePremiumStorage maxStorageCapacity) {
         this.inner().withEdition(DatabaseEdition.PREMIUM);
+        this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveId(null);
         this.inner().withRequestedServiceObjectiveName(ServiceObjectiveName.fromString(serviceObjective.toString()));
         this.inner().withMaxSizeBytes(Long.toString(maxStorageCapacity.capacity()));
         return this;
@@ -817,6 +855,7 @@ class SqlDatabaseImpl
     @Override
     public SqlDatabaseImpl withServiceObjective(ServiceObjectiveName serviceLevelObjective) {
         this.inner().withElasticPoolName(null);
+        this.inner().withRequestedServiceObjectiveId(null);
         this.inner().withRequestedServiceObjectiveName(serviceLevelObjective);
 
         return this;
